@@ -1,0 +1,47 @@
+import { get, writable } from 'svelte/store'
+
+export const route = writable({ current: { loading: true } })
+
+// Types: 'success', 'warning', 'info', 'error'
+export const notifications = writable([])
+
+export const serving = writable(false)
+
+const createQueue = () => {
+	const queue = []
+
+	const run = async () => {
+		if (queue.length == 0 || get(serving)) return
+
+		serving.set(true)
+
+		while (queue.length) {
+			const f = queue[0]
+			try {
+				await f()
+			} catch (error) {
+				notifications.set([get(notifications), { type: 'error', message: error }])
+			}
+			queue.shift()
+		}
+
+		serving.set(false)
+	}
+
+	const { subscribe, set, update } = writable(queue)
+
+	return {
+		subscribe,
+		set,
+		update,
+		enq: f => {
+			for (const g of queue)
+				if (f.toString() === g.toString()) return
+			queue.push(f)
+			run()
+		},
+		deq: () => queue.pop()
+	}
+}
+
+export const queue = createQueue()

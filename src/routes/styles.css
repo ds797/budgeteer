@@ -1,0 +1,230 @@
+@import '@fontsource-variable/gabarito';
+
+:root {
+	height: 100%;
+
+	--font: 'Gabarito Variable', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	--bg-0: hsl(209, 20%, 90%);
+	--frosted: hsla(0, 0%, 100%, 75%);
+	--bg-1: hsl(209, 36%, 86%);
+	--bg-2: hsl(224, 44%, 95%);
+	--accent-0: rgb(0, 0, 0);
+	--accent-old: rgb(154, 154, 240);
+	--danger: #bb0000;
+	--text: rgba(20, 20, 20, 1);
+	--text-weak: rgba(20, 20, 20, 0.75);
+	--text-bg: rgba(20, 20, 20, 0.1);
+	--text-bad: rgb(233, 80, 80);
+	--text-okay: rgb(230, 187, 59);
+	--text-good: rgb(80, 200, 80);
+	--noti-success: rgb(50, 225, 50);
+	--noti-warning: rgb(255, 205, 0);
+	--noti-error: rgb(225, 50, 50);
+	--noti-info: rgb(50, 130, 225);
+	--shadow: 0.125rem 0.125rem 1rem #00000035;
+	--shadow-strong: 0.125rem 0.125rem 0.5rem #00000050;
+	--blur: blur(0.5rem);
+	--transition: all 0.2s ease-out;
+	--transition-fast: all 0.1s ease-out;
+	font-family: var(--font);
+	color: var(--text);
+}
+
+* {
+	transition: var(--transition);
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	background-attachment: fixed;
+	background-color: var(--bg-0);
+	background-size: 100vw 100vh;
+}
+
+main {
+	width: 100%;
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.row {
+	width: 100%;
+	height: 100%;
+	display: flex;
+}
+
+.column {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-flow: column;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+	margin: 0;
+}
+
+p {
+	line-height: 1.5;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.good {
+	color: var(--text-good);
+}
+
+.bad {
+	color: var(--text-bad);
+}
+
+a {
+	color: var(--accent-0);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	font-size: 2rem;
+	text-align: center;
+}
+
+h2 {
+	font-size: 1.5rem;
+}
+
+pre {
+	font-size: 16px;
+	font-family: var(--font-mono);
+	background-color: rgba(255, 255, 255, 0.45);
+	border-radius: 3px;
+	box-shadow: 2px 2px 6px rgb(255 255 255 / 25%);
+	padding: 0.5em;
+	overflow-x: auto;
+	color: var(--text);
+}
+
+.text-column {
+	display: flex;
+	max-width: 48rem;
+	flex: 0.6;
+	flex-direction: column;
+	justify-content: center;
+	margin: 0 auto;
+}
+
+input, button {
+	margin: 0;
+	padding: 0.25rem;
+	/* display: flex;
+	justify-content: stretch;
+	align-items: center; */
+	background: none;
+	color: var(--text);
+	font-size: 1.5rem;
+	font-weight: bold;
+	border: 0.125rem solid var(--accent-0);
+	border-radius: 0.25rem;
+	box-shadow: 0px 0px 0.25rem #0000;
+}
+
+button:hover {
+	transform: translate(0.125rem, -0.0625rem);
+	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
+}
+
+input {
+	cursor: text;
+}
+
+button {
+	cursor: pointer;
+}
+
+input.dangerous, button.dangerous {
+	background: var(--danger);
+	color: var(--bg-0);
+	border: 0.125rem solid transparent;
+}
+
+input.none, button.none {
+	border: 0.125rem solid transparent;
+}
+
+button.none:hover {
+	box-shadow: none;
+	text-shadow: var(--shadow);
+}
+
+input.fill, button.fill {
+	background: var(--accent-0);
+	color: var(--bg-0);
+	border: 0.125rem solid transparent;
+}
+
+input.disabled, button.disabled {
+	background: lightgray;
+	color: var(--text);
+	border: 0.125rem solid transparent;
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+input,
+button {
+	font-size: inherit;
+	font-family: inherit;
+}
+
+button:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* progress {
+	appearance: none;
+	background-color: red;
+	color: blue;
+	border: 0.125rem solid var(--accent-0);
+	border-radius: 1rem;
+}
+
+progress::-webkit-progress-value {
+  background-color: blue;
+}
+
+progress::-moz-progress-bar {
+  background-color: #4caf50;
+  border-radius: 10px;
+}
+
+progress::-ms-fill {
+  background-color: #4caf50;
+  border-radius: 10px;
+} */
+
+@media (min-width: 720px) {
+	h1 {
+		font-size: 2.4rem;
+	}
+}
+
+.visually-hidden {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: auto;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	white-space: nowrap;
+}
