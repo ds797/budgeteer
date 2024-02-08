@@ -6,7 +6,7 @@
 	import { slide } from '$lib/utils/transition'
 	import Month from '$lib/components/Month.svelte'
 	import Graph from '$lib/components/Graph.svelte'
-	import Arrow from '$lib/icons/filled/Arrow.svelte'
+	import Arrow from '$lib/svg/Arrow.svelte'
 
 	let show = false
 

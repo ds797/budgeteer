@@ -3,9 +3,9 @@
 	import { slide } from '$lib/utils/transition'
 	import { fly, fade, crossfade } from 'svelte/transition'
 	import { flip } from 'svelte/animate'
-	import AlertCircle from '$lib/icons/filled/AlertCircle.svelte'
-	import CloseCircle from '$lib/icons/filled/CloseCircle.svelte'
-	import CheckmarkCircle from '$lib/icons/filled/CheckmarkCircle.svelte'
+	import AlertCircle from '$lib/svg/AlertCircle.svelte'
+	import CloseCircle from '$lib/svg/CloseCircle.svelte'
+	import CheckmarkCircle from '$lib/svg/CheckmarkCircle.svelte'
 
 	const [send, receive] = crossfade({
 		duration: d => Math.sqrt(d * 200),

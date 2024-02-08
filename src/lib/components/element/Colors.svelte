@@ -3,7 +3,7 @@
 	import { slide } from '../../js/transition';
 	import { hexify } from '../../js/colors';
 	import Swatch from './Swatch.svelte';
-	import Close from '../../icons/filled/Close.svelte';
+	import Close from '../../svg/Close.svelte';
 
 	export let value = undefined;
 	export let set = v => v;
