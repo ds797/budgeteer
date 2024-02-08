@@ -88,16 +88,6 @@
 		margin: 0;
 	}
 
-	p {
-		margin: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-weight: 500;
-		color: var(--accent);
-		user-select: none;
-	}
-
 	.container {
 		display: flex;
 		flex-flow: column;
@@ -130,11 +120,6 @@
 	.day {
 		width: 2rem;
 		height: 2rem;
-	}
-
-	.selected {
-		background: var(--plink);
-		color: var(--neutral-high);
 	}
 
 	.disabled {

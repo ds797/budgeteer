@@ -69,27 +69,4 @@
 	.fg {
 		stroke: var(--text-weak);
 	}
-
-	.graph {
-		flex: 1;
-		display: flex;
-		justify-content: space-around;
-	}
-
-	/* svg {
-		flex: 0.5;
-	} */
-
-	.labels {
-		display: flex;
-		justify-content: stretch;
-	}
-
-	.labels > p {
-		flex: 1;
-		font-size: 0.5rem;
-		display: flex;
-		justify-content: center;
-		color: var(--text-weak);
-	}
 </style>
