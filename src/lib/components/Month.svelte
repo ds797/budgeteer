@@ -9,8 +9,6 @@
 	}
 
 	let next, backward
-
-	// $: console.log(date)
 </script>
 
 <main>

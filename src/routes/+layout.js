@@ -34,7 +34,6 @@ export const load = async ({ fetch, data, depends }) => {
 	}
 
 	storage.set = (key, data) => {
-		// console.log('UPLOADING: ', data)
 		data = JSON.stringify(data)
 		localStorage.setItem(key, data)
 	}

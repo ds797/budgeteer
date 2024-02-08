@@ -25,7 +25,6 @@
 							$notifications = [...$notifications, await post('/pay/stop', { session: data?.session })]
 							window.location.href = '/'
 						})
-						console.log('unsubscribing')
 						$route.current = undefined
 					}
 				}]
@@ -36,9 +35,12 @@
 			dangerous: true,
 			click: async () => {
 				try {
-					await data.supabase.auth.signOut()
+					const { error } = await data.supabase.auth.signOut()
+					if (error) console.log(error)
+					window.location.href = '/'
 					invalidateAll()
-				} catch {
+				} catch (err) {
+					console.log('err', err)
 					$notifications = [...$notifications, {
 						type: 'error',
 						message: 'Couldn\'t sign out'
@@ -120,7 +122,6 @@
 			{ :else }
 				<button class="none account" on:click={() => {
 					$route.current = $route.account
-					console.log($route.account)
 				}}>
 					<Account />
 				</button>

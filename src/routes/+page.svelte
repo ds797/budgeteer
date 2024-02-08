@@ -5,8 +5,6 @@
 	import Budgets from '$lib/components/Budgets.svelte'
 
 	export let data
-
-	console.log(data.session)
 </script>
 
 <svelte:head>

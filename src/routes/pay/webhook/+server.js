@@ -7,7 +7,12 @@ export const POST = async event => {
 	const payload = await request.text()
 	const sig = request.headers.get('stripe-signature')
 	const id = JSON.parse(payload).data.object.id
-	const user_id = JSON.parse(payload).data.object.metadata.user_id
+	let user_id
+	try {
+		user_id = JSON.parse(payload).data.object.metadata.user_id
+	} catch (error) {
+		console.log('no user_id found')
+	}
 
 	const supabase = createClient(PUBLIC_SUPABASE_URL, SECRET_SUPABASE_KEY)
 

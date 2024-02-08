@@ -5,7 +5,6 @@
 
 	export let data
 
-	console.log(data.session)
 	let card
 	let account = {
 		name: 'Account',
@@ -32,7 +31,6 @@
 		let x = e.x / window.innerWidth - 0.5
 		let y = e.y / window.innerHeight - 0.5
 		card.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`
-		// console.log(card?.style)
 	}
 </script>
 

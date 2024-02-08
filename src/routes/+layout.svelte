@@ -40,7 +40,6 @@
 	}
 
 	const quit = () => {
-		console.log('quitting')
 		if ($route.current?.quit) $route.current.quit()
 		$route.state = {}
 		$route.current = undefined
@@ -51,7 +50,6 @@
 		if (storage.get('links')) {
 			$links = new Links(storage.get('links'), m => $notifications = [...$notifications, { type: 'error', message: m }])
 		}
-		console.log('initializing')
 		if ($links.budgets.length) $route.current = undefined
 
 		let { budgets, selected } = await supabase.getBudgets()
@@ -92,7 +90,6 @@
 	}
 
 	onMount(async () => {
-		console.log('mounting')
 		if ($page.url.pathname === '/demo') $route.current = undefined
 
 		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
@@ -518,7 +515,6 @@
 					$route.state = {}
 					updateBudgets()
 					updateLinks()
-					console.log('removing')
 					$route.current = undefined
 				}
 			})

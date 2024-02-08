@@ -11,8 +11,6 @@
 
 	export let data
 
-	$: console.log($route.current)
-
 	onMount(() => {
 		const today = new Date()
 	

@@ -1,9 +1,10 @@
 import OpenAI from 'openai'
 import Stripe from 'stripe'
-import { Configuration, PlaidApi, Products, PlaidEnvironments } from 'plaid'
+import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid'
+import { createClient } from '@supabase/supabase-js'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY } from '$env/static/public'
-import { PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENVIRONMENT } from '$env/static/private'
+import { SECRET_SUPABASE_KEY, PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENVIRONMENT } from '$env/static/private'
 import { SECRET_OPENAI_KEY } from '$env/static/private'
 import { toTransaction } from '$lib/utils/convert'
 
@@ -22,6 +23,17 @@ export const handle = async ({ event, resolve }) => {
 			data: { session },
 		} = await event.locals.supabase.auth.getSession()
 		return session
+	}
+
+	event.locals.paid = async id => {
+		const supabase = createClient(PUBLIC_SUPABASE_URL, SECRET_SUPABASE_KEY)
+
+		const get = await supabase.from('payments').select('*')
+		if (get.error) console.error(get.error)
+
+		const data = get.data.filter(p => p.user_id === id)
+
+		return data[0]?.paid
 	}
 
 	const plaidConfig = new Configuration({
@@ -79,7 +91,6 @@ export const handle = async ({ event, resolve }) => {
 
 		// id, access_token, institution, name, accounts, transactions
 		const { error } = await event.locals.supabase.from('links').upsert(link)
-		console.log('ERROR', error)
 
 		if (error) throw new Error(error)
 	}

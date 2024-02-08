@@ -6,7 +6,6 @@ export const POST = async event => {
 	const { session } = await event.request.json()
 
 	const user_id = session?.user?.id
-	console.log('Cancelling subscription', user_id)
 
 	if (!user_id) return new Response(JSON.stringify({ type: 'error', message: 'Couldn\'t find a user to unsubscribe' }))
 

@@ -280,7 +280,6 @@ export default class Links {
 			},
 			transaction: (...transactions) => {
 				for (let t of transactions) {
-					// console.log(t)
 					if (t.properties) {
 						t.properties.group = t.properties.group ?? 'Other'
 						t.properties.category = t.properties.category ?? 'Uncategorized'
@@ -502,7 +501,6 @@ export default class Links {
 				transactions: [],
 				user_groups: self.selected.groups
 			}
-			console.log('Starting sort')
 
 			let all = []
 
@@ -563,8 +561,6 @@ export default class Links {
 				original[i].properties.group = all[i].group
 				original[i].properties.category = all[i].category
 			}
-
-			console.log(all, original)
 
 			return self
 		}
