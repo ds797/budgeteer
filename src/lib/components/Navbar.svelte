@@ -22,7 +22,8 @@
 					dangerous: true,
 					click: () => {
 						queue.enq(async () => {
-							$notifications = [...$notifications, await post('/pay/stop', { session: data?.session })]
+							const { data: notification } = await data.supabase.invoke('payStop')
+							notifications.add(notification)
 							window.location.href = '/'
 						})
 						$route.current = undefined
@@ -39,12 +40,11 @@
 					if (error) console.log(error)
 					window.location.href = '/'
 					invalidateAll()
-				} catch (err) {
-					console.log('err', err)
-					$notifications = [...$notifications, {
+				} catch {
+					notifications.add({
 						type: 'error',
 						message: 'Couldn\'t sign out'
-					}]
+					})
 				}
 				return 1
 			}
@@ -52,17 +52,16 @@
 	}
 
 	let email = ''
-
 	const enter = async email => { // TODO: valid email?
 		const { error } = await data.supabase.auth.signInWithOtp({ email })
-		if (error) $notifications = [...$notifications, {
+		if (error) notifications.add({
 			type: 'error',
 			message: error
-		}]
-		else $notifications = [...$notifications, {
+		})
+		else notifications.add({
 			type: 'success',
 			message: 'Check your email to enter Budgeteer!'
-		}]
+		})
 
 		return 1;
 	}
@@ -103,7 +102,7 @@
 			<button class="fill" on:click={() => $route.current = $route.pickBudget}>Budgets</button>
 				<button class="fill add" on:click={() => {
 				if (demo) {
-					$notifications = [...$notifications, { type: 'error', message: 'Join Budgeteer to add custom transactions!' }]
+					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
 					return
 				}
 				$route.state.transaction = { properties: {} }

@@ -12,14 +12,14 @@
 
 		fallback: node => {
 			const style = getComputedStyle(node);
-			const transform = style.transform === 'none' ? '' : style.transform;
+			const transform = style.transform === 'none' ? '' : style.transform
 
 			return {
 				duration: 600,
 				easing: cubicOut,
 				css: t => `
 					transform: ${transform} scale(${t});
-					opacity: ${t}
+					opacity: ${t};
 				`
 			};
 		}
@@ -30,8 +30,7 @@
 
 		if (index === -1) return
 
-		$notifications.splice(index, 1);
-		$notifications = $notifications
+		notifications.remove(index)
 	}
 
 	const timer = async n => {

@@ -17,10 +17,10 @@
 					await data.supabase.auth.signOut()
 					window.location.href = '/'
 				} catch {
-					$notifications = [...$notifications, {
+					notifications.add({
 						type: 'error',
 						message: 'Couldn\'t sign out'
-					}]
+					})
 				}
 				return 1
 			}
@@ -58,9 +58,12 @@
 					<p>month</p>
 				</div>
 			</div>
-			<div class="buy">
-				<p>Harness the power of AI with Budgeteer.</p>
-				<button class="fill" on:click={() => window.location.href = '/pay/start'}>Purchase</button>
+			<div class="info">
+				<p>Simple, streamlined budgeting that allows you to act on your decisions as easily as if you controlled Budgeteer with your mind.</p>
+				<div class="buy">
+					<p class="tos">By continuing, you agree to our <a href="/tos" target="_blank">terms</a>.</p>
+					<button class="fill" on:click={() => window.location.href = '/pay/start'}>Purchase</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -128,11 +131,26 @@
 		color: var(--text-weak);
 	}
 
-	.buy {
+	.info {
 		flex: 1;
 		display: flex;
 		flex-flow: column;
 		justify-content: space-between;
+	}
+
+	.buy {
+		display: flex;
+		flex-flow: column;
+		justify-content: space-between;
+		gap: 0.25rem;
+	}
+
+	.buy > p {
+		color: var(--text-weak);
+	}
+
+	.buy > .tos {
+		font-size: 0.875rem;
 	}
 
 	.buy > button {

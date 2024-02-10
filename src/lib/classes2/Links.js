@@ -49,7 +49,7 @@ export default class Links {
 					}]
 				}, {
 					name: self.fallback().group,
-					categories: [{ name: self.fallback().category, overflow: {}  }],
+					categories: [{ name: self.fallback().category, overflow: {} }],
 					protected: true
 				}]
 			}
@@ -337,11 +337,20 @@ export default class Links {
 
 				if (typeof data.date === 'object') data.date = format(data.date)
 
+				if (transaction.account === data.account
+					&& transaction.amount === data.amount
+					&& transaction.date === data.date
+					&& transaction.name === data.name
+					&& transaction.properties.group === data.properties.group
+					&& transaction.properties.category === data.properties.category
+					&& transaction.properties.hide === data.properties.hide)
+					return {}
+
 				data.properties = Object.assign(transaction.properties, data.properties)
 
 				Object.assign(transaction, data)
 
-				return self
+				return { data: self}
 			},
 			group: (name, data) => {
 				if (!data) {
@@ -371,8 +380,7 @@ export default class Links {
 			},
 			category: (group, category, data) => {
 				if (!data) {
-					err('No data provided')
-					return
+					return self.remove.category(group, category)
 				} if (!data.name) {
 					err('No name provided')
 					return
@@ -496,7 +504,7 @@ export default class Links {
 				return self
 			}
 		}
-		self.sort = async transactions => {
+		self.sort = async (transactions, invoke) => {
 			let build = {
 				transactions: [],
 				user_groups: self.selected.groups
@@ -505,8 +513,8 @@ export default class Links {
 			let all = []
 
 			const parse = async () => {
-				const { message } = await post('/server/sortTransactions', { messages: build })
-				const parsed = JSON.parse(message)
+				const { data, error } = await invoke('sortTransactions', { messages: build })
+				const parsed = JSON.parse(data)
 
 				if (parsed.sorted.length !== build.transactions.length) return false
 

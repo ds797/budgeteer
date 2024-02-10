@@ -86,11 +86,12 @@ p {
 
 a {
 	color: var(--accent-0);
-	text-decoration: none;
+	text-decoration: underline;
+	text-underline-offset: 0.125rem;
 }
 
 a:hover {
-	text-decoration: underline;
+	text-underline-offset: 0.0625rem;
 }
 
 h1 {

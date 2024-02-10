@@ -31,9 +31,9 @@
 			return
 
 		const ls = await plaid.getLinks()
-		if (!ls) return
+		if (!ls.length) return
 
-		ls.push($links.links.at(-1))
+		ls.push($links.links.find(l => !l.institution))
 
 		$links.set.links(ls)
 		$links = $links
@@ -48,7 +48,7 @@
 	const init = async () => {
 		// Step 1: get budgets
 		if (storage.get('links')) {
-			$links = new Links(storage.get('links'), m => $notifications = [...$notifications, { type: 'error', message: m }])
+			$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }))
 		}
 		if ($links.budgets.length) $route.current = undefined
 
@@ -73,6 +73,7 @@
 		
 		$links.budgets = budgets
 		$links.selected = selected
+		$route.current = undefined
 
 		storage.set('links', $links)
 
@@ -128,22 +129,21 @@
 
 	const link = async () => {
 		try {
-			const { token } = await data.plaid.link()
+			const { token } = await plaid.link()
 
 			if (!token) return 0
 
-			const { link } = await post('/server/createLink', { public_token: token })
-			$links = $links.add.link(link)
+			const { data, error } = await supabase.invoke('createLink', { public_token: token })
+			$links = $links.set.links([data, ...$links.links])
+			$route = $route
+			updateLinks()
 
-			// $items = [...$items, item]
-			// $selected = [...$selected, item]
-			// localStorage.setItem('items', fromLinks($items))
+			notifications.add({ type: 'success', message: 'Successfully linked your account to Budgeteer' })
 		} catch (error) {
-			console.error(error)
-			// Push error to stack
+			notifications.add({ type: 'error', message: error })
 		}
 
-		return 1;
+		return 1
 	}
 	$route.link = {
 		name: 'Link Institution',
@@ -157,11 +157,11 @@
 			name: 'Create Link',
 			description: 'Budgeteer uses Plaid to link your account.',
 			type: 'action',
-			click: () => {
+			click: async () => {
 				if ($page.url.pathname === '/demo') {
-					$notifications = [...$notifications, { type: 'error', message: 'Join Budgeteer to link your personal accounts!' }]
+					notifications.add({ type: 'error', message: 'Join Budgeteer to link your personal accounts!' })
 					$route.current = undefined
-				} else link()
+				} else return await link()
 			},
 			fill: true
 		}],
@@ -225,6 +225,7 @@
 						})
 
 						$links = $links.remove.link(l.id)
+						$route = $route
 
 						updateLinks()
 						updateBudgets()
@@ -455,17 +456,31 @@
 		$route.transaction.name = $route.state.transaction.id	? 'Edit Transaction' : 'Add Transaction'
 		$route.transaction.quit = async () => {
 			if ($route.state.transaction.id) {
-				$links = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
-				// Edit Custom
-				$links.links.forEach(l => {
-					const t = l.transactions.find(t => t.id === $route.state.transaction.id)
-					if (t) Object.assign(t, $route.state.transaction.new)
-				})
+				if (!$route.state.transaction.new.name) $route.state.transaction.new.name = $route.state.transaction.name
+				if (!$route.state.transaction.new.properties.group || !$route.state.transaction.new.properties.category) {
+					$route.state.transaction.new.properties.group = $route.state.transaction.properties.group
+					$route.state.transaction.new.properties.category = $route.state.transaction.properties.category
+				}
+
+				const { data } = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
+				if (data) {
+					$links = data
+					// Edit Custom
+					$links.links.forEach(l => {
+						const t = l.transactions.find(t => t.id === $route.state.transaction.id)
+						if (t) Object.assign(t, $route.state.transaction.new)
+					})
+					delete $route.state.transaction.new
+					updateBudgets()
+					updateLinks()
+					return
+				}
+				delete $route.state.transaction.new
+			} else {
+				delete $route.state.transaction.new
+				updateBudgets()
+				updateLinks()
 			}
-			delete $route.state.transaction.new
-			updateBudgets()
-			updateLinks()
-			return
 		}
 		$route.transaction.children = [$route.pickCategory, $route.pickAccount, {
 			name: 'Name',
@@ -577,7 +592,7 @@
 		$route.category.quit = () => {
 			// Remove circular reference
 			delete $route.state.category.new.overflow.disabled
-			const data = $links.update.category($route.state.category.group, $route.state.category.name, $route.state.category.new)
+			const data = $links.update.category($route.state.category.group, $route.state.category.name, $route.state.category.new.group ? $route.state.category.new : null)
 			delete $route.state.category.new
 			if (data) {
 				$links = data
@@ -617,13 +632,13 @@
 					$route = $route
 					const ts = $links.which.transactions(t => t.properties.group === $route.state.category.group && t.properties.category === $route.state.category.name && month(t.date, $date))
 					if (!ts.length) {
-						$notifications = [...$notifications, { type: 'info', message: 'No uncategorized transactions to sort!' }]
+						notifications.add({ type: 'info', message: 'No uncategorized transactions to sort!' })
 						sorting = false
 						return 1
 					}
 					queue.enq(async () => {
-						$notifications = [...$notifications, { type: 'info', message: 'Sort is still in beta, so it might not work flawlessly.' }]
-						$links = await $links.sort(ts)
+						notifications.add({ type: 'info', message: 'Sort is still in beta, so it might not work flawlessly.' })
+						$links = await $links.sort(ts, supabase.invoke)
 						sorting = false
 						$route = $route
 						updateBudgets()
@@ -636,9 +651,11 @@
 			type: 'action',
 			dangerous: true,
 			click: () => {
-				$links = $links.remove.category($route.state.category.new.group, $route.state.category.new.name)
-				updateBudgets()
+				$route.state.category.new = {}
 				return 1
+				// $links = $links.remove.category($route.state.category.new.group, $route.state.category.new.name)
+				// updateBudgets()
+				// return 1
 			}
 		})
 	}
@@ -673,10 +690,10 @@
 
 						// Name match
 						if (group && group.categories.find(c => c.name === $route.state.category.new?.name)) {
-							$notifications = [...$notifications, {
+							notifications.add({
 								type: 'error',
 								message: 'Another category by the same name exists!'
-							}]
+							})
 						} else {
 							for (const t of $links.which.transactions(() => true))
 								if (t.properties.category === $route.state.category.name)
@@ -755,7 +772,7 @@
 				<Flow />
 			</div>
 			<div class="fill">
-				<slot />
+				<slot {data} />
 			</div>
 			<div class="bottom">
 				<Navbar {data} />
@@ -777,7 +794,7 @@
 			<Flow />
 		</div>
 		<div class="fill">
-			<slot />
+			<slot {data} />
 		</div>
 		<div class="bottom">
 			<Navbar {data} demo={true} />
@@ -786,7 +803,7 @@
 		<div class="top">
 		</div>
 		<div class="fill">
-			<slot />
+			<slot {data} />
 		</div>
 		<div class="bottom">
 		</div>

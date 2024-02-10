@@ -3,10 +3,10 @@
 	import { notifications } from '$lib/stores/ui'
 
 	onMount(() => {
-		$notifications = [...$notifications, {
+		notifications.add({
 			type: 'error',
 			message: 'Invalid authentication'
-		}]
+		})
 		window.location.href = ''
 	})
 </script>

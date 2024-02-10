@@ -18,7 +18,7 @@ export const post = async (url = '', data, f) => {
 
 	const res = await response.json()
 	if (res.error) {
-		notifications.set([...get(notifications), { type: 'error', message: res.error, status: res.status }])
+		notifications.set([...get(notifications), { type: 'error', message: res.error }])
 		return undefined
 	}
 

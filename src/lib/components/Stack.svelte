@@ -27,8 +27,7 @@
 	const timer = async index => {
 		await new Promise(r => setTimeout(r, 7500));
 
-		$notifications.splice(index, 1);
-		$notifications = $notifications
+		notifications.remove(index)
 	}
 </script>
 

@@ -3,7 +3,7 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY, PUBLIC_STRIPE_KEY } from '$en
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import Links from '$lib/classes2/Links'
 import { links } from '$lib/stores/user'
-import { queue } from '$lib/stores/ui'
+import { queue, notifications } from '$lib/stores/ui'
 import { post } from '$lib/utils/requests'
 
 export const load = async ({ fetch, data, depends }) => {
@@ -16,9 +16,21 @@ export const load = async ({ fetch, data, depends }) => {
 		serverSession: data.session,
 	})
 
-	const {
-		data: { session },
-	} = await supabase.auth.getSession()
+	const { data: { session } } = await supabase.auth.getSession()
+
+	const invoke = async (name, payload) => {
+		let data, error
+		if (!payload) ({ data, error } = await supabase.functions.invoke(name))
+		else ({ data, error } = await supabase.functions.invoke(name, { body: payload }))
+		if (error) return { error }
+
+		({ data, error } = data)
+		if (error) return { error }
+
+		return data
+	}
+
+	supabase.invoke = invoke
 
 	let storage = {}
 
@@ -36,11 +48,6 @@ export const load = async ({ fetch, data, depends }) => {
 	storage.set = (key, data) => {
 		data = JSON.stringify(data)
 		localStorage.setItem(key, data)
-	}
-
-	supabase.refreshBudget = async budget => {
-		const predicate = link => link.accounts.findIndex(a => budget.accounts.indexOf(a.account_id) !== -1)
-		return await post('/server/refreshLinks', { predicate })
 	}
 
 	supabase.getBudgets = async () => {
@@ -87,29 +94,24 @@ export const load = async ({ fetch, data, depends }) => {
 	let plaid = {}
 
 	plaid.unlink = async id => {
-		await post('/server/removeItem', { id })
+		await invoke('removeLink', { id })
 	}
 
 	plaid.link = async () => {
-		const response = await post('/server/generateLinkToken')
-
-		if (response === undefined) return { error: 'Link generation failure' }
+		const { data: token, error } = await invoke('generateLinkToken')
 
 		return new Promise((resolve, reject) => {
 			const handler = Plaid.create({
-				token: response.token,
+				token,
 				onSuccess: async (token, metadata) => {
-					// TODO: Add notification to stack
-					// Set Supabase item
-
 					resolve({ token, metadata })
 				},
 				onExit: (err, metadata) => {
-					console.log(
-						`Exited early. Error: ${JSON.stringify(err)} Metadata: ${JSON.stringify(
-							metadata
-						)}`
-					)
+					// console.log(
+					// 	`Exited early. Error: ${JSON.stringify(err)} Metadata: ${JSON.stringify(
+					// 		metadata
+					// 	)}`
+					// )
 
 					if (err) reject({ err, metadata })
 
@@ -126,7 +128,15 @@ export const load = async ({ fetch, data, depends }) => {
 
 	plaid.getLinks = async () => {
 		storage.set('cooldown', new Date().getTime())
-		return await post('/server/refreshLinks', { predicate: v => v })
+		const { data, error } = await supabase.functions.invoke('refreshLinks', {
+			body: { predicate: () => true }
+		})
+		if (error) console.error(error)
+
+		({ data, error } = data)
+		if (error) console.error(error)
+
+		return data ?? []
 	}
 
 	supabase.updateLinks = () => {
@@ -154,11 +164,5 @@ export const load = async ({ fetch, data, depends }) => {
 		queue.set(get(queue))
 	}
 
-	let openai = {}
-
-	openai.sort = async message => {
-		return await post('/server/sortTransactions', { message })
-	}
-
-	return { supabase, session, plaid, storage, openai }
+	return { supabase, session, plaid, storage }
 }

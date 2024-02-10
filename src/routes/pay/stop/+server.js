@@ -12,7 +12,7 @@ export const POST = async event => {
 	const supabase = createClient(PUBLIC_SUPABASE_URL, SECRET_SUPABASE_KEY)
 
 	const get = await supabase.from('payments').select('*')
-	if (get.error) console.error(get.error)
+	if (get.error) return new Response(JSON.stringify({ type: 'error', message: get.error }), { status: 200 })
 
 	const remove = await supabase.from('payments').delete().eq('user_id', user_id)
 	if (remove.error) console.error(remove.error)

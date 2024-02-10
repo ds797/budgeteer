@@ -36,7 +36,6 @@
 				loading = i + 1
 				await child.click()
 				loading = 0
-				console.log(menu.close)
 			}
 
 			show = i
