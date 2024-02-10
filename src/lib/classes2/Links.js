@@ -108,26 +108,6 @@ export default class Links {
 		self.get = {
 			groups: () => self.selected?.groups ?? [],
 			categories: name => (self.selected?.groups ?? []).find(g => g.name === name).categories ?? [],
-			sum: (group, category, predicate) => {
-				let sum = 0
-				let bts
-
-				if (category) {
-					bts = self.which.transactions(t => t.properties.group === group && t.properties.category === category)
-					const g = self.selected.groups.find(g => g.name === group)
-					sum += g.categories.find(c => c.name === category).overflow?.value ?? 0
-				} else if (group) {
-					bts = self.which.transactions(t => t.properties.group === group)
-					for (const c of self.selected.groups.find(g => g.name === group).categories)
-						sum += c.overflow?.value ?? 0
-				} else bts = self.which.transactions(() => true)
-				for (const t of bts) {
-					if (predicate && !predicate(t)) continue
-					if (!t.properties.hide) sum += t.amount
-				}
-
-				return sum
-			},
 			sum: (predicate = () => true) => {
 				let sum = 0
 				for (const t of self.selected?.transactions ?? []) {

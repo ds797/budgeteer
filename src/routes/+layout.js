@@ -20,12 +20,12 @@ export const load = async ({ fetch, data, depends }) => {
 	const { data: { session } } = await supabase.auth.getSession()
 
 	const invoke = async (name, payload) => {
-		let data, error
-		if (!payload) ({ data, error } = await supabase.functions.invoke(name))
-		else ({ data, error } = await supabase.functions.invoke(name, { body: payload }))
-		if (error) return { error }
+		let response
+		if (!payload) response = await supabase.functions.invoke(name)
+		else response = await supabase.functions.invoke(name, { body: payload })
+		if (response.error) return { error: response.error }
 
-		({ data, error } = data)
+		const { data, error } = response.data
 		if (error) return { error }
 
 		return data
@@ -129,13 +129,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 	plaid.getLinks = async () => {
 		storage.set('cooldown', new Date().getTime())
-		const { data, error } = await supabase.functions.invoke('refreshLinks', {
-			body: { predicate: () => true }
-		})
-		if (error) console.error(error)
-
-		({ data, error } = data)
-		if (error) console.error(error)
+		const { data, error } = await invoke('refreshLinks', { predicate: () => true })
 
 		return data ?? []
 	}
