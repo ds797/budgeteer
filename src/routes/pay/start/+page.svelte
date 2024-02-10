@@ -1,7 +1,8 @@
 <script>
 	import { onMount } from 'svelte'
-	import { PUBLIC_STRIPE_KEY } from '$env/static/public'
 	import Loading from '$lib/components/Loading.svelte'
+
+	const PUBLIC_STRIPE_KEY = 'pk_test_51OfvXCBA2iuGdMvmMTk5Y43V9jjFwDdlKSlcfMtIzPZ9qd3FXkvimyn7piaDkZhmo0ECfowewNSxbXYUmStmGjpY00VmiPvxc6'
 
 	export let data
 

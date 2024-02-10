@@ -1,8 +1,7 @@
-import Stripe from 'stripe'
-import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid'
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY } from '$env/static/public'
-import { PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENVIRONMENT } from '$env/static/private'
+
+const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
+const PUBLIC_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnFwamZsaHVmdWRxcGlmZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4NDA0NzIsImV4cCI6MjAyMDQxNjQ3Mn0.1SppoHM5zG3j-P_RbaSOYaf7QyrJ00RxouWS34_c148'
 
 export const handle = async ({ event, resolve }) => {
 	event.locals.supabase = createSupabaseServerClient({
@@ -27,21 +26,6 @@ export const handle = async ({ event, resolve }) => {
 
 		return false
 	}
-
-	const plaidConfig = new Configuration({
-		basePath: PlaidEnvironments[PLAID_ENVIRONMENT],
-		baseOptions: {
-			headers: {
-				'PLAID-CLIENT-ID': PLAID_CLIENT_ID,
-				'PLAID-SECRET': PLAID_SECRET
-			}
-		}
-	})
-
-	// Plaid client
-	event.locals.plaid = new PlaidApi(plaidConfig)
-
-	event.locals.stripe = new Stripe('sk_test_51OfvXCBA2iuGdMvmDaiczZAH0QCksuhTNU0fRJXrUI46YNlo6Y8xobgkZn7xtKhudiTBybtpNisbIvPV2wSNZ01q00q8FfK3zs')
 
 	event.locals.getLink = async id => {
 		// id, access_token, institution, name, accounts, transactions

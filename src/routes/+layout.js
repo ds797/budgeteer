@@ -1,10 +1,11 @@
 import { get } from 'svelte/store'
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY, PUBLIC_STRIPE_KEY } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
-import Links from '$lib/classes2/Links'
 import { links } from '$lib/stores/user'
-import { queue, notifications } from '$lib/stores/ui'
-import { post } from '$lib/utils/requests'
+import { queue } from '$lib/stores/ui'
+import Links from '$lib/classes2/Links'
+
+const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
+const PUBLIC_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnFwamZsaHVmdWRxcGlmZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4NDA0NzIsImV4cCI6MjAyMDQxNjQ3Mn0.1SppoHM5zG3j-P_RbaSOYaf7QyrJ00RxouWS34_c148'
 
 export const load = async ({ fetch, data, depends }) => {
 	depends('supabase:auth')
