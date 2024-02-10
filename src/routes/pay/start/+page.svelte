@@ -28,7 +28,9 @@
 			<p>Initializing secure checkout...</p>
 		</div>
 	{ /if }
-	<div class="checkout" bind:this={element} />
+	<div class="padding">
+		<div class="checkout" bind:this={element} />
+	</div>
 </main>
 
 <style>
@@ -51,6 +53,15 @@
 
 	.loading > p {
 		color: var(--text-weak);
+	}
+
+	.padding {
+		padding: 1rem;
+		flex: 1;
+		display: flex;
+		flex-flow: column;
+		justify-content: stretch;
+		align-items: stretch;
 	}
 
 	.checkout {
