@@ -86,7 +86,7 @@ export const refreshLink = async (anon: any, id: string, access_token: any, curs
 		link.name = name
 
 		// TODO: refresh transactions? (expensive, but this code will do it)
-		// await event.locals.plaid.transactionsRefresh(request)
+		// await plaid.transactionsRefresh(request)
 
 		// Get transactions
 		let added: any[] = []
