@@ -1,9 +1,32 @@
+// import { browser } from '$app/environment'
 import { get, writable } from 'svelte/store'
 
 export const route = writable({ current: { loading: true } })
 
 // Types: 'success', 'warning', 'info', 'error'
-export const notifications = writable([])
+const createNotifications = () => {
+	let notis = []
+	const { subscribe, set, update } = writable(notis)
+
+	return {
+		subscribe,
+		set,
+		update,
+		add: ({ type, message }) => {
+			const notis = [...get(notifications), { type, message }]
+			// localStorage.setItem('notifications', JSON.stringify(notis))
+			set(notis)
+		},
+		remove: index => {
+			const notis = [...get(notifications)]
+			notis.splice(index, 1)
+			// localStorage.setItem('notifications', JSON.stringify(notis))
+			set(notis)
+		}
+	}
+}
+
+export const notifications = createNotifications()
 
 export const serving = writable(false)
 
@@ -20,7 +43,7 @@ const createQueue = () => {
 			try {
 				await f()
 			} catch (error) {
-				notifications.set([get(notifications), { type: 'error', message: error }])
+				notifications.set([...get(notifications), { type: 'error', message: error }])
 			}
 			queue.shift()
 		}
