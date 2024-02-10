@@ -28,7 +28,7 @@ export const load = async ({ fetch, data, depends }) => {
 		const { data, error } = response.data
 		if (error) return { error }
 
-		return data
+		return { data }
 	}
 
 	supabase.invoke = invoke
@@ -129,7 +129,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 	plaid.getLinks = async () => {
 		storage.set('cooldown', new Date().getTime())
-		const { data, error } = await invoke('refreshLinks', { predicate: () => true })
+		const { data } = await invoke('refreshLinks', { predicate: () => true })
 
 		return data ?? []
 	}

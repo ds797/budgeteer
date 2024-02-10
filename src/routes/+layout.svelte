@@ -133,7 +133,7 @@
 
 			if (!token) return 0
 
-			const { data, error } = await supabase.invoke('createLink', { public_token: token })
+			const { data } = await supabase.invoke('createLink', { public_token: token })
 			$links = $links.set.links([data, ...$links.links])
 			$route = $route
 			updateLinks()

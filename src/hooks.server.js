@@ -21,7 +21,7 @@ export const handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.paid = async () => {
-		const { data, error } = await event.locals.supabase.functions.invoke('paid')
+		const { data } = await event.locals.supabase.functions.invoke('paid')
 		if (data?.data) return true
 
 		return false

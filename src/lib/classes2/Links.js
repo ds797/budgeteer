@@ -493,7 +493,7 @@ export default class Links {
 			let all = []
 
 			const parse = async () => {
-				const { data, error } = await invoke('sortTransactions', { messages: build })
+				const { data } = await invoke('sortTransactions', { messages: build })
 				const parsed = JSON.parse(data)
 
 				if (parsed.sorted.length !== build.transactions.length) return false
