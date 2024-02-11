@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte'
 	import Loading from '$lib/components/Loading.svelte'
 
-	const PUBLIC_STRIPE_KEY = 'pk_test_51OfvXCBA2iuGdMvmMTk5Y43V9jjFwDdlKSlcfMtIzPZ9qd3FXkvimyn7piaDkZhmo0ECfowewNSxbXYUmStmGjpY00VmiPvxc6'
+	const PUBLIC_STRIPE_KEY = 'pk_live_51OfvXCBA2iuGdMvmwAx2c2L55a60p2zILJp3t3mle06hmFeOcRcxgDCV3duwCHkspbqab8J2EVKKoP65tVwkHYX100oQgoVBhw'
 
 	export let data
 

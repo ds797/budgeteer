@@ -14,9 +14,9 @@ Deno.serve(async (req: Request) => {
 		ui_mode: 'embedded',
 		line_items: [
 			{
-				price: 'price_1Og0F6BA2iuGdMvmlvxx6FK2',
-				quantity: 1,
-			},
+				price: Deno.env.get('SECRET_STRIPE_PRICE'),
+				quantity: 1
+			}
 		],
 		mode: 'subscription',
 		return_url: `${DOMAIN}/pay/finish`,	
