@@ -57,7 +57,7 @@
 
 <div class="container" style="flex-flow: {reverse ? 'row-reverse' : 'row'};">
 { #if show === -1 }
-	<main on:introend={() => reverse = false} transition:slide={{ axis: 'both' }}>
+	<main on:introend={() => reverse = false} transition:slide|global={{ axis: 'both' }}>
 		<div class='items'>
 			<div class='title'>
 				<button class="close" class:disabled={!(menu?.close ?? true) || loading} on:click={() => dispatch('close', 0)}>
