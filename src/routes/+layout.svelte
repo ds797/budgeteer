@@ -628,20 +628,30 @@
 				fill: true,
 				icon: 'sparkle',
 				click: () => {
+					if (!session?.user?.id) {
+						notifications.add({ type: 'error', message: 'Join Budgeteer to use AI to sort transactions!' })
+						return 1
+					}
+
 					sorting = true
 					$route = $route
-					const ts = $links.which.transactions(t => t.properties.group === $route.state.category.group && t.properties.category === $route.state.category.name && month(t.date, $date))
+					const ts = $links.which.transactions(t => t.properties.group === $route.state.category.group && t.properties.category === $route.state.category.name && month(t.date, $date) && t.properties.imported)
 					if (!ts.length) {
-						notifications.add({ type: 'info', message: 'No uncategorized transactions to sort!' })
+						notifications.add({ type: 'info', message: 'No imported transactions to sort!' })
 						sorting = false
 						return 1
 					}
 					queue.enq(async () => {
 						notifications.add({ type: 'info', message: 'Sort is still in beta, so it might not work flawlessly.' })
-						$links = await $links.sort(ts, supabase.invoke)
+						const { data, error } = await $links.sort(ts, supabase.invoke)
+						if (error) {
+							notifications.add({ type: 'error', message: error.message })
+						} else if (data) {
+							$links = data
+							updateBudgets()
+						}
 						sorting = false
 						$route = $route
-						updateBudgets()
 					})
 					return 1
 				}

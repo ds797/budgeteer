@@ -492,7 +492,8 @@ export default class Links {
 			let all = []
 
 			const parse = async () => {
-				const { data } = await invoke('sortTransactions', { messages: build })
+				const { data, error } = await invoke('sortTransactions', { messages: build })
+				if (error) return { error }
 				const parsed = JSON.parse(data)
 
 				if (parsed.sorted.length !== build.transactions.length) return false
@@ -504,13 +505,15 @@ export default class Links {
 				}
 				build.transactions = []
 		
-				return parsed.sorted
+				return { data: parsed.sorted }
 			}
 
 			const loop = async build => {
 				let sorted
 				for (let i = 0; i < 5; i++) {
-					sorted = await parse(build)
+					const { data, error } = await parse(build)
+					if (error) return error
+					sorted = data
 					if (sorted) break
 				}
 				if (!sorted) sorted = build.transactions.map(() => {
@@ -536,11 +539,17 @@ export default class Links {
 
 				original.push(transaction)
 
-				if (5 <= build.transactions.length) await loop(build)
+				if (5 <= build.transactions.length) {
+					const error = await loop(build)
+					if (error) return { error }
+				}
 			}
 
 			// Flush
-			if (build.transactions.length) await loop(build)
+			if (build.transactions.length) {
+				const error = await loop(build)
+				if (error) return { error }
+			}
 
 			all = all.flat()
 
@@ -549,7 +558,7 @@ export default class Links {
 				original[i].properties.category = all[i].category
 			}
 
-			return self
+			return { data: self }
 		}
 		self.order = (group, category, predicate = () => true) => {
 			const ts = self.which.transactions(t => t.properties.group === group && t.properties.category === category && predicate(t))
