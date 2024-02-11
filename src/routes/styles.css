@@ -94,6 +94,10 @@ a:hover {
 	text-underline-offset: 0.0625rem;
 }
 
+a:focus {
+	text-underline-offset: 0.0625rem;
+}
+
 h1 {
 	font-size: 2rem;
 	text-align: center;
@@ -143,6 +147,16 @@ button:hover {
 	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
 }
 
+input:focus {
+	outline: none;
+}
+
+button:focus {
+	outline: none;
+	transform: translate(0.125rem, -0.0625rem);
+	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
+}
+
 input {
 	cursor: text;
 }
@@ -162,6 +176,11 @@ input.none, button.none {
 }
 
 button.none:hover {
+	box-shadow: none;
+	text-shadow: var(--shadow);
+}
+
+button.none:focus {
 	box-shadow: none;
 	text-shadow: var(--shadow);
 }
@@ -189,28 +208,6 @@ button {
 button:focus:not(:focus-visible) {
 	outline: none;
 }
-
-/* progress {
-	appearance: none;
-	background-color: red;
-	color: blue;
-	border: 0.125rem solid var(--accent-0);
-	border-radius: 1rem;
-}
-
-progress::-webkit-progress-value {
-  background-color: blue;
-}
-
-progress::-moz-progress-bar {
-  background-color: #4caf50;
-  border-radius: 10px;
-}
-
-progress::-ms-fill {
-  background-color: #4caf50;
-  border-radius: 10px;
-} */
 
 @media (min-width: 720px) {
 	h1 {
