@@ -206,6 +206,7 @@ export default class Links {
 						groups: budget.groups ?? [],
 						protected: budget.protected
 					})
+					self.selected = self.budgets.at(-1)
 				}
 
 				return self
@@ -419,7 +420,7 @@ export default class Links {
 				}
 
 				if (self.budgets.length === 0)
-					self.budgets = [self.defaultBudget()]
+					self.budgets = [self.default()]
 
 				self.selected = self.budgets[0]
 

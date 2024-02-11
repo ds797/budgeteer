@@ -308,6 +308,15 @@
 						b.name = v
 						$route = $route
 					}
+				}, { type: 'spacer' }, {
+					name: 'Delete Budget',
+					type: 'action',
+					dangerous: true,
+					click: () => {
+						$links = $links.remove.budget(b.name)
+						$route = $route
+						return 1
+					}
 				}],
 				click: () => {
 					$links.selected = b
