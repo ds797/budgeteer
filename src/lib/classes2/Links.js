@@ -29,15 +29,14 @@ export default class Links {
 					categories: [{
 						name: 'Mortgage',
 						value: 2000,
-						overflow: {}
+						overflow: { group: 'Needs', category: 'Groceries' }
 					}]
 				}, {
 					name: 'Needs',
 					categories: [{
 						name: 'Groceries',
 						value: 0,
-						spend: true,
-						overflow: {}
+						overflow: { group: 'Wants', category: 'Dinners Out' }
 					}]
 				}, {
 					name: 'Wants',
