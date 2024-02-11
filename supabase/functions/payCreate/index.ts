@@ -6,7 +6,7 @@ import { respond } from '../_shared/response.ts'
 Deno.serve(async (req: Request) => {
 	if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
-	const DOMAIN = 'http://budgeteer.cc'
+	const DOMAIN = 'https://budgeteer.cc'
 
 	const user_id = await user(req)
 
