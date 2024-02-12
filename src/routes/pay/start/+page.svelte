@@ -12,7 +12,7 @@
 	onMount(async () => {
 		const stripe = Stripe(PUBLIC_STRIPE_KEY)
 
-		const { data: secret } = await data.supabase.invoke('payCreate')
+		const { data: secret } = await data.supabase.invoke('pay', { type: 'create' })
 
 		const checkout = await stripe.initEmbeddedCheckout({ clientSecret: secret })
 

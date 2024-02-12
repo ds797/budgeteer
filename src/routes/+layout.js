@@ -1,7 +1,7 @@
 import { get } from 'svelte/store'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import { links } from '$lib/stores/user'
-import { queue } from '$lib/stores/ui'
+import { queue, notifications } from '$lib/stores/ui'
 import Links from '$lib/classes2/Links'
 
 const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
@@ -23,10 +23,10 @@ export const load = async ({ fetch, data, depends }) => {
 		let response
 		if (!payload) response = await supabase.functions.invoke(name)
 		else response = await supabase.functions.invoke(name, { body: payload })
-		if (response.error) return { error: response.error }
+		if (response.error) return notifications.add({ type: 'error', message: response.error })
 
 		const { data, error } = response.data
-		if (error) return { error }
+		if (error) return notifications.add({ type: 'error', message: error })
 
 		return { data }
 	}
@@ -73,7 +73,7 @@ export const load = async ({ fetch, data, depends }) => {
 	}
 
 	supabase.getLinks = async () => {
-		let { data, error } = await supabase.from('links').select('*')
+		const { data, error } = await supabase.invoke('links', { type: { get: true } })
 
 		if (error) console.error(error)
 
@@ -84,18 +84,15 @@ export const load = async ({ fetch, data, depends }) => {
 	}
 
 	supabase.setLinks = async links => {
-		for (const link of links.links) {
-			// id, institution, name, accounts, transactions
-			const { error } = await supabase.from('links').upsert(link)
+		const { error } = await supabase.invoke('links', { type: { set: links.links } })
 
-			if (error) throw new Error(error)
-		}
+		if (error) throw new Error(error)
 	}
 
 	let plaid = {}
 
 	plaid.unlink = async id => {
-		await invoke('removeLink', { id })
+		await invoke('links', { type: { remove: [id] } })
 	}
 
 	plaid.link = async () => {
@@ -129,7 +126,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 	plaid.getLinks = async () => {
 		storage.set('cooldown', new Date().getTime())
-		const { data } = await invoke('refreshLinks', { predicate: () => true })
+		const { data } = await invoke('links', { type: { refresh: () => true } })
 
 		return data ?? []
 	}

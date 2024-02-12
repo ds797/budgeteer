@@ -22,7 +22,7 @@
 					dangerous: true,
 					click: () => {
 						queue.enq(async () => {
-							const { data: notification } = await data.supabase.invoke('payStop')
+							const { data: notification } = await data.supabase.invoke('pay', { type: 'stop' })
 							notifications.add(notification)
 							window.location.href = '/'
 						})
