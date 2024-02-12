@@ -86,8 +86,8 @@
 		setTimeout(() => {
 			setInterval(() => {
 				queue.enq(refreshLinks)
-			}, 1 * 60 * 1000)
-		}, 1 * 60 * 1000)
+			}, 10 * 60 * 1000)
+		}, 10 * 60 * 1000)
 	}
 
 	onMount(async () => {
