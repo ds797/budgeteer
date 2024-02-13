@@ -1,5 +1,5 @@
 import { cors } from '../_shared/cors.ts'
-import { getLinks, setLinks, removeLinks, refreshLinks, createLinks } from '../_shared/plaid.ts'
+import { plaid, getLinks, setLinks, removeLinks, refreshLinks, createLinks } from '../_shared/plaid.ts'
 import { user } from '../_shared/user.ts'
 import { respond, err } from '../_shared/response.ts'
 
@@ -39,6 +39,22 @@ Deno.serve(async (req: Request) => {
 		try {
 			const links = await createLinks(user_id, ...public_token)
 			return respond(links)
+		} catch (error) {
+			return err(error, 0)
+		}
+	} else if (type.token) {
+		const config = {
+			user: { client_user_id: user_id },
+			client_name: 'Budgeteer',
+			language: 'en',
+			products: ['auth', 'transactions'],
+			country_codes: ['US'],
+			webhook: 'https://www.example.com/webhook',
+		}
+
+		try {
+			const token = await plaid.linkTokenCreate(config)
+			return respond(token.data.link_token)
 		} catch (error) {
 			return err(error, 0)
 		}

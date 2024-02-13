@@ -96,7 +96,7 @@ export const load = async ({ fetch, data, depends }) => {
 	}
 
 	plaid.link = async () => {
-		const { data: token } = await invoke('generateLinkToken')
+		const { data: token } = await invoke('links', { type: { token: true } })
 
 		return new Promise((resolve, reject) => {
 			const handler = Plaid.create({
