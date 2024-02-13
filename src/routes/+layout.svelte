@@ -4,7 +4,7 @@
 	import { v4 as uuidv4 } from 'uuid'
 	import { page } from '$app/stores'
 	import { invalidate, invalidateAll } from '$app/navigation'
-	import Links from '$lib/classes2/Links'
+	import Links from '$lib/classes/Links'
 	import { links, date } from '$lib/stores/user'
 	import { route, queue, notifications } from '$lib/stores/ui'
 	import { num } from '$lib/utils/math'

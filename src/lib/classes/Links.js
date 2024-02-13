@@ -176,7 +176,7 @@ export default class Links {
 		self.add = {
 			link: (...links) => {
 				for (const link of links) {
-					if (self.links.find(l => l.institution == link.institution)) {
+					if (self.links.find(l => l.institution === link.institution)) {
 						self.err('Link already exists')
 						continue
 					}
@@ -495,6 +495,7 @@ export default class Links {
 			const parse = async () => {
 				const { data, error } = await invoke('sortTransactions', { messages: build })
 				if (error) return { error }
+				console.log('input', JSON.stringify(build), 'names', ...build.transactions, 'output', data)
 				const parsed = JSON.parse(data)
 
 				if (parsed.sorted.length !== build.transactions.length) return false

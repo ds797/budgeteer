@@ -1,6 +1,6 @@
 import { writable } from "svelte/store"
 import { get } from 'svelte/store'
-import Links from '$lib/classes2/Links'
+import Links from '$lib/classes/Links'
 
 export const links = writable(new Links())
 

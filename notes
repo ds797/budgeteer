@@ -1,9 +1,0 @@
-on page load:
-sign in
-start loading
-if (supabase budgetCAESJVJyUWFqUko3bzlVZzF5NFFyYVZaQ2Q2UjFMdnZrYmZhTExxcXcaCwjFl6OtBhCQ9OETIgsIxZejrQYQkPThEyoLCMWXo60GEJD04RM=)
-	load supabase budget
-	load links
-else
-	load default budget
-	save default budget to supabase
