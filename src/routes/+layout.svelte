@@ -22,7 +22,7 @@
 
 	$: ({ supabase, session, plaid, storage } = data)
 
-	const FREQUENCY = 1 * 60 * 1000
+	const FREQUENCY = 5 * 60 * 1000
 
 	const refreshLinks = async () => {
 		// Within cooldown range OR been 3 * FREQUENCY since last active
@@ -86,8 +86,8 @@
 		setTimeout(() => {
 			setInterval(() => {
 				queue.enq(refreshLinks)
-			}, 10 * 60 * 1000)
-		}, 10 * 60 * 1000)
+			}, FREQUENCY)
+		}, FREQUENCY)
 	}
 
 	onMount(async () => {
