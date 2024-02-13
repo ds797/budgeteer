@@ -1,6 +1,6 @@
 import { cors } from '../_shared/cors.ts'
 import { user } from '../_shared/user.ts'
-import { stripe } from '../_shared/stripe.ts'
+import { stripe, price } from '../_shared/stripe.ts'
 import { service } from '../_shared/service.ts'
 import { respond, err } from '../_shared/response.ts'
 
@@ -18,7 +18,7 @@ Deno.serve(async (req: Request) => {
 			ui_mode: 'embedded',
 			line_items: [
 				{
-					price: Deno.env.get('SECRET_STRIPE_PRICE'),
+					price,
 					quantity: 1
 				}
 			],

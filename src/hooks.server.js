@@ -27,15 +27,6 @@ export const handle = async ({ event, resolve }) => {
 		return false
 	}
 
-	event.locals.getLink = async id => {
-		// id, access_token, institution, name, accounts, transactions
-		const { data, error } = await event.locals.supabase.from('links').select('*')
-
-		if (error) throw new Error(error)
-
-		return data.find(l => l.id === id)
-	}
-
 	return resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === 'content-range'

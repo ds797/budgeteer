@@ -23,7 +23,7 @@ const toTransaction = (...transactions: any[]) => {
 			account: t.account_id,
 			merchant: t.merchant_name,
 			name: t.name,
-			category: t.category
+			category: t.personal_finance_category
 		}
 	})
 }
@@ -72,27 +72,101 @@ export const removeLinks = async (user_id: string, ...ids: string[]) => {
 	}
 }
 
-export const refreshLinks = async (user_id: string, ...links: any[]) => {
-	let build: any[] = []
+const refreshLink = async (user_id: string, id: string, access_token: string, cursor: string|null, transactions: any[]) => {
+	let link: any = {
+		id,
+		institution: '',
+		access_token,
+		cursor,
+		name: '',
+		accounts: [],
+		transactions: []
+	}
 
-	for (let { id, access_token, cursor, transactions } of links) {
-		if (!access_token) continue
+	const request: any = { access_token }
 
-		let link: {
-			id: string;
-			institution: string;
-			name: string;
-			accounts: any[];
-			transactions: any[];
-		} = {
-			id,
-			institution: '',
-			name: '',
-			accounts: [],
-			transactions: []
+	try {
+		// Get item
+		const { data: { item } } = await plaid.itemGet(request)
+
+		// Get accounts
+		const { data: { accounts } } = await plaid.accountsGet(request)
+
+		// Get institution name
+		const { data: { institution: { name } } } = await plaid.institutionsGetById({
+			institution_id: item.institution_id,
+			country_codes: ['US', 'GB', 'ES', 'NL', 'FR', 'IE', 'CA', 'DE', 'IT', 'PL', 'DK', 'NO', 'SE', 'EE', 'LT', 'LV', 'PT', 'BE']
+		})
+
+		link.institution = item.institution_id
+		link.name = name
+
+		// TODO: refresh transactions? (expensive, but this code will do it)
+		// await plaid.transactionsRefresh(request)
+
+		// Get transactions
+		let added: any[] = []
+		let modified: any[] = []
+		let removed: any[] = []
+		let more = true
+
+		request.options = { include_personal_finance_category: true }
+		while (more) {
+			request.cursor = link.cursor
+			const response = await plaid.transactionsSync(request)
+
+			const { status, data: transactions } = response
+
+			if (status != 200) throw new Error(`Server not OK (${status}`)
+
+			added = [...added, ...transactions.added]
+			modified = [...modified, ...transactions.modified]
+			removed = [...removed, ...transactions.removed]
+			more = transactions.has_more
+
+			link.cursor = transactions.next_cursor
 		}
 
-		const request: any = { access_token }
+		added = toTransaction(...added)
+		modified = toTransaction(...modified)
+
+		// Remove
+		transactions.filter((t: any) => !removed.some(r => r.transaction_id === t.transaction_id))
+		// Modify
+		transactions.map((t: any) =>
+			modified.some(r => r.transaction_id === t.transaction_id)
+			? { ...t, ...modified.find(r => r.transaction_id === t.transaction_id) }
+			: t
+		)
+		// Add
+		transactions = [...transactions, ...added]
+
+		link.accounts = accounts
+		link.transactions = transactions
+
+		await service.from('links').upsert({
+			user_id,
+			...link
+		})
+
+		delete link.access_token
+		delete link.cursor
+
+		return link
+	} catch (error) {
+		throw new Error(error?.response?.statusText ?? error ?? 'Bad request')
+	}
+}
+
+export const refreshLinks = async (user_id: string, predicate: Function|undefined = () => true) => {
+	const { data, error } = await service.from('links').select('*')
+	if (error) throw new Error(error)
+
+	let links = data.filter((l: any) => predicate(l))
+
+	for (let i = 0; i < links.length; i++) {
+		let { id, access_token, cursor, transactions } = links[i]
+		if (!access_token) continue
 
 		if (transactions) {
 			if (typeof transactions === 'string')
@@ -103,83 +177,10 @@ export const refreshLinks = async (user_id: string, ...links: any[]) => {
 			else transactions = l.transactions
 		}
 
-		try {
-			// Get item
-			const { data: { item } } = await plaid.itemGet(request)
-
-			// Get accounts
-			const { data: { accounts } } = await plaid.accountsGet(request)
-
-			// Get institution name
-			const { data: { institution: { name } } } = await plaid.institutionsGetById({
-				institution_id: item.institution_id,
-				country_codes: ['US', 'GB', 'ES', 'NL', 'FR', 'IE', 'CA', 'DE', 'IT', 'PL', 'DK', 'NO', 'SE', 'EE', 'LT', 'LV', 'PT', 'BE']
-			})
-
-			link.institution = item.institution_id
-			link.name = name
-
-			// TODO: refresh transactions? (expensive, but this code will do it)
-			// await plaid.transactionsRefresh(request)
-
-			// Get transactions
-			let added: any[] = []
-			let modified: any[] = []
-			let removed: any[] = []
-			let more = true
-
-			while (more) {
-				request.cursor = cursor
-				const response = await plaid.transactionsSync(request)
-
-				const { status, data: transactions } = response
-
-				if (status != 200) throw new Error(`Server not OK (${status}`)
-
-				added = [...added, ...transactions.added]
-				modified = [...modified, ...transactions.modified]
-				removed = [...removed, ...transactions.removed]
-				more = transactions.has_more
-
-				cursor = transactions.next_cursor
-			}
-
-			added = toTransaction(...added)
-			modified = toTransaction(...modified)
-
-			// Remove
-			transactions.filter((t: any) => !removed.some(r => r.transaction_id === t.transaction_id))
-			// Modify
-			transactions.map((t: any) =>
-				modified.some(r => r.transaction_id === t.transaction_id)
-				? { ...t, ...modified.find(r => r.transaction_id === t.transaction_id) }
-				: t
-			)
-			// Add
-			transactions = [...transactions, ...added]
-
-			link.accounts = accounts
-			link.transactions = transactions
-
-			await setLinks(user_id, {
-				...link,
-				access_token,
-				cursor
-			})
-
-			build.push(link)
-		} catch (error) {
-			throw new Error(error?.response?.statusText ?? error ?? 'Bad request')
-		}
+		links[i] = await refreshLink(user_id, id, access_token, cursor, transactions)
 	}
 
-	let data = await getLinks(user_id, () => true)
-	data.forEach((l: any) => {
-		if (l.access_token) delete l.access_token
-		if (l.cursor) delete l.cursor
-	})
-
-	return data
+	return links
 }
 
 export const createLinks = async (user_id: string, ...tokens: any[]) => {
@@ -196,15 +197,7 @@ export const createLinks = async (user_id: string, ...tokens: any[]) => {
 
 				if ((await getLinks(user_id, (l: any) => l.institution === item.institution_id)).length) throw new Error('Link already exists!')
 
-				const id = uuidv4()
-				const link = {
-					id,
-					user_id,
-					access_token,
-					cursor: null
-				}
-
-				const data = await refreshLinks(user_id, link)
+				const data = await refreshLink(user_id, uuidv4(), access_token, null, [])
 
 				return data
 			}

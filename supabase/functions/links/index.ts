@@ -29,7 +29,8 @@ Deno.serve(async (req: Request) => {
 
 		return respond({ success: true })
 	} else if (type.refresh) {
-		const links = await refreshLinks(user_id, ...await getLinks(user_id, () => true))
+		console.log('REFRESHHINNGGG')
+		const links = await refreshLinks(user_id, () => true)
 
 		return respond(links)
 	} else if (type.create) {

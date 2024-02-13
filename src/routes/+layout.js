@@ -126,7 +126,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 	plaid.getLinks = async () => {
 		storage.set('cooldown', new Date().getTime())
-		const { data } = await invoke('links', { type: { refresh: () => true } })
+		const { data } = await invoke('links', { type: { refresh: true } })
 
 		return data ?? []
 	}
