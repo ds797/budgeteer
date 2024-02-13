@@ -134,6 +134,7 @@
 		<!-- Logged out -->
 		<button on:click={() => window.location.href = '/demo'}>Demo</button>
 		<button class='fill' on:click={() => $route.current = $route.start}>Start</button>
+		<button on:click={() => window.location.href = '/pricing'}>Pricing</button>
 	{ /if }
 </main>
 
