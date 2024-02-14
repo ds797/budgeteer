@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
 		try {
 			await stripe.subscriptions.cancel(id)
 		} catch (error) {
-			return err(error, 0)
+			return err(error.raw.message, 0)
 		}
 
 		return respond({ type: 'success', message: 'You\'ve successfully unsubscribed from Budgeteer!' })
