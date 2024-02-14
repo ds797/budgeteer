@@ -5,7 +5,7 @@ export const GET = async ({ url: { searchParams }, locals: { supabase, paid } })
 	const type = searchParams.get('type')
 
 	if (token_hash && type) {
-		const { data, error } = await supabase.auth.verifyOtp({
+		const { error } = await supabase.auth.verifyOtp({
 			type,
 			token_hash,
 		})
@@ -14,8 +14,9 @@ export const GET = async ({ url: { searchParams }, locals: { supabase, paid } })
 			if (await paid()) throw redirect(303, '/')
 			else throw redirect(303, '/pay')
 		}
+
+		throw redirect(303, `/?error=${encodeURIComponent(error)}`)
 	}
 
-	// return the user to an error page with some instructions
-	throw redirect(303, '/auth/error')
+	throw redirect(303, `/?error=${encodeURIComponent('Authentication error')}`)
 }

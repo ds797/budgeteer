@@ -1,48 +1,51 @@
 <script>
+	import { onMount } from 'svelte'
 	import { notifications } from '$lib/stores/ui'
-	import { slide } from '$lib/utils/transition'
-	import { fly, fade, crossfade } from 'svelte/transition'
+	import { crossfade } from 'svelte/transition'
 	import { flip } from 'svelte/animate'
 	import AlertCircle from '$lib/svg/AlertCircle.svelte'
 	import CloseCircle from '$lib/svg/CloseCircle.svelte'
 	import CheckmarkCircle from '$lib/svg/CheckmarkCircle.svelte'
+  import { cubicOut } from 'svelte/easing';
 
-	const [send, receive] = crossfade({
-		duration: d => Math.sqrt(d * 200),
+	let visible = []
 
-		fallback: node => {
-			const style = getComputedStyle(node);
+	export const [send, receive] = crossfade({
+		duration: (d) => Math.sqrt(d * 200),
+		fallback: (node, params) => {
+			const style = getComputedStyle(node)
 			const transform = style.transform === 'none' ? '' : style.transform
 
 			return {
-				duration: 600,
+				duration: 400,
 				easing: cubicOut,
-				css: t => `
+				css: (t) => `
 					transform: ${transform} scale(${t});
-					opacity: ${t};
+					opacity: ${t}
 				`
-			};
+			}
 		}
 	})
 
-	const remove = n => {
-		const index = $notifications.indexOf(n)
+	// Pretty animations on load
+	let mounted = false
+	onMount(() => {
+		visible = $notifications
+		mounted = true
+	})
 
-		if (index === -1) return
+	const updateVisible = async () => {
+		if (!mounted) return
 
-		notifications.remove(index)
+		visible = $notifications
 	}
 
-	const timer = async n => {
-		await new Promise(r => setTimeout(r, 7500));
-
-		remove(n)
-	}
+	$: updateVisible($notifications)
 </script>
 
 <main>
-	{ #each $notifications as notification (notification) }
-		<button class="notification" on:click={() => remove(notification)} on:introstart={async () => timer(notification)} in:fly={{ y: 50 }} out:fly={{ y: 25 }} animate:flip>
+	{ #each visible as notification (notification) }
+		<button class="notification" on:click={() => notifications.remove(notification)} in:receive={{ key: notification }} out:send={{ key: notification }} animate:flip>
 			<div class="title">
 				<div class="icon">
 					{ #if notification.type === 'success' }
@@ -68,14 +71,11 @@
 		position: fixed;
 		bottom: 0;
 		left: 0;
+		flex-flow: column-reverse;
 		justify-content: flex-end;
 		align-items: stretch;
 		z-index: 1000;
 		pointer-events: none;
-	}
-
-	main > * {
-		pointer-events: auto;
 	}
 
 	.title {
@@ -90,6 +90,7 @@
 
 	button {
 		all: unset;
+		pointer-events: auto;
 		cursor: pointer;
 	}
 

@@ -8,21 +8,29 @@ const createNotifications = () => {
 	let notis = []
 	const { subscribe, set, update } = writable(notis)
 
+	const remove = noti => {
+		const index = get(notifications).indexOf(noti)
+		if (index === -1) return
+
+		get(notifications).splice(index, 1)
+		set(get(notifications))
+		// localStorage.setItem('notifications', JSON.stringify(notis))
+	}
+
+	const add = ({ type, message }) => {
+		const noti = { type, message }
+		const notis = [...get(notifications), noti]
+		// localStorage.setItem('notifications', JSON.stringify(notis))
+		setTimeout(() => remove(noti), 5000)
+		set(notis)
+	}
+
 	return {
 		subscribe,
 		set,
 		update,
-		add: ({ type, message }) => {
-			const notis = [...get(notifications), { type, message }]
-			// localStorage.setItem('notifications', JSON.stringify(notis))
-			set(notis)
-		},
-		remove: index => {
-			const notis = [...get(notifications)]
-			notis.splice(index, 1)
-			// localStorage.setItem('notifications', JSON.stringify(notis))
-			set(notis)
-		}
+		add,
+		remove
 	}
 }
 

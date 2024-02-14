@@ -23,8 +23,9 @@
 					dangerous: true,
 					click: () => {
 						queue.enq(async () => {
-							const { data: notification } = await data.supabase.invoke('pay', { type: 'stop' })
-							notifications.add(notification)
+							const { data: notification, error } = await data.supabase.invoke('pay', { type: 'stop' })
+							if (error) notifications.add({ type: 'error', message: error.message })
+							else notifications.add(notification)
 							goto('/')
 						})
 						$route.current = undefined

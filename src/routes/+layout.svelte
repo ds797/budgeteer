@@ -3,7 +3,8 @@
 	import { onMount } from 'svelte'
 	import { v4 as uuidv4 } from 'uuid'
 	import { page } from '$app/stores'
-	import { invalidate, invalidateAll } from '$app/navigation'
+	import { goto, invalidate, invalidateAll } from '$app/navigation'
+	import { browser } from '$app/environment'
 	import Links from '$lib/classes/Links'
 	import { links, date } from '$lib/stores/user'
 	import { route, queue, notifications } from '$lib/stores/ui'
@@ -771,6 +772,14 @@
 		updateGroup()
 		updateCategory()
 		updatePickBudget()
+	}
+
+	$: {
+		const message = $page.url.searchParams.get('error')
+		if (message) {
+			notifications.add({ type: 'error', message })
+			if (browser) goto('.', { replaceState: true })
+		}
 	}
 
 	$: update($route)
