@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation'
 	import { route, serving, queue, notifications } from '$lib/stores/ui'
 	import { post } from '$lib/utils/requests'
 	import Loading from '$lib/components/Loading.svelte'
@@ -24,7 +25,7 @@
 						queue.enq(async () => {
 							const { data: notification } = await data.supabase.invoke('pay', { type: 'stop' })
 							notifications.add(notification)
-							window.location.href = '/'
+							goto('/')
 						})
 						$route.current = undefined
 					}
@@ -38,8 +39,8 @@
 				try {
 					const { error } = await data.supabase.auth.signOut()
 					if (error) console.log(error)
-					window.location.href = '/'
 					invalidateAll()
+					goto('/')
 				} catch {
 					notifications.add({
 						type: 'error',
@@ -115,7 +116,7 @@
 		</div>
 		<div class="right">
 			{ #if demo }
-				<button class="none account" on:click={() => window.location.href = '/'}>
+				<button class="none account" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>
 			{ :else }
@@ -132,9 +133,9 @@
 		<button on:click={() => goto('/account', { replaceState: true })}>Account</button> -->
 	{ :else }
 		<!-- Logged out -->
-		<button on:click={() => window.location.href = '/demo'}>Demo</button>
+		<button on:click={() => goto('/demo')}>Demo</button>
 		<button class='fill' on:click={() => $route.current = $route.start}>Start</button>
-		<button on:click={() => window.location.href = '/pricing'}>Pricing</button>
+		<button on:click={() => goto('/pricing')}>Pricing</button>
 	{ /if }
 </main>
 

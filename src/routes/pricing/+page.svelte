@@ -1,4 +1,5 @@
 <script>
+	import { goto, invalidateAll } from '$app/navigation'
 	import { route, notifications } from '$lib/stores/ui'
 	import Account from '$lib/svg/Account.svelte'
 
@@ -14,7 +15,8 @@
 			click: async () => {
 				try {
 					await data.supabase.auth.signOut()
-					window.location.href = '/'
+					invalidateAll()
+					goto('/')
 				} catch {
 					notifications.add({
 						type: 'error',
@@ -60,7 +62,7 @@
 			<div class="info">
 				<p>Simple, streamlined budgeting that allows you to act on your decisions as easily as if you controlled Budgeteer with your mind.</p>
 				<div class="buy">
-					<button class="fill" on:click={() => window.location.href = '/'}>Start</button>
+					<button class="fill" on:click={() => goto('/')}>Start</button>
 				</div>
 			</div>
 		</div>
