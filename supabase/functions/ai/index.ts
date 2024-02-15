@@ -1,6 +1,6 @@
 import { cors } from '../_shared/cors.ts'
 import { user } from '../_shared/user.ts'
-import { complete } from '../_shared/openai.ts'
+import { json, complete } from '../_shared/openai.ts'
 import { respond, err } from '../_shared/response.ts'
 
 const instruct_category = `You're given a Group and a Category (the category is part of the Group). From the following list of Personal Finance Categories (PFCs), select which PFC(s) fit the Category best. Return the PFCs in JSON format, with two keys: 'pfc' and 'confidence', both arrays. Each entry in 'pfc' should have an entry in 'confidence', a float from 0-1.
@@ -215,6 +215,8 @@ RENT_AND_UTILITIES_TELEPHONE
 RENT_AND_UTILITIES_WATER
 RENT_AND_UTILITIES_OTHER_UTILITIES`
 
+const instruct_assist = `You are a friendly assistant who offers feedback to a user based on their budget.`
+
 Deno.serve(async (req: Request) => {
 	if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
@@ -225,15 +227,61 @@ Deno.serve(async (req: Request) => {
 	if (type.category) {
 		const message = `Group: '${type.category.group}', Category: '${type.category.category}'`
 
-		const response = await complete(instruct_category, message)
+		const response = await json(instruct_category, {
+			role: 'user',
+			content: message
+		})
 
 		return respond(response)
 	} else if (type.transaction) {
-		const message = `Name: ${type.transaction.name}'`
+		const message = `Name: '${type.transaction.name}'`
 
-		const response = await complete(instruct_transaction, message)
+		const response = await json(instruct_transaction, {
+			role: 'user',
+			content: message
+		})
 
 		return respond(response)
+	} else if (type.assistant) {
+		const messages = type.assistant
+
+		const response = await complete(instruct_assist, ...messages)
+
+		return respond(response)
+		// try {
+		// 	const stream = await openai.chat.completions.create({
+		// 		messages: [{
+		// 			role: 'system',
+		// 			content: instruct_assist
+		// 		}, ...messages.map((m: any) => {
+		// 			return {
+		// 				role: m.role,
+		// 				content: m.content
+		// 			}
+		// 		})],
+		// 		model: 'gpt-3.5-turbo-0125',
+		// 		stream: true
+		// 	})
+
+		// 	return new Response(new ReadableStream({
+		// 		start: async controller => {
+		// 			for await (const chunk of stream) {
+		// 				const c = chunk.choices[0]?.delta?.content || ''
+		// 				controller.enqueue(c)
+		// 			}
+		// 			controller.close()
+		// 		}
+		// 	}), {
+		// 		headers: {
+		// 			...cors,
+		// 			'Content-type': 'text/plain',
+		// 			'Transfer-encoding': 'chunked'
+		// 		},
+		// 		status: 200
+		// 	})
+		// } catch (error) {
+		// 	return err(error, 0)
+		// }
 	}
 
 	return err('No type specified', 400)

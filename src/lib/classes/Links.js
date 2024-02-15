@@ -300,7 +300,7 @@ export default class Links {
 				const set = t => {
 					for (const group of self.selected.groups)
 						for (const category of group.categories)
-							if ((category.pfc ?? []).find(pfc => pfc.name === t.pfc.detailed)) {
+							if ((category.pfc ?? []).find(pfc => pfc.name === t.pfc?.detailed)) {
 								t.properties.group = group.name
 								t.properties.category = category.name
 								return
@@ -657,7 +657,6 @@ export default class Links {
 				const pfc = JSON.parse(data)
 
 				transaction.pfc = { detailed: pfc.pfc }
-				console.log(transaction.pfc)
 				return self
 			}
 		}

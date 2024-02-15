@@ -1,12 +1,12 @@
 <script>
-	export let size = '4rem', border = '0.5rem'
+	export let size = '4rem', border = '0.5rem', color = 'var(--accent-0)'
 </script>
 
 <div style="
 	width: {size};
 	height: {size};
 	border: {border} solid;
-	border-color: var(--accent-0) #0000;
+	border-color: {color} #0000;
 " />
 
 <style>

@@ -4,16 +4,27 @@
 	import { fade } from 'svelte/transition';
 	import { slide } from 'svelte/transition';
 
+	export let alpha = 1
+	export let closable = true
+
 	let overlay;
 	let dispatch = createEventDispatcher();
 
 	const click = e => e.target === overlay && dispatch('close')
 </script>
 
+<svelte:window on:keydown={e => closable && e.key === 'Escape' && dispatch('close')} />
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main transition:fade={{ duration: 300, easing: cubicOut }} on:click={click} bind:this={overlay}>
-	<div class='focus'>
+	{ #if alpha }
+		<div class='focus'>
+			<slot />
+		</div>
+	{ :else }
 		<slot />
-	</div>
+	{ /if }
 </main>
 <div class='tip' transition:slide={{ duration: 300, fade: true }}>
 	<slot name='tip' />

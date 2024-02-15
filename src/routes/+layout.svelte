@@ -18,6 +18,7 @@
 	import Navbar from '$lib/components/Navbar.svelte'
 	import BillStack from '../lib/components/BillStack.svelte'
 	import Notifications from '$lib/components/Notifications.svelte'
+	import Assistant from '$lib/components/Assistant.svelte'
 
 	export let data
 
@@ -73,7 +74,6 @@
 		
 		$links.budgets = budgets
 		$links.selected = selected
-		$route.current = undefined
 
 		storage.set('links', $links)
 
@@ -573,7 +573,7 @@
 			$route.transaction.children.push({
 				name: 'Add',
 				type: 'action',
-				disabled: !$route.state.transaction.new.name || !$route.state.transaction.new.amount || !$route.state.transaction.new.properties.category || !$route.state.transaction.new.account,
+				disabled: !$route.state.transaction.new.name || !$route.state.transaction.new.amount || (!$route.state.transaction.new.properties.category && $route.state.transaction.new.properties.manual) || !$route.state.transaction.new.account,
 				fill: true,
 				click: () => {
 					const t = {
@@ -584,8 +584,12 @@
 						account: $route.state.transaction.new.account,
 						properties: $route.state.transaction.new.properties
 					}
-					$links = $links.add.transaction(t)
-					$links.links.find(l => !l.institution).transactions.push(t)
+					queue.enq(async () => {
+						$links = $links.add.transaction(t)
+						$links = await $links.ai.transaction(t.id)
+						$links = $links.sort(...$links.which.transactions(u => u.id === t.id))
+						$links.links.find(l => !l.institution).transactions.push(t)
+					})
 					return 1
 				}
 			})
@@ -785,8 +789,14 @@
 
 <main>
 	<Notifications />
-	{ #if $route.current && !$route.current?.loading }
-		<Modal on:close={quit}>
+	<!-- svelte-ignore empty-block -->
+	{ #if $route.current?.loading }
+	{ :else if $route.current?.assistant }
+		<Modal alpha={0} on:close={() => $route.current = undefined}>
+			<Assistant {supabase} />
+		</Modal>
+	{ :else if $route.current }
+		<Modal closable={false} on:close={quit}>
 			<Menu bind:menu={$route.current} on:close={quit} />
 		</Modal>
 	{ /if }

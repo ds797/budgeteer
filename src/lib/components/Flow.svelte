@@ -2,11 +2,13 @@
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
 	import { links, date } from '$lib/stores/user'
+	import { route } from '$lib/stores/ui'
 	import { month } from '$lib/utils/compare'
 	import { slide } from '$lib/utils/transition'
 	import Month from '$lib/components/Month.svelte'
 	import Graph from '$lib/components/Graph.svelte'
 	import Arrow from '$lib/svg/Arrow.svelte'
+	import Sparkle from '$lib/svg/Sparkle.svelte'
 
 	let show = false
 
@@ -49,7 +51,11 @@
 			</div>
 		</button>
 	</div>
-	<div class="right"></div>
+	<div class="right">
+		<button class="none" on:click={() => $route.current = { assistant: true }}>
+			<Sparkle />
+		</button>
+	</div>
 </main>
 { #if show }
 	<div class="graph" transition:slide={{ duration: 600 }}>
@@ -76,15 +82,26 @@
 	}
 
 	button {
-		flex: 1;
 		display: flex;
 		justify-content: stretch;
 		align-items: stretch;
 	}
 
+	.middle > button {
+		flex: 1;
+	}
+
 	.left {
+		padding-left: 0.5rem;
 		display: flex;
 		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.right {
+		padding-right: 0.5rem;
+		display: flex;
+		justify-content: flex-end;
 		align-items: center;
 	}
 

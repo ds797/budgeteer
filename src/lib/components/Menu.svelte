@@ -97,7 +97,9 @@
 									{ /if }	
 									{child.name}
 									{ #if loading == index + 1 }
-										<Loading size={'0.5rem'} border={'0.125rem'} />
+										<div transition:slide={{ axis: 'both' }} class="icon">
+											<Loading size={'0.5rem'} border={'0.125rem'} />
+										</div>
 									{ /if }
 								</button>
 								{ #if child.children }
@@ -308,6 +310,14 @@
 		gap: 0.5rem;
 		align-self: stretch;
 		white-space: nowrap;
+	}
+
+	.icon {
+		padding: 0.125rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
 	}
 
 	/* .time {

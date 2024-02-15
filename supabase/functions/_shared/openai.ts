@@ -25,20 +25,41 @@ export const sort = async message => {
 	}
 }
 
-export const complete = async (instructions: string, ...user: string[]) => {
+export const json = async (instructions: string, ...messages: any[]) => {
 	try {
 		const completion = await openai.chat.completions.create({
 			messages: [{
 				role: 'system',
 				content: instructions
-			}, ...user.map(u => {
+			}, ...messages.map(m => {
 				return {
-					role: 'user',
-					content: JSON.stringify(u)
+					role: m.role,
+					content: m.content
 				}
 			})],
 			model: 'gpt-3.5-turbo-0125',
 			response_format: { type: 'json_object' }
+		})
+		
+		return completion.choices[0].message.content
+	} catch (error) {
+		throw new Error(error)
+	}
+}
+
+export const complete = async (instructions: string, ...messages: any[]) => {
+	try {
+		const completion = await openai.chat.completions.create({
+			messages: [{
+				role: 'system',
+				content: instructions
+			}, ...messages.map(m => {
+				return {
+					role: m.role,
+					content: m.content
+				}
+			})],
+			model: 'gpt-3.5-turbo-0125'
 		})
 		
 		return completion.choices[0].message.content

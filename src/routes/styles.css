@@ -7,7 +7,7 @@
 		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	--bg-0: hsl(209, 20%, 90%);
 	--frosted: hsla(0, 0%, 100%, 75%);
-	--bg-1: hsl(209, 36%, 86%);
+	--bg-1: hsl(0, 0%, 100%);
 	--bg-2: hsl(224, 44%, 95%);
 	--accent-0: rgb(0, 0, 0);
 	--accent-old: rgb(154, 154, 240);
@@ -165,6 +165,11 @@ button {
 	cursor: pointer;
 }
 
+input, button {
+	font-size: inherit;
+	font-family: inherit;
+}
+
 input.dangerous, button.dangerous {
 	background: var(--danger);
 	color: var(--bg-0);
@@ -196,13 +201,9 @@ input.disabled, button.disabled {
 	color: var(--text);
 	border: 0.125rem solid transparent;
 	pointer-events: none;
+	transform: none;
+	box-shadow: none;
 	cursor: not-allowed;
-}
-
-input,
-button {
-	font-size: inherit;
-	font-family: inherit;
 }
 
 button:focus:not(:focus-visible) {
