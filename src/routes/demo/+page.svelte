@@ -133,7 +133,7 @@
 
 <style>
 	main {
-		padding: 0 4rem;
+		padding: 0 5vw;
 		box-sizing: border-box;
 		flex: 1;
 		display: flex;
