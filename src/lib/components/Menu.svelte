@@ -79,7 +79,14 @@
 							<h4>{child.hint}</h4>
 						{ /if }
 						{ #if child.name && (child.type ?? 'menu') === 'menu' }
-							<button class:fill={child.fill} class:disabled={child.disabled} on:click={() => click.menu(child, index)} class:dangerous={child.dangerous}>{child.name}</button>
+							<button class:fill={child.fill} class:disabled={child.disabled} on:click={() => click.menu(child, index)} class:dangerous={child.dangerous}>
+								{ #if child.icon }
+									{ #if child.icon === 'sparkle' }
+										<Sparkle size={'1rem'} />
+									{ /if }
+								{ /if }	
+								{child.name}
+							</button>
 						{ :else if child.name && child.type === 'action' }
 							<div class='select'>
 								<button class='action' class:fill={child.fill} class:disabled={child.disabled || loading == index + 1} class:dangerous={child.dangerous} on:click={() => click.action(child, index)}>

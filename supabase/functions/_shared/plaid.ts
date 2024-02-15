@@ -23,7 +23,7 @@ const toTransaction = (...transactions: any[]) => {
 			account: t.account_id,
 			merchant: t.merchant_name,
 			name: t.name,
-			category: t.personal_finance_category
+			pfc: t.personal_finance_category
 		}
 	})
 }
@@ -162,7 +162,7 @@ export const refreshLinks = async (user_id: string, predicate: Function|undefine
 	const { data, error } = await service.from('links').select('*')
 	if (error) throw new Error(error)
 
-	let links = data.filter((l: any) => predicate(l))
+	let links = data.filter((l: any) => l.user_id === user_id && predicate(l))
 
 	for (let i = 0; i < links.length; i++) {
 		let { id, access_token, cursor, transactions } = links[i]

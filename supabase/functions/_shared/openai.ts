@@ -21,6 +21,28 @@ export const sort = async message => {
 
 		return completion.choices[0].message.content
 	} catch (error) {
-		return { error: 'Error sorting transactions' }
+		throw new Error(error)
+	}
+}
+
+export const complete = async (instructions: string, ...user: string[]) => {
+	try {
+		const completion = await openai.chat.completions.create({
+			messages: [{
+				role: 'system',
+				content: instructions
+			}, ...user.map(u => {
+				return {
+					role: 'user',
+					content: JSON.stringify(u)
+				}
+			})],
+			model: 'gpt-3.5-turbo-0125',
+			response_format: { type: 'json_object' }
+		})
+		
+		return completion.choices[0].message.content
+	} catch (error) {
+		throw new Error(error)
 	}
 }

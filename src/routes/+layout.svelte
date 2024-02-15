@@ -34,7 +34,7 @@
 		const ls = await plaid.getLinks()
 		if (!ls.length) return
 
-		ls.push($links.links.find(l => !l.institution))
+		// ls.push($links.links.find(l => !l.institution))
 
 		$links.set.links(ls)
 		$links = $links
@@ -48,10 +48,9 @@
 
 	const init = async () => {
 		// Step 1: get budgets
-		if (storage.get('links')) {
-			$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }))
-		}
-		if ($links.budgets.length) $route.current = undefined
+		$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }), supabase.invoke)
+
+		$route.current = undefined
 
 		let { budgets, selected } = await supabase.getBudgets()
 
@@ -359,22 +358,24 @@
 
 		$route.pickCategory.hint = $route.state.pickCategory.hint
 		$route.pickCategory.disabled = $route.state.pickCategory.disabled == true
-		$route.pickCategory.name = $route.state.pickCategory?.category ?? 'Select Category'
-		$route.pickCategory.fill = $route.state.pickCategory?.category
+		$route.pickCategory.name = (!$route.state.pickCategory.overflow && !$route.state.pickCategory.manual) ? 'Auto' : $route.state.pickCategory?.category ?? 'Select Category'
+		$route.pickCategory.icon = (!$route.state.pickCategory.overflow && !$route.state.pickCategory.manual) && 'sparkle'
+		$route.pickCategory.fill = (!$route.state.pickCategory.overflow && !$route.state.pickCategory.manual) || $route.state.pickCategory?.category
 		$route.pickCategory.children = [...$links.selected.groups.map(g => {
 			return {
 				name: g.name,
-				fill: $route.state.pickCategory?.group === g.name,
+				fill: ($route.state.pickCategory.overflow || $route.state.pickCategory.manual) && $route.state.pickCategory.group === g.name,
 				click: () => $route.state.pickCategory.groupName = g.name,
 				children: [...g.categories.map(c => {
 					return {
 						name: c.name,
 						type: 'action',
 						disabled: (($route.state.pickCategory.disabled?.length && $route.state.pickCategory.disabled) ?? []).find(d => d.group === g.name && d.name === c.name),
-						fill: $route.state.pickCategory?.category === c.name,
+						fill: ($route.state.pickCategory.overflow || $route.state.pickCategory.manual) && $route.state.pickCategory.category === c.name,
 						click: () => {
 							$route.state.pickCategory.group = g.name
 							$route.state.pickCategory.category = c.name
+							if (!$route.state.pickCategory.overflow) $route.state.pickCategory.manual = true
 							return 2
 						}
 					}
@@ -404,6 +405,11 @@
 							$route.state.pickCategory.category = $route.state.pickCategory.categoryName
 							$route.state.pickCategory.categoryName = undefined
 							$route.state.pickCategory.categoryValue = undefined
+							queue.enq(async () => {
+								$links = await $links.ai.category($route.state.pickCategory.group, $route.state.pickCategory.category)
+								$links = $links.sort(...$links.which.transactions(t => !t.properties.manual))
+								$route = $route
+							})
 							updateBudgets()
 							return 1
 						}
@@ -431,17 +437,31 @@
 					return 1
 				}
 			}]
-		}, { type: 'spacer' }, {
-			name: 'Deselect',
-			type: 'action',
-			dangerous: true,
-			disabled: !$route.state.pickCategory.category,
-			click: () => {
-				$route.state.pickCategory.group = undefined
-				$route.state.pickCategory.category = undefined
-				return 1
-			}
-		}]
+		}, { type: 'spacer' }, ]
+		if ($route.state.pickCategory.overflow) {
+			$route.pickCategory.children.push({
+				name: 'Deselect',
+				type: 'action',
+				dangerous: true,
+				disabled: !$route.state.pickCategory.category,
+				click: () => {
+					$route.state.pickCategory.group = undefined
+					$route.state.pickCategory.category = undefined
+					return 1
+				}
+			})
+		} else {
+			$route.pickCategory.children.push({
+				name: 'Auto',
+				icon: 'sparkle',
+				type: 'action',
+				fill: !$route.state.pickCategory.manual,
+				click: () => {
+					$route.state.pickCategory.manual = false
+					return 1
+				}
+			})
+		}
 	}
 
 	$route.transaction = {}
@@ -467,12 +487,18 @@
 		$route.transaction.quit = async () => {
 			if ($route.state.transaction.id) {
 				if (!$route.state.transaction.new.name) $route.state.transaction.new.name = $route.state.transaction.name
-				if (!$route.state.transaction.new.properties.group || !$route.state.transaction.new.properties.category) {
-					$route.state.transaction.new.properties.group = $route.state.transaction.properties.group
-					$route.state.transaction.new.properties.category = $route.state.transaction.properties.category
-				}
+				else if ($route.state.transaction.name !== $route.state.transaction.new.name ?? $route.state.transaction.name) {
+					const id = $route.state.transaction.id
 
-				const { data } = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
+					queue.enq(async () => {
+						$links = await $links.ai.transaction(id)
+						$links = $links.sort(...$links.which.transactions(t => t.id === id))
+					})
+				}
+				// Auto sort
+				if (!$route.state.transaction.new.properties.manual) $links = $links.sort($route.state.transaction.new)
+
+				const data = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
 				if (data) {
 					$links = data
 					// Edit Custom
@@ -567,7 +593,6 @@
 	}
 
 	$route.category = {}
-	let sorting = false
 	const conflicts = (group, category) => {
 		let categories = []
 		$links.selected.groups.forEach(g => {
@@ -596,13 +621,21 @@
 			] : true
 			updatePickCategory()
 			$route.state.pickCategory.hint = $route.state.category.new.spend ? 'Underflow' : 'Overflow'
+			$route.state.pickCategory.overflow = true
 		}
 
 		$route.category.name = 'Edit Category'
 		$route.category.quit = () => {
 			// Remove circular reference
 			delete $route.state.category.new.overflow.disabled
+
+			// Should we update PFCs?
+			const update = $route.state.category.new.group && $route.state.category.name !== $route.state.category.new.name
+
+			// Update category
 			const data = $links.update.category($route.state.category.group, $route.state.category.name, $route.state.category.new.group ? $route.state.category.new : null)
+
+			if (update) queue.enq(async () => $links.ai.category($route.state.category.new.group, $route.state.category.new.name))
 			delete $route.state.category.new
 			if (data) {
 				$links = data
@@ -629,44 +662,7 @@
 			value: $route.state.category.new?.spend,
 			set: v => $route.state.category.new.spend = v,
 			// bg: !$route.state.category.new?.spend ? 'var(--text-good)' : 'var(--text-bad)'
-		}, $route.pickCategory, { type: 'spacer' }]
-		if ($route.state.category.group === $links.fallback().group && $route.state.category.name === $links.fallback().category)
-			$route.category.children.push({
-				name: 'Sort',
-				type: 'action',
-				disabled: sorting,
-				fill: true,
-				icon: 'sparkle',
-				click: () => {
-					if (!session?.user?.id) {
-						notifications.add({ type: 'error', message: 'Join Budgeteer to use AI to sort transactions!' })
-						return 1
-					}
-
-					sorting = true
-					$route = $route
-					const ts = $links.which.transactions(t => t.properties.group === $route.state.category.group && t.properties.category === $route.state.category.name && month(t.date, $date) && t.properties.imported)
-					if (!ts.length) {
-						notifications.add({ type: 'info', message: 'No imported transactions to sort!' })
-						sorting = false
-						return 1
-					}
-					queue.enq(async () => {
-						notifications.add({ type: 'info', message: 'Sort is still in beta, so it might not work flawlessly.' })
-						const { data, error } = await $links.sort(ts, supabase.invoke)
-						if (error) {
-							notifications.add({ type: 'error', message: error.message })
-						} else if (data) {
-							$links = data
-							updateBudgets()
-						}
-						sorting = false
-						$route = $route
-					})
-					return 1
-				}
-			})
-		$route.category.children.push({
+		}, $route.pickCategory, { type: 'spacer' }, {
 			name: 'Remove Category',
 			type: 'action',
 			dangerous: true,
@@ -677,7 +673,7 @@
 				// updateBudgets()
 				// return 1
 			}
-		})
+		}]
 	}
 
 	$route.group = {}

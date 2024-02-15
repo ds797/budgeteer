@@ -9,12 +9,9 @@
 	import { month } from '$lib/utils/compare'
 	import Progress from '$lib/components/element/Progress.svelte'
 	import Transaction from '$lib/components/Transaction.svelte'
-	import Sparkle from '$lib/svg/Sparkle.svelte'
 	import Chevron from '../svg/Chevron.svelte'
 
 	export let group, category
-
-	let sorting = false
 
 	const value = tweened(0, {
 		duration: 600,
@@ -71,11 +68,6 @@
 			<button class="none" class:turn={!category.hide} on:click={() => category.hide = !category.hide}>
 				<Chevron size={'1.5rem'} direction={'right'} />
 			</button>
-			{ #if group.name === $links.fallback().group && category.name === $links.fallback().category }
-				<button class="none" class:disabled={sorting} on:click={click}>
-					<Sparkle size={'1.5rem'} />
-				</button>
-			{ /if }
 		</div>
 		{ #if category.value && parseFloat(category.value) !== 0 }
 			<div class="bar">

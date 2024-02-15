@@ -3,14 +3,118 @@ import { post } from '$lib/utils/requests'
 import { clamp, num } from '$lib/utils/math'
 import { format } from '$lib/utils/string'
 
-export default class Links {
-	constructor(obj, err = m => console.error(m)) {
-		const self = this
+const PFCs = [
+	'INCOME_DIVIDENDS',
+	'INCOME_INTEREST_EARNED',
+	'INCOME_RETIREMENT_PENSION',
+	'INCOME_TAX_REFUND',
+	'INCOME_UNEMPLOYMENT',
+	'INCOME_WAGES',
+	'INCOME_OTHER_INCOME',
+	'TRANSFER_IN_CASH_ADVANCES_AND_LOANS',
+	'TRANSFER_IN_DEPOSIT',
+	'TRANSFER_IN_INVESTMENT_AND_RETIREMENT_FUNDS',
+	'TRANSFER_IN_SAVINGS',
+	'TRANSFER_IN_ACCOUNT_TRANSFER',
+	'TRANSFER_IN_OTHER_TRANSFER_IN',
+	'TRANSFER_OUT_INVESTMENT_AND_RETIREMENT_FUNDS',
+	'TRANSFER_OUT_SAVINGS',
+	'TRANSFER_OUT_WITHDRAWAL',
+	'TRANSFER_OUT_ACCOUNT_TRANSFER',
+	'TRANSFER_OUT_OTHER_TRANSFER_OUT',
+	'LOAN_PAYMENTS_CAR_PAYMENT',
+	'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT',
+	'LOAN_PAYMENTS_PERSONAL_LOAN_PAYMENT',
+	'LOAN_PAYMENTS_MORTGAGE_PAYMENT',
+	'LOAN_PAYMENTS_STUDENT_LOAN_PAYMENT',
+	'LOAN_PAYMENTS_OTHER_PAYMENT',
+	'BANK_FEES_ATM_FEES',
+	'BANK_FEES_FOREIGN_TRANSACTION_FEES',
+	'BANK_FEES_INSUFFICIENT_FUNDS',
+	'BANK_FEES_INTEREST_CHARGE',
+	'BANK_FEES_OVERDRAFT_FEES',
+	'BANK_FEES_OTHER_BANK_FEES',
+	'ENTERTAINMENT_CASINOS_AND_GAMBLING',
+	'ENTERTAINMENT_MUSIC_AND_AUDIO',
+	'ENTERTAINMENT_SPORTING_EVENTS_AMUSEMENT_PARKS_AND_MUSEUMS',
+	'ENTERTAINMENT_TV_AND_MOVIES',
+	'ENTERTAINMENT_VIDEO_GAMES',
+	'ENTERTAINMENT_OTHER_ENTERTAINMENT',
+	'FOOD_AND_DRINK_BEER_WINE_AND_LIQUOR',
+	'FOOD_AND_DRINK_COFFEE',
+	'FOOD_AND_DRINK_FAST_FOOD',
+	'FOOD_AND_DRINK_GROCERIES',
+	'FOOD_AND_DRINK_RESTAURANT',
+	'FOOD_AND_DRINK_VENDING_MACHINES',
+	'FOOD_AND_DRINK_OTHER_FOOD_AND_DRINK',
+	'GENERAL_MERCHANDISE_BOOKSTORES_AND_NEWSSTANDS',
+	'GENERAL_MERCHANDISE_CLOTHING_AND_ACCESSORIES',
+	'GENERAL_MERCHANDISE_CONVENIENCE_STORES',
+	'GENERAL_MERCHANDISE_DEPARTMENT_STORES',
+	'GENERAL_MERCHANDISE_DISCOUNT_STORES',
+	'GENERAL_MERCHANDISE_ELECTRONICS',
+	'GENERAL_MERCHANDISE_GIFTS_AND_NOVELTIES',
+	'GENERAL_MERCHANDISE_OFFICE_SUPPLIES',
+	'GENERAL_MERCHANDISE_ONLINE_MARKETPLACES',
+	'GENERAL_MERCHANDISE_PET_SUPPLIES',
+	'GENERAL_MERCHANDISE_SPORTING_GOODS',
+	'GENERAL_MERCHANDISE_SUPERSTORES',
+	'GENERAL_MERCHANDISE_TOBACCO_AND_VAPE',
+	'GENERAL_MERCHANDISE_OTHER_GENERAL_MERCHANDISE',
+	'HOME_IMPROVEMENT_FURNITURE',
+	'HOME_IMPROVEMENT_HARDWARE',
+	'HOME_IMPROVEMENT_REPAIR_AND_MAINTENANCE',
+	'HOME_IMPROVEMENT_SECURITY',
+	'HOME_IMPROVEMENT_OTHER_HOME_IMPROVEMENT',
+	'MEDICAL_DENTAL_CARE',
+	'MEDICAL_EYE_CARE',
+	'MEDICAL_NURSING_CARE',
+	'MEDICAL_PHARMACIES_AND_SUPPLEMENTS',
+	'MEDICAL_PRIMARY_CARE',
+	'MEDICAL_VETERINARY_SERVICES',
+	'MEDICAL_OTHER_MEDICAL',
+	'PERSONAL_CARE_GYMS_AND_FITNESS_CENTERS',
+	'PERSONAL_CARE_HAIR_AND_BEAUTY',
+	'PERSONAL_CARE_LAUNDRY_AND_DRY_CLEANING',
+	'PERSONAL_CARE_OTHER_PERSONAL_CARE',
+	'GENERAL_SERVICES_ACCOUNTING_AND_FINANCIAL_PLANNING',
+	'GENERAL_SERVICES_AUTOMOTIVE',
+	'GENERAL_SERVICES_CHILDCARE',
+	'GENERAL_SERVICES_CONSULTING_AND_LEGAL',
+	'GENERAL_SERVICES_EDUCATION',
+	'GENERAL_SERVICES_INSURANCE',
+	'GENERAL_SERVICES_POSTAGE_AND_SHIPPING',
+	'GENERAL_SERVICES_STORAGE',
+	'GENERAL_SERVICES_OTHER_GENERAL_SERVICES',
+	'GOVERNMENT_AND_NON_PROFIT_DONATIONS',
+	'GOVERNMENT_AND_NON_PROFIT_GOVERNMENT_DEPARTMENTS_AND_AGENCIES',
+	'GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT',
+	'GOVERNMENT_AND_NON_PROFIT_OTHER_GOVERNMENT_AND_NON_PROFIT',
+	'TRANSPORTATION_BIKES_AND_SCOOTERS',
+	'TRANSPORTATION_GAS',
+	'TRANSPORTATION_PARKING',
+	'TRANSPORTATION_PUBLIC_TRANSIT',
+	'TRANSPORTATION_TAXIS_AND_RIDE_SHARES',
+	'TRANSPORTATION_TOLLS',
+	'TRANSPORTATION_OTHER_TRANSPORTATION',
+	'TRAVEL_FLIGHTS',
+	'TRAVEL_LODGING',
+	'TRAVEL_RENTAL_CARS',
+	'TRAVEL_OTHER_TRAVEL',
+	'RENT_AND_UTILITIES_GAS_AND_ELECTRICITY',
+	'RENT_AND_UTILITIES_INTERNET_AND_CABLE',
+	'RENT_AND_UTILITIES_RENT',
+	'RENT_AND_UTILITIES_SEWAGE_AND_WASTE_MANAGEMENT',
+	'RENT_AND_UTILITIES_TELEPHONE',
+	'RENT_AND_UTILITIES_WATER',
+	'RENT_AND_UTILITIES_OTHER_UTILITIES'
+]
 
-		self.links = obj?.links ?? []
-		self.budgets = obj?.budgets ?? []
-		self.selected = obj?.selected ?? undefined
-		self.err = err
+export default class Links {
+	constructor(obj, err = m => console.error(m), invoke = () => {
+		return { error: `No 'invoke' function supplied` }
+	}) {
+		const self = this
 
 		// Methods
 		self.fallback = () => {
@@ -28,6 +132,10 @@ export default class Links {
 					name: 'Bills',
 					categories: [{
 						name: 'Mortgage',
+						pfc: [{
+							name: 'LOAN_PAYMENTS_MORTGAGE_PAYMENT',
+							confidence: 1
+						}],
 						value: 2000,
 						overflow: { group: 'Needs', category: 'Groceries' }
 					}]
@@ -35,6 +143,10 @@ export default class Links {
 					name: 'Needs',
 					categories: [{
 						name: 'Groceries',
+						pfc: [{
+							name: 'FOOD_AND_DRINK_GROCERIES',
+							confidence: 1
+						}],
 						value: 0,
 						overflow: { group: 'Wants', category: 'Dinners Out' }
 					}]
@@ -42,6 +154,10 @@ export default class Links {
 					name: 'Wants',
 					categories: [{
 						name: 'Dinners Out',
+						pfc: [{
+							name: 'FOOD_AND_DRINK_RESTAURANT',
+							confidence: 1
+						}],
 						value: 0,
 						spend: true,
 						overflow: {}
@@ -66,6 +182,11 @@ export default class Links {
 				transactions: []
 			}
 		}
+
+		self.links = obj?.links ?? [self.custom()]
+		self.budgets = obj?.budgets ?? [self.default()]
+		self.selected = obj?.selected ?? self.budgets[0]
+
 		self.select = name => {
 			self.selected = self.budgets.find(b => b.name === name)
 		}
@@ -173,11 +294,29 @@ export default class Links {
 				return false
 			}
 		}
+		self.sort = (...transactions) => {
+			for (const t of transactions) {
+				// TODO: improve efficiency
+				const set = t => {
+					for (const group of self.selected.groups)
+						for (const category of group.categories)
+							if ((category.pfc ?? []).find(pfc => pfc.name === t.pfc.detailed)) {
+								t.properties.group = group.name
+								t.properties.category = category.name
+								return
+							}
+					t.properties.group = self.fallback().group
+					t.properties.category = self.fallback().category
+				}
+				set(t)
+			}
+			return self
+		}
 		self.add = {
 			link: (...links) => {
 				for (const link of links) {
 					if (self.links.find(l => l.institution === link.institution)) {
-						self.err('Link already exists')
+						err('Link already exists')
 						continue
 					}
 
@@ -195,7 +334,7 @@ export default class Links {
 			budget: (...budgets) => {
 				for (const budget of budgets) {
 					if (self.budgets.find(b => b.name === budget.name)) {
-						self.err('Budget already exists')
+						err('Budget already exists')
 						return self
 					}
 
@@ -213,12 +352,12 @@ export default class Links {
 			},
 			group: name => {
 				if (!name.length) {
-					self.err('No name supplied')
+					err('No name supplied')
 					return self
 				}
 
 				if (self.selected.groups.find(g => g.name === name)) {
-					self.err('Group already exists')
+					err('Group already exists')
 					return self
 				}
 
@@ -233,26 +372,27 @@ export default class Links {
 				const g = self.selected.groups.find(g => g.name === group)
 			
 				if (!name.length) {
-					self.err('No name supplied')
+					err('No name supplied')
 					return
 				}
 			
 				if (g.protected) {
-					self.err('Group is protected')
+					err('Group is protected')
 					return self
 				}
 
 				if (!g) {
-					self.err('Group doesn\'t exist')
+					err('Group doesn\'t exist')
 					return self
 				}
 
 				if (g.categories.find(c => c.name === name)) {
-					self.err('Category already exists')
+					err('Category already exists')
 					return self
 				}
 
 				if (!properties.overflow) properties.overflow = {}
+				if (!properties.pfc) properties.pfc = []
 
 				g.categories.unshift({ name, ...properties })
 
@@ -273,10 +413,12 @@ export default class Links {
 						account: t.account_id ?? t.account,
 						merchant: t.merchant_name ?? t.merchant,
 						name: t.name,
-						category: t.category ?? ['Unknown'],
+						pfc: t.pfc ?? [],
 						properties: t.properties
 					})
 				}
+
+				self.sort(...transactions)
 
 				return self
 			},
@@ -291,11 +433,12 @@ export default class Links {
 						continue
 
 					t.properties = t.properties ?? {
-						imported: true,
+						manual: false,
 						group: 'Other',
 						category: 'Uncategorized',
 						ignore: true
 					}
+					console.log('adding', t)
 					self.add.transaction(t)
 				}
 
@@ -324,13 +467,13 @@ export default class Links {
 					&& transaction.properties.group === data.properties.group
 					&& transaction.properties.category === data.properties.category
 					&& transaction.properties.hide === data.properties.hide)
-					return {}
+					return
 
 				data.properties = Object.assign(transaction.properties, data.properties)
 
 				Object.assign(transaction, data)
 
-				return { data: self}
+				return self
 			},
 			group: (name, data) => {
 				if (!data) {
@@ -412,7 +555,7 @@ export default class Links {
 			budget: (...names) => {
 				for (const name of names) {
 					if (!self.budgets.filter(b => b.name === name).length) {
-						self.err('Budget doesn\'t exist')
+						err('Budget doesn\'t exist')
 						return self
 					}
 
@@ -429,7 +572,7 @@ export default class Links {
 			group: name => {
 				const index = self.selected.groups.findIndex(g => g.name === name)
 				if (self.selected.groups[index].protected) {
-					self.err('Group is protected')
+					err('Group is protected')
 					return self
 				}
 
@@ -451,7 +594,7 @@ export default class Links {
 			category: (group, category) => {
 				const gIndex = self.selected.groups.findIndex(g => g.name === group)
 				if (self.selected.groups[gIndex].protected) {
-					self.err('Group is protected')
+					err('Group is protected')
 					return self
 				}
 
@@ -484,87 +627,39 @@ export default class Links {
 				return self
 			}
 		}
-		self.sort = async (transactions, invoke) => {
-			let build = {
-				transactions: [],
-				user_groups: self.selected.groups
-			}
-
-			let all = []
-
-			const parse = async () => {
-				const { data, error } = await invoke('sortTransactions', { messages: build })
-				if (error) return { error }
-				console.log('input', JSON.stringify(build), 'names', ...build.transactions, 'output', data)
-				const parsed = JSON.parse(data)
-
-				if (parsed.sorted.length !== build.transactions.length) return false
-
-				for (const s of parsed.sorted) {
-					const g = self.selected.groups.find(g => g.name === s.group)
-					if (!g) return false
-					if (!g.categories.find(c => c.name === s.category)) return false
-				}
-				build.transactions = []
-		
-				return { data: parsed.sorted }
-			}
-
-			const loop = async build => {
-				let sorted
-				for (let i = 0; i < 5; i++) {
-					const { data, error } = await parse(build)
-					if (error) return error
-					sorted = data
-					if (sorted) break
-				}
-				if (!sorted) sorted = build.transactions.map(() => {
-					return {
-						group: 'Other',
-						category: 'Uncategorized'
-					}
-				})
-
-				all.push(sorted)
-			}
-
-			let original = []
-
-			for (const transaction of transactions) {
-				if (!transaction.properties.imported) continue
-
-				build.transactions.push({
-					name: transaction.name,
-					merchant: transaction.merchant,
-					general_categories: transaction.category
-				})
-
-				original.push(transaction)
-
-				if (5 <= build.transactions.length) {
-					const error = await loop(build)
-					if (error) return { error }
-				}
-			}
-
-			// Flush
-			if (build.transactions.length) {
-				const error = await loop(build)
-				if (error) return { error }
-			}
-
-			all = all.flat()
-
-			for (let i = 0; i < original.length; i++) {
-				original[i].properties.group = all[i].group
-				original[i].properties.category = all[i].category
-			}
-
-			return { data: self }
-		}
 		self.order = (group, category, predicate = () => true) => {
 			const ts = self.which.transactions(t => t.properties.group === group && t.properties.category === category && predicate(t))
 			return ts.toSorted((one, two) => new Date(two.date) - new Date(one.date))
+		}
+		self.ai = {
+			category: async (group, category) => {
+				console.log(group, category, self.selected.groups)
+				let c = self.selected.groups.find(g => g.name === group).categories.find(c => c.name === category)
+
+				const { data } = await invoke('ai', { type: { category: { group, category } } })
+				const pfcs = JSON.parse(data)
+
+				c.pfc = pfcs.pfc.map((name, index) => {
+					return {
+						name,
+						confidence: pfcs.confidence[index]
+					}
+				})
+
+				console.log('set pfcs', c.pfc)
+
+				return self
+			},
+			transaction: async id => {
+				let transaction = self.selected.transactions.find(t => t.id === id)
+
+				const { data } = await invoke('ai', { type: { transaction: { name: transaction.name } } })
+				const pfc = JSON.parse(data)
+
+				transaction.pfc = { detailed: pfc.pfc }
+				console.log(transaction.pfc)
+				return self
+			}
 		}
 	}
 }
