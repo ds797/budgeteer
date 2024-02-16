@@ -1,6 +1,7 @@
 <script>
 	import { onMount, tick } from 'svelte'
 	import { slide } from '$lib/utils/transition'
+	import { chats } from '$lib/stores/ui'
 	import Account from '$lib/svg/Account.svelte'
 	import Sparkle from '$lib/svg/Sparkle.svelte'
 	import Loading from '$lib/components/Loading.svelte'
@@ -11,18 +12,17 @@
 
 	let message = ''
 
-	let chats = []
 	let thinking = false
 	let input, response
 
 	const scroll = async () => {
 		await tick()
-		response.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+		response.scroll({ top: response.scrollHeight, behavior: 'smooth' })
 	}
 
 	const ask = async () => {
 		thinking = !thinking
-		chats = [...chats, {
+		$chats = [...$chats, {
 			role: 'user',
 			content: message
 		}, {
@@ -38,7 +38,7 @@
 				'Content-type': 'application/json',
 				'Authorization': `Bearer ${session.access_token}`
 			},
-			body: JSON.stringify({ type: { assistant: chats } })
+			body: JSON.stringify({ type: { assistant: $chats } })
 		})
 
 		const reader = res.body.getReader()
@@ -47,13 +47,16 @@
 			if (done) break
 
 			const text = new TextDecoder().decode(value)
-			chats[chats.length - 1].content += text
+			$chats[$chats.length - 1].content += text
 			scroll()
 		}
 		thinking = false
 	}
 
-	onMount(() => input.focus())
+	onMount(() => {
+		input.focus()
+		scroll()
+	})
 
 	const key = e => e.key === 'Enter' && !thinking && ask()
 </script>
@@ -62,7 +65,20 @@
 
 <main style="width: {width / 1.5}px; height: {height / 1.5}px;">
 	<div class="response" bind:this={response}>
-		{ #each chats as chat, index }
+		<div transition:slide>
+			<div class="chat">
+				<div class="role">
+					<div class="icon">
+						<Sparkle size={'1.5rem'} />
+					</div>
+					<div class="message">
+						<p>Ask AI any questions you have about your budget!</p>
+					</div>
+				</div>
+			</div>
+			<div class="bar" />
+		</div>
+		{ #each $chats as chat, index }
 			<div transition:slide>
 				{ #if index !== 0 }
 					<div class="bar" />
