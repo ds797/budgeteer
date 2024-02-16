@@ -15,9 +15,9 @@
 	let thinking = false
 	let input, response
 
-	const scroll = async node => {
+	const scroll = async () => {
 		await tick()
-		node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
+		response.scroll({ top: node.scrollHeight, behavior: 'smooth' })
 	}
 
 	const ask = async () => {
@@ -30,9 +30,9 @@
 			content: ''
 		}]
 		message = ''
-		scroll(response)
+		scroll()
 
-		const response = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
+		const res = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json',
@@ -41,14 +41,14 @@
 			body: JSON.stringify({ type: { assistant: chats } })
 		})
 
-		const reader = response.body.getReader()
+		const reader = res.body.getReader()
 		while (true) {
 			const { done, value } = await reader.read()
 			if (done) break
 
 			const text = new TextDecoder().decode(value)
 			chats[chats.length - 1].content += text
-			scroll(response)
+			scroll()
 		}
 		thinking = false
 	}
