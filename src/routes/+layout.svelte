@@ -816,11 +816,13 @@
 				<Navbar {data} />
 			</div>
 			<div class="fill">
-				<div class="info">
+				<div class="info" style="">
 					<h1 class="hero">Budgeteer</h1>
 					<p class="big">Intuitive budgeting that allows you to harness the power of artificial intelligence.</p>
 				</div>
-				<BillStack />
+				<div class="stack">
+					<BillStack />
+				</div>
 			</div>
 		{ /if }
 	{ :else if $page.url.pathname === '/demo' }
@@ -880,8 +882,24 @@
 
 	.info {
 		margin: 2rem;
+		margin-right: 9rem;
 		display: flex;
 		flex-flow: column;
 		gap: 2rem;
+	}
+
+	.stack {
+		position: fixed;
+		bottom: 0;
+		right: 4.5rem;
+	}
+
+	@media (max-aspect-ratio: 1/1) {
+		.info {
+			margin: 2rem;
+		}
+		.stack {
+			bottom: -30vh;
+		}
 	}
 </style>

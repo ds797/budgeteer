@@ -29,7 +29,6 @@
 	--transition-fast: all 0.1s ease-out;
 	font-family: var(--font);
 	color: var(--text);
-	overflow: hidden;
 }
 
 * {

@@ -24,9 +24,6 @@
 </main>
 
 <style>
-	* {
-		overflow: hidden;
-	}
 	main {
 		padding: 2rem;
 		display: flex;
