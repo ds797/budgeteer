@@ -69,11 +69,6 @@
 
 	$route.start = {
 		name: 'Budgeteer',
-		key: async e => {
-			if (e.key !== 'Enter') return
-
-			return await enter(email)
-		},
 		children: [{
 			name: 'Email',
 			type: 'input',
@@ -82,6 +77,7 @@
 		}, {
 			name: 'Send link',
 			type: 'action',
+			submit: true,
 			fill: true,
 			click: async () => {
 				await enter(email)

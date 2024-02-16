@@ -337,6 +337,7 @@
 			}, {
 				name: 'Add',
 				type: 'action',
+				submit: true,
 				disabled: !$route.state.pickBudget.name,
 				fill: true,
 				click: () => {
@@ -394,8 +395,9 @@
 						value: $route.state.pickCategory?.categoryValue,
 						set: v => $route.state.pickCategory.categoryValue = v
 					}, {
-						name: 'Add Category',
+						name: 'Add',
 						type: 'action',
+						submit: true,
 						fill: true,
 						disabled: !$route.state.pickCategory?.categoryName,
 						click: () => {
@@ -426,8 +428,9 @@
 				value: $route.state.pickCategory?.groupName,
 				set: v => $route.state.pickCategory.groupName = v
 			}, {
-				name: 'Add Group',
+				name: 'Add',
 				type: 'action',
+				submit: true,
 				fill: true,
 				disabled: !$route.state.pickCategory?.groupName,
 				click: () => {
@@ -573,6 +576,7 @@
 			$route.transaction.children.push({
 				name: 'Add',
 				type: 'action',
+				submit: true,
 				disabled: !$route.state.transaction.new.name || !$route.state.transaction.new.amount || (!$route.state.transaction.new.properties.category && $route.state.transaction.new.properties.manual) || !$route.state.transaction.new.account,
 				fill: true,
 				click: () => {

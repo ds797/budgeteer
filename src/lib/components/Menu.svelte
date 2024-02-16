@@ -16,20 +16,6 @@
 	
 	const dispatch = createEventDispatcher();
 	
-	const key = async e => {
-		if (menu.key) {
-			const close = await menu.key(e);
-			if (close) dispatch('close', 0);
-		}
-
-		if (e.key !== 'Escape') return;
-
-		if (show === -1) dispatch('close', 0);
-	}
-
-	let show = -1;
-	let loading = 0
-
 	let click = {
 		menu: async (child, i) => {
 			if (child.click) {
@@ -49,6 +35,25 @@
 			}
 		}
 	}
+
+	const key = async e => {
+		if (menu.key) {
+			const close = await menu.key(e);
+			if (close) dispatch('close', 0);
+		}
+
+		if (e.key === 'Enter') {
+			const index = menu.children.findIndex(c => c.submit)
+			if (index !== -1 && !menu.children[index].disabled) click.action(menu.children[index], index)
+		}
+
+		if (e.key !== 'Escape') return;
+
+		if (show === -1) dispatch('close', 0);
+	}
+
+	let show = -1;
+	let loading = 0
 
 	$: if (!menu) dispatch('close', 0)
 </script>
@@ -73,13 +78,12 @@
 					{ #if child.description }
 						<p class='description'>{child.description}</p>
 					{ /if }
-
 					<div class="hint">
 						{ #if child.hint }
 							<h4>{child.hint}</h4>
 						{ /if }
 						{ #if child.name && (child.type ?? 'menu') === 'menu' }
-							<button class:fill={child.fill} class:disabled={child.disabled} on:click={() => click.menu(child, index)} class:dangerous={child.dangerous}>
+							<button class:fill={child.fill} class:disabled={child.disabled} on:click={() => !child.disabled && click.menu(child, index)} class:dangerous={child.dangerous}>
 								{ #if child.icon }
 									{ #if child.icon === 'sparkle' }
 										<Sparkle size={'1rem'} />
@@ -89,7 +93,7 @@
 							</button>
 						{ :else if child.name && child.type === 'action' }
 							<div class='select'>
-								<button class='action' class:fill={child.fill} class:disabled={child.disabled || loading == index + 1} class:dangerous={child.dangerous} on:click={() => click.action(child, index)}>
+								<button class='action' class:fill={child.fill} class:disabled={child.disabled || loading == index + 1} class:dangerous={child.dangerous} on:click={() => !child.disabled && click.action(child, index)}>
 									{ #if child.icon }
 										{ #if child.icon === 'sparkle' }
 											<Sparkle size={'1rem'} />
