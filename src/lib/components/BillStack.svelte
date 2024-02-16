@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte'
 	import { fly } from 'svelte/transition'
-	import Stack from '$lib/svg/Stack.svelte'
+	import Bill from '../svg/Bill.svelte'
 
 	let bills = Array(50).fill(undefined).map(() => {
 		return {}
@@ -9,31 +9,33 @@
 
 	onMount(() => {
 		setInterval(() => {
-			bills.shift()
-			bills = [...bills, {}]
+			bills.pop()
+			bills = [{}, ...bills]
 		}, 1000)
 	})
 </script>
 
 <main>
-	{ #each bills as b, i (b) }
-			<div style="top: {(i - 5) * 10}px;" in:fly={{ y: 200, duration: 1000 }}>
-				<Stack size={'5rem'} />
-			</div>
+	{ #each bills as _, i (bills[bills.length - 1 - i]) }
+		<div style="bottom: {(i - 5) * 10}px;" in:fly={{ y: -200, duration: 1000 }}>
+			<Bill size={'5rem'} />
+		</div>
 	{ /each }
 </main>
 
 <style>
-	main {
-		/* align-self: flex-start; */
-		display: block;
+	* {
 		overflow: hidden;
-		transform: scaleY(-1);
+	}
+	main {
+		padding: 2rem;
+		display: flex;
+		flex-flow: column;
+		align-items: flex-end;
 	}
 
 	div {
 		position: absolute;
-		right: 2rem;
 		transition: all 1s linear;
 	}
 </style>
