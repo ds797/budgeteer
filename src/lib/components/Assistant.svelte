@@ -3,7 +3,7 @@
 	import { slide } from '$lib/utils/transition'
 	import { month } from '$lib/utils/compare'
 	import { links, date } from '$lib/stores/user'
-	import { chats } from '$lib/stores/ui'
+	import { notifications, assistant } from '$lib/stores/ui'
 	import Account from '$lib/svg/Account.svelte'
 	import Sparkle from '$lib/svg/Sparkle.svelte'
 	import Loading from '$lib/components/Loading.svelte'
@@ -14,7 +14,6 @@
 
 	let message = ''
 
-	let thinking = false
 	let input, response
 
 	const scroll = async () => {
@@ -23,8 +22,8 @@
 	}
 
 	const ask = async () => {
-		thinking = !thinking
-		$chats = [...$chats, {
+		$assistant.thinking = !$assistant.thinking
+		$assistant.chats = [...$assistant.chats, {
 			role: 'user',
 			content: message
 		}, {
@@ -36,37 +35,50 @@
 
 		const obj = structuredClone($links.selected)
 		delete obj.accounts
-		obj.month_inflow = $links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date))
-		obj.month_outflow = $links.get.sum(t => !t.properties.hide && t.amount < 0 && month(t.date, $date))
-		obj.transactions = $links.which.transactions(t => month(t.date, $date)).map(t => {
-			return {
-				name: t.name,
-				amount: t.amount,
-				date: t.date,
-				properties: t.properties
+		delete obj.groups
+		const context = JSON.stringify({
+			inflow: $links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date)),
+			outflow: obj.month_outflow = $links.get.sum(t => !t.properties.hide && t.amount < 0 && month(t.date, $date)),
+			transactions: $links.which.transactions(t => {
+				// Check if transactions are within last three months
+				const one = new Date($date)
+				one.setMonth($date.getMonth() - 1)
+				const two = new Date($date)
+				two.setMonth($date.getMonth() - 2)
+				return month(t.date, $date) || month(t.date, one) || month(t.date, two)
+			}).map(t => {
+				return {
+					name: t.name,
+					amount: t.amount,
+					date: t.date,
+					properties: t.properties
+				}
+			})
+		})
+
+		try {
+			const res = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
+				method: 'POST',
+				headers: {
+					'Content-type': 'application/json',
+					'Authorization': `Bearer ${session.access_token}`
+				},
+				body: JSON.stringify({ type: { assistant: { context: `Metadata: ${context}`, messages: $assistant.chats } } })
+			})
+
+			const reader = res.body.getReader()
+			while (true) {
+				const { done, value } = await reader.read()
+				if (done) break
+
+				const text = new TextDecoder().decode(value)
+				$assistant.chats[$assistant.chats.length - 1].content += text
+				scroll()
 			}
-		})
-		const context = 'Budget metadata: ' + JSON.stringify(obj)
-
-		const res = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
-			method: 'POST',
-			headers: {
-				'Content-type': 'application/json',
-				'Authorization': `Bearer ${session.access_token}`
-			},
-			body: JSON.stringify({ type: { assistant: { context, messages: $chats } } })
-		})
-
-		const reader = res.body.getReader()
-		while (true) {
-			const { done, value } = await reader.read()
-			if (done) break
-
-			const text = new TextDecoder().decode(value)
-			$chats[$chats.length - 1].content += text
-			scroll()
+		} catch (error) {
+			notifications.add({ type: 'error', message: error })
 		}
-		thinking = false
+		$assistant.thinking = false
 	}
 
 	onMount(() => {
@@ -74,7 +86,7 @@
 		scroll()
 	})
 
-	const key = e => e.key === 'Enter' && !thinking && ask()
+	const key = e => e.key === 'Enter' && !$assistant.thinking && ask()
 </script>
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} />
@@ -94,7 +106,7 @@
 			</div>
 			<div class="bar" />
 		</div>
-		{ #each $chats as chat, index }
+		{ #each $assistant.chats as chat, index }
 			<div transition:slide>
 				{ #if index !== 0 }
 					<div class="bar" />
@@ -124,9 +136,9 @@
 	</div>
 	<div class="send">
 		<input bind:this={input} class="none" on:keydown={key} bind:value={message}>
-		<button class="fill" class:disabled={thinking || !message.length} on:click={ask}>
+		<button class="fill" class:disabled={$assistant.thinking || !message.length} on:click={ask}>
 			Send
-			{ #if thinking }
+			{ #if $assistant.thinking }
 				<div transition:slide={{ axis: 'both' }} class="icon">
 					<Loading size={'0.5rem'} border={'0.125rem'} />
 				</div>
