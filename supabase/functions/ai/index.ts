@@ -1,6 +1,6 @@
 import { cors } from '../_shared/cors.ts'
 import { user } from '../_shared/user.ts'
-import { json, complete } from '../_shared/openai.ts'
+import { openai, json } from '../_shared/openai.ts'
 import { respond, err } from '../_shared/response.ts'
 
 const instruct_category = `You're given a Group and a Category (the category is part of the Group). From the following list of Personal Finance Categories (PFCs), select which PFC(s) fit the Category best. Return the PFCs in JSON format, with two keys: 'pfc' and 'confidence', both arrays. Each entry in 'pfc' should have an entry in 'confidence', a float from 0-1.
@@ -245,43 +245,42 @@ Deno.serve(async (req: Request) => {
 	} else if (type.assistant) {
 		const messages = type.assistant
 
-		const response = await complete(instruct_assist, ...messages)
+		const body = new ReadableStream({
+			start: async controller => {
+				try {
+					const stream = await openai.chat.completions.create({
+						messages: [{
+							role: 'system',
+							content: instruct_assist
+						}, ...messages.map(m => {
+							return {
+								role: m.role,
+								content: m.content
+							}
+						})],
+						model: 'gpt-3.5-turbo-0125',
+						stream: true
+					})
 
-		return respond(response)
-		// try {
-		// 	const stream = await openai.chat.completions.create({
-		// 		messages: [{
-		// 			role: 'system',
-		// 			content: instruct_assist
-		// 		}, ...messages.map((m: any) => {
-		// 			return {
-		// 				role: m.role,
-		// 				content: m.content
-		// 			}
-		// 		})],
-		// 		model: 'gpt-3.5-turbo-0125',
-		// 		stream: true
-		// 	})
+					for await (const chunk of stream) {
+						let message = chunk.choices[0]?.delta?.content
+						controller.enqueue(new TextEncoder().encode(message))
+					}
+					controller.close()
+				} catch (error) {
+					return err(error, 0)
+				}
+			}
+		})
+		return new Response(body, {
+			headers: {
+				...cors,
+				"content-type": "text/plain",
+				"x-content-type-options": "nosniff"
+			}
+		})
 
-		// 	return new Response(new ReadableStream({
-		// 		start: async controller => {
-		// 			for await (const chunk of stream) {
-		// 				const c = chunk.choices[0]?.delta?.content || ''
-		// 				controller.enqueue(c)
-		// 			}
-		// 			controller.close()
-		// 		}
-		// 	}), {
-		// 		headers: {
-		// 			...cors,
-		// 			'Content-type': 'text/plain',
-		// 			'Transfer-encoding': 'chunked'
-		// 		},
-		// 		status: 200
-		// 	})
-		// } catch (error) {
-		// 	return err(error, 0)
-		// }
+		// return respond(response)
 	}
 
 	return err('No type specified', 400)

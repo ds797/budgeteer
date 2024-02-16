@@ -793,7 +793,7 @@
 	{ #if $route.current?.loading }
 	{ :else if $route.current?.assistant }
 		<Modal alpha={0} on:close={() => $route.current = undefined}>
-			<Assistant {supabase} />
+			<Assistant {session} />
 		</Modal>
 	{ :else if $route.current }
 		<Modal closable={false} on:close={quit}>

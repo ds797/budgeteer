@@ -46,24 +46,3 @@ export const json = async (instructions: string, ...messages: any[]) => {
 		throw new Error(error)
 	}
 }
-
-export const complete = async (instructions: string, ...messages: any[]) => {
-	try {
-		const completion = await openai.chat.completions.create({
-			messages: [{
-				role: 'system',
-				content: instructions
-			}, ...messages.map(m => {
-				return {
-					role: m.role,
-					content: m.content
-				}
-			})],
-			model: 'gpt-3.5-turbo-0125'
-		})
-		
-		return completion.choices[0].message.content
-	} catch (error) {
-		throw new Error(error)
-	}
-}

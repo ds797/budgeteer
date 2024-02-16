@@ -1,11 +1,11 @@
 <script>
-	import { tick } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import { slide } from '$lib/utils/transition'
 	import Account from '$lib/svg/Account.svelte'
 	import Sparkle from '$lib/svg/Sparkle.svelte'
 	import Loading from '$lib/components/Loading.svelte'
 
-	export let supabase
+	export let session
 
 	let width, height
 
@@ -13,11 +13,11 @@
 
 	let chats = []
 	let thinking = false
-	let response
+	let input, response
 
 	const scroll = async node => {
 		await tick()
-		node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+		node.scroll({ top: node.scrollHeight, behavior: 'smooth' })
 	}
 
 	const ask = async () => {
@@ -25,38 +25,35 @@
 		chats = [...chats, {
 			role: 'user',
 			content: message
+		}, {
+			role: 'assistant',
+			content: ''
 		}]
 		message = ''
 		scroll(response)
 
-		const { data } = await supabase.invoke('ai', { type: { assistant: chats } })
+		const response = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
+				'Authorization': `Bearer ${session.access_token}`
+			},
+			body: JSON.stringify({ type: { assistant: chats } })
+		})
 
-		console.log(data)
-		chats = [...chats, {
-			role: 'assistant',
-			content: data
-		}]
-		scroll(response)
-		// const response = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-type': 'application/json',
-		// 		'Authorization': `Bearer ${session.access_token}`
-		// 	},
-		// 	body: JSON.stringify({ type: { assistant: chats } })
-		// })
+		const reader = response.body.getReader()
+		while (true) {
+			const { done, value } = await reader.read()
+			if (done) break
 
-		// const reader = response.body.getReader()
-		// while (true) {
-		// 	const { done, value } = await reader.read()
-		// 	console.log(value, done)
-		// 	if (done) break
-		// 	const text = new TextDecoder().decode(value)
-		// 	console.log('got text', text)
-		// 	chats[chats.length - 1].content += text
-		// }
+			const text = new TextDecoder().decode(value)
+			chats[chats.length - 1].content += text
+			scroll(response)
+		}
 		thinking = false
 	}
+
+	onMount(() => input.focus())
 
 	const key = e => e.key === 'Enter' && !thinking && ask()
 </script>
@@ -66,33 +63,35 @@
 <main style="width: {width / 1.5}px; height: {height / 1.5}px;">
 	<div class="response" bind:this={response}>
 		{ #each chats as chat, index }
-			{ #if chat.content }
-				<div transition:slide>
-					{ #if index !== 0 }
-						<div class="bar" />
-					{ /if }
-					<div class="chat">
-						<div class="role">
-							<div class="icon">
-								{ #if chat.role === 'user' }
-									<Account size={'1.5rem'} />
+			<div transition:slide>
+				{ #if index !== 0 }
+					<div class="bar" />
+				{ /if }
+				<div class="chat">
+					<div class="role">
+						<div class="icon">
+							{ #if chat.role === 'user' }
+								<Account size={'1.5rem'} />
+							{ :else }
+								{ #if chat.content === '' }
+									<Loading size={'1rem'} border={'0.125rem'} />
 								{ :else }
 									<Sparkle size={'1.5rem'} />
 								{ /if }
-							</div>
-							<div class="message">
-								{ #each chat.content.split('\n') as chunk }
-									<p>{chunk}</p>
-								{ /each }
-							</div>
+							{ /if }
+						</div>
+						<div class="message">
+							{ #each (chat.content ?? '').split('\n') as chunk }
+								<p>{chunk}</p>
+							{ /each }
 						</div>
 					</div>
 				</div>
-			{ /if }
+			</div>
 		{ /each }
 	</div>
 	<div class="send">
-		<input class="none" on:keydown={key} bind:value={message}>
+		<input bind:this={input} class="none" on:keydown={key} bind:value={message}>
 		<button class="fill" class:disabled={thinking || !message.length} on:click={ask}>
 			Send
 			{ #if thinking }
@@ -127,11 +126,15 @@
 
 	.role {
 		display: flex;
+		align-items: flex-start;
 		gap: 0.5rem;
 	}
 
 	.role .icon {
 		min-width: 1.5rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.message {
