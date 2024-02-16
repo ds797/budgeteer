@@ -34,7 +34,6 @@
 		message = ''
 		scroll()
 
-		console.log($links.selected)
 		const obj = structuredClone($links.selected)
 		delete obj.accounts
 		obj.month_inflow = $links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date))
@@ -58,8 +57,6 @@
 			body: JSON.stringify({ type: { assistant: { context, messages: $chats } } })
 		})
 
-		console.log('fetched')
-
 		const reader = res.body.getReader()
 		while (true) {
 			const { done, value } = await reader.read()
@@ -67,7 +64,6 @@
 
 			const text = new TextDecoder().decode(value)
 			$chats[$chats.length - 1].content += text
-			console.log('added')
 			scroll()
 		}
 		thinking = false
