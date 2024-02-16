@@ -1,6 +1,8 @@
 <script>
 	import { onMount, tick } from 'svelte'
 	import { slide } from '$lib/utils/transition'
+	import { month } from '$lib/utils/compare'
+	import { links, date } from '$lib/stores/user'
 	import { chats } from '$lib/stores/ui'
 	import Account from '$lib/svg/Account.svelte'
 	import Sparkle from '$lib/svg/Sparkle.svelte'
@@ -32,14 +34,31 @@
 		message = ''
 		scroll()
 
+		console.log($links.selected)
+		const obj = structuredClone($links.selected)
+		delete obj.accounts
+		obj.month_inflow = $links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date))
+		obj.month_outflow = $links.get.sum(t => !t.properties.hide && t.amount < 0 && month(t.date, $date))
+		obj.transactions = $links.which.transactions(t => month(t.date, $date)).map(t => {
+			return {
+				name: t.name,
+				amount: t.amount,
+				date: t.date,
+				properties: t.properties
+			}
+		})
+		const context = 'Budget metadata: ' + JSON.stringify(obj)
+
 		const res = await fetch('https://mabqpjflhufudqpifesa.supabase.co/functions/v1/ai', {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json',
 				'Authorization': `Bearer ${session.access_token}`
 			},
-			body: JSON.stringify({ type: { assistant: $chats } })
+			body: JSON.stringify({ type: { assistant: { context, messages: $chats } } })
 		})
+
+		console.log('fetched')
 
 		const reader = res.body.getReader()
 		while (true) {
@@ -48,6 +67,7 @@
 
 			const text = new TextDecoder().decode(value)
 			$chats[$chats.length - 1].content += text
+			console.log('added')
 			scroll()
 		}
 		thinking = false

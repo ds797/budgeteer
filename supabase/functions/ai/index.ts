@@ -215,7 +215,7 @@ RENT_AND_UTILITIES_TELEPHONE
 RENT_AND_UTILITIES_WATER
 RENT_AND_UTILITIES_OTHER_UTILITIES`
 
-const instruct_assist = `You are a friendly assistant who offers feedback to a user based on their budget.`
+const instruct_assist = `You are a friendly assistant who offers feedback to a user based on their budget. Don't help with things that aren't budgeting related. Also, use any metadata supplied to you to personalize assistance.`
 
 Deno.serve(async (req: Request) => {
 	if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
@@ -243,16 +243,15 @@ Deno.serve(async (req: Request) => {
 
 		return respond(response)
 	} else if (type.assistant) {
-		const messages = type.assistant
-
+		console.log(type.assistant)
 		const body = new ReadableStream({
 			start: async controller => {
 				try {
 					const stream = await openai.chat.completions.create({
 						messages: [{
 							role: 'system',
-							content: instruct_assist
-						}, ...messages.map(m => {
+							content: type.assistant.context ? instruct_assist + ' ' + type.assistant.context : instruct_assist
+						}, ...(type.assistant?.messages ?? []).map(m => {
 							return {
 								role: m.role,
 								content: m.content
