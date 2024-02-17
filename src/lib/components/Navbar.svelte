@@ -3,6 +3,7 @@
 	import { route, serving, queue, notifications } from '$lib/stores/ui'
 	import { post } from '$lib/utils/requests'
 	import Loading from '$lib/components/Loading.svelte'
+	import Plus from '$lib/svg/Plus.svelte'
 	import Account from '$lib/svg/Account.svelte'
 	import Close from '$lib/svg/Close.svelte'
 
@@ -111,7 +112,9 @@
 				$route.state.pickCategory = $route.state.transaction.new.properties
 				$route.state.pickAccount = $route.state.transaction.new
 				$route.current = $route.transaction
-			}}>+</button>
+			}}>
+				<Plus size={'1rem'} />
+			</button>
 			<button class="fill secondary" on:click={() => $route.current = $route.selectAccounts}>Links</button>
 		</div>
 		<div class="right">
@@ -155,10 +158,16 @@
 
 	.secondary {
 		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.primary {
 		width: 3rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.left, .mid, .right {
