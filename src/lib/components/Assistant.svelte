@@ -157,7 +157,7 @@
 	}
 
 	.response {
-		padding: 0.5rem;
+		padding: 1rem 0.5rem;
 		flex: 1;
 		display: flex;
 		flex-flow: column;

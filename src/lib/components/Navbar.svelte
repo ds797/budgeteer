@@ -92,12 +92,16 @@
 		<!-- Logged in -->
 		<div class="left">
 			<div style="opacity: {$serving ? 1 : 0}">
-				<Loading size={'1.5rem'} border={'0.25rem'} />
+				<div class="icon">
+					<div class="loading">
+						<Loading size={'1.25rem'} border={'0.25rem'} />
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="mid">
-			<button class="fill" on:click={() => $route.current = $route.pickBudget}>Budgets</button>
-				<button class="fill add" on:click={() => {
+			<button class="fill secondary" on:click={() => $route.current = $route.pickBudget}>Budgets</button>
+				<button class="fill primary" on:click={() => {
 				if (demo) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
 					return
@@ -108,7 +112,7 @@
 				$route.state.pickAccount = $route.state.transaction.new
 				$route.current = $route.transaction
 			}}>+</button>
-			<button class="fill" on:click={() => $route.current = $route.selectAccounts}>Links</button>
+			<button class="fill secondary" on:click={() => $route.current = $route.selectAccounts}>Links</button>
 		</div>
 		<div class="right">
 			{ #if demo }
@@ -116,7 +120,7 @@
 					<Close stroke={'var(--accent-0)'} />
 				</button>
 			{ :else }
-				<button class="none account" on:click={() => {
+				<button class="none icon" on:click={() => {
 					$route.current = $route.account
 				}}>
 					<Account />
@@ -143,13 +147,17 @@
 		background: var(--bg-0);
 	}
 
-	button {
-		width: 6rem;
+	.mid button {
+		max-width: 6rem;
 		height: 3rem;
 		margin: 0.5rem;
 	}
 
-	.add {
+	.secondary {
+		flex: 1;
+	}
+
+	.primary {
 		width: 3rem;
 	}
 
@@ -165,6 +173,7 @@
 	}
 
 	.mid {
+		flex: 2;
 		justify-content: center;
 	}
 
@@ -172,10 +181,14 @@
 		justify-content: flex-end;
 	}
 
-	.account {
-		width: unset;
+	.icon {
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.loading {
+		padding: 0.25rem;
+		border: 0.125rem solid transparent;
 	}
 </style>
