@@ -30,15 +30,32 @@
 		})
 		return string
 	}
+
+	let width = 1
+	let position = 0
+
+	const move = e => position = Math.floor(e.x / (width / 31))
+	const leave = () => position = 30
+
+	const value = tweened($values[position] ?? 0, {
+		duration: 200,
+		easing: cubicOut
+	})
+
+	$: $value = $values[position] ?? $value
 </script>
 
-<main>
-	<svg viewBox="0 0 300 1020" preserveAspectRatio="none">
+<main bind:clientWidth={width}>
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<svg viewBox="0 0 300 1020" preserveAspectRatio="none" on:mousemove={move} on:mouseleave={leave} on:mousedown={move}>
 		<path class="bg" d="M0, 10 L300, 10"/>
 		<path class="fg" d="M0, 510 {path($values)}" />
 		<path class="bg" d="M0, 510 L300, 510"/>
 		<path class="bg" d="M0, 1010 L300, 1010"/>
 	</svg>
+	<div class="tooltip">
+		<h3 style="color: {($values[position] ?? $value) < 0 ? 'var(--text-bad)' : 'var(--text-good)'};">{$value.toFixed(2)}</h3>
+	</div>
 </main>
 
 <style>
@@ -48,6 +65,12 @@
 		justify-content: stretch;
 		align-items: stretch;
 		background: var(--bg-0);
+	}
+
+	.tooltip {
+		padding: 0.25rem;
+		display: flex;
+		justify-content: center;
 	}
 
 	svg {
