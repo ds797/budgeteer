@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid'
-import { post } from '$lib/utils/requests'
 import { clamp, num } from '$lib/utils/math'
 import { format } from '$lib/utils/string'
 
@@ -629,6 +628,8 @@ export default class Links {
 		}
 		self.order = (group, category, predicate = () => true) => {
 			const ts = self.which.transactions(t => t.properties.group === group && t.properties.category === category && predicate(t))
+			if (!ts.length) return ts
+
 			return ts.toSorted((one, two) => new Date(two.date) - new Date(one.date))
 		}
 		self.ai = {
