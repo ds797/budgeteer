@@ -14,13 +14,20 @@
 			dangerous: true,
 			click: async () => {
 				try {
-					await data.supabase.auth.signOut()
-					invalidateAll()
-					goto('/')
-				} catch {
+					const { error } = await data.supabase.auth.signOut()
+					if (error) {
+						notifications.add({
+							type: 'error',
+							message: error
+						})
+					} else {
+						invalidateAll()
+						goto('/')
+					}
+				} catch (error) {
 					notifications.add({
 						type: 'error',
-						message: 'Couldn\'t sign out'
+						message: error
 					})
 				}
 				return 1

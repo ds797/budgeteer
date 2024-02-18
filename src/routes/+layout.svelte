@@ -904,7 +904,7 @@
 			margin: 2rem;
 		}
 		.stack {
-			bottom: -30vh;
+			bottom: -45vh;
 		}
 	}
 </style>

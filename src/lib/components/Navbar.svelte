@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation'
+	import { goto, invalidateAll } from '$app/navigation'
 	import { route, serving, queue, notifications } from '$lib/stores/ui'
 	import { post } from '$lib/utils/requests'
 	import Loading from '$lib/components/Loading.svelte'
@@ -39,13 +39,19 @@
 			click: async () => {
 				try {
 					const { error } = await data.supabase.auth.signOut()
-					if (error) console.log(error)
-					invalidateAll()
-					goto('/')
-				} catch {
+					if (error) {
+						notifications.add({
+							type: 'error',
+							message: error
+						})
+					} else {
+						invalidateAll()
+						goto('/')
+					}
+				} catch (error) {
 					notifications.add({
 						type: 'error',
-						message: 'Couldn\'t sign out'
+						message: error
 					})
 				}
 				return 1
@@ -65,7 +71,7 @@
 			message: 'Check your email to enter Budgeteer!'
 		})
 
-		return 1;
+		return 1
 	}
 
 	$route.start = {
@@ -136,9 +142,11 @@
 		<button on:click={() => goto('/account', { replaceState: true })}>Account</button> -->
 	{ :else }
 		<!-- Logged out -->
-		<button on:click={() => goto('/demo')}>Demo</button>
-		<button class='fill' on:click={() => $route.current = $route.start}>Start</button>
-		<button on:click={() => goto('/pricing')}>Pricing</button>
+		<div class="home">
+			<button on:click={() => goto('/demo')}>Demo</button>
+			<button class='fill' on:click={() => $route.current = $route.start}>Start</button>
+			<button on:click={() => goto('/pricing')}>Pricing</button>
+		</div>
 	{ /if }
 </main>
 
@@ -146,28 +154,23 @@
 	main {
 		height: 4rem;
 		flex-flow: row;
+		justify-content: center;
 		align-items: stretch;
 		background: var(--bg-0);
 	}
 
-	.mid button {
-		max-width: 6rem;
-		height: 3rem;
-		margin: 0.5rem;
-	}
-
-	.secondary {
+	.home {
 		flex: 1;
+		max-width: 20rem;
+		padding: 0.5rem;
 		display: flex;
 		justify-content: center;
-		align-items: center;
+		align-items: stretch;
+		gap: 0.5rem;
 	}
 
-	.primary {
-		width: 3rem;
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	.home button {
+		flex: 1;
 	}
 
 	.left, .mid, .right {
@@ -186,8 +189,28 @@
 		justify-content: center;
 	}
 
+	.mid button {
+		max-width: 6rem;
+		height: 3rem;
+		margin: 0.5rem;
+	}
+
 	.right {
 		justify-content: flex-end;
+	}
+
+	.secondary {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.primary {
+		width: 3rem;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.icon {

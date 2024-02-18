@@ -95,11 +95,7 @@ a {
 	text-underline-offset: 0.125rem;
 }
 
-a:hover {
-	text-underline-offset: 0.0625rem;
-}
-
-a:focus {
+a:hover, a:focus {
 	text-underline-offset: 0.0625rem;
 }
 
