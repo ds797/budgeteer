@@ -7,42 +7,7 @@
 	import Account from '$lib/svg/Account.svelte'
 	import Close from '$lib/svg/Close.svelte'
 
-	export let data
 	export let demo = false
-
-	let email = ''
-	const enter = async email => { // TODO: valid email?
-		const { error } = await data.supabase.auth.signInWithOtp({ email })
-		if (error) notifications.add({
-			type: 'error',
-			message: error
-		})
-		else notifications.add({
-			type: 'success',
-			message: 'Check your email to enter Budgeteer!'
-		})
-
-		return 1
-	}
-
-	$route.start = {
-		name: 'Budgeteer',
-		children: [{
-			name: 'Email',
-			type: 'input',
-			value: email,
-			set: v => email = v
-		}, {
-			name: 'Send link',
-			type: 'action',
-			submit: true,
-			fill: true,
-			click: async () => {
-				await enter(email)
-				return 0
-			}
-		}]
-	}
 </script>
 
 <main>
