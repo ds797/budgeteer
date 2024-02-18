@@ -1,5 +1,4 @@
 <script>
-	import '../styles.css'
 	import { onMount } from 'svelte'
 	import { route } from '$lib/stores/ui'
 	import { links } from '$lib/stores/user'

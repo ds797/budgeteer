@@ -6,19 +6,16 @@
 	import { goto, invalidate, invalidateAll } from '$app/navigation'
 	import { browser } from '$app/environment'
 	import Links from '$lib/classes/Links'
-	import { links, date } from '$lib/stores/user'
+	import { links } from '$lib/stores/user'
 	import { route, queue, notifications } from '$lib/stores/ui'
 	import { num } from '$lib/utils/math'
-	import { post } from '$lib/utils/requests'
-	import { month } from '$lib/utils/compare'
 	import { toDate } from '$lib/utils/convert'
-	import Flow from '$lib/components/Flow.svelte'
 	import Menu from '$lib/components/Menu.svelte'
 	import Modal from '$lib/components/Modal.svelte'
-	import Navbar from '$lib/components/Navbar.svelte'
-	import BillStack from '../lib/components/BillStack.svelte'
 	import Notifications from '$lib/components/Notifications.svelte'
 	import Assistant from '$lib/components/Assistant.svelte'
+	import Header from '$lib/components/Header.svelte'
+	import Footer from '$lib/components/Footer.svelte'
 
 	export let data
 
@@ -50,8 +47,6 @@
 	const init = async () => {
 		// Step 1: get budgets
 		$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }), supabase.invoke)
-
-		$route.current = undefined
 
 		let { budgets, selected } = await supabase.getBudgets()
 
@@ -90,27 +85,63 @@
 		}, FREQUENCY)
 	}
 
-	onMount(async () => {
-		if ($page.url.pathname === '/demo') $route.current = undefined
-
-		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
-			if (_session && $route.current === $route.start) {
-				$route.current = { loading: true }
-				queue.enq(init)
-			}
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-				invalidateAll()
-			}
-		})
-
-		if (session && $page.url.pathname !== '/demo') await init()
-
-		return () => data.subscription.unsubscribe()
-	})
-
 	const active = () => {
 		storage.set('active', new Date().getTime())
+	}
+
+	const updateAccount = session => {
+		$route.account = {
+			name: 'Account',
+			children: [{
+				name: 'Exit',
+				type: 'action',
+				dangerous: true,
+				click: async () => {
+					try {
+						const { error } = await data.supabase.auth.signOut()
+						if (error) {
+							notifications.add({
+								type: 'error',
+								message: error
+							})
+						} else {
+							invalidateAll()
+							goto('/')
+						}
+					} catch (error) {
+						notifications.add({
+							type: 'error',
+							message: error
+						})
+					}
+					return 1
+				}
+			}]
+		}
+		if (session) {
+			$route.account.children.unshift({
+				name: 'Subscription',
+				children: [{
+					name: 'Unsubscribe',
+					dangerous: true,
+					children: [{
+						name: 'Unsubscribe',
+						description: 'Are you sure you want to unsubscribe?',
+						type: 'action',
+						dangerous: true,
+						click: () => {
+							queue.enq(async () => {
+								const { data: notification } = await data.supabase.invoke('pay', { type: 'stop' })
+								if (notification) notifications.add(notification)
+								goto('/')
+							})
+							$route.current = undefined
+						}
+					}]
+				}]
+			})
+		}
+		$route.account = $route.account
 	}
 
 	const updateLinks = () => {
@@ -786,6 +817,22 @@
 		}
 	}
 
+	onMount(async () => {
+		if ($page.url.pathname === '/demo') $route.current = undefined
+
+		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
+			updateAccount(_session)
+			if (_session) queue.enq(init)
+
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+				invalidateAll()
+			}
+		})
+
+		return () => data.subscription.unsubscribe()
+	})
+
 	$: update($route)
 </script>
 
@@ -804,50 +851,15 @@
 			<Menu bind:menu={$route.current} on:close={quit} />
 		</Modal>
 	{ /if }
-	{ #if $page.url.pathname === '/' }
-		{ #if session }
-			<div class="top">
-				<Flow />
-			</div>
-			<div class="fill">
-				<slot {data} />
-			</div>
-			<div class="bottom">
-				<Navbar {data} />
-			</div>
-		{ :else }
-			<div class="top">
-				<Navbar {data} />
-			</div>
-			<div class="fill">
-				<div class="info" style="">
-					<h1 class="hero">Budgeteer</h1>
-					<p class="big">Intuitive budgeting that allows you to harness the power of artificial intelligence.</p>
-				</div>
-				<div class="stack">
-					<BillStack />
-				</div>
-			</div>
-		{ /if }
-	{ :else if $page.url.pathname === '/demo' }
-		<div class="top">
-			<Flow />
-		</div>
-		<div class="fill">
-			<slot {data} />
-		</div>
-		<div class="bottom">
-			<Navbar {data} demo={true} />
-		</div>
-	{ :else }
-		<div class="top">
-		</div>
-		<div class="fill">
-			<slot {data} />
-		</div>
-		<div class="bottom">
-		</div>
-	{ /if }
+	<div class="top">
+		<Header {data} />
+	</div>
+	<div class="fill">
+		<slot {data} />
+	</div>
+	<div class="bottom">
+		<Footer {data} />
+	</div>
 </main>
 
 <style>
@@ -873,38 +885,5 @@
 		display: flex;
 		justify-content: stretch;
 		align-items: stretch;
-	}
-
-	.hero {
-		font-size: 12vw;
-		display: flex;
-		justify-content: flex-start;
-	}
-
-	.big {
-		font-size: 2rem;
-	}
-
-	.info {
-		margin: 2rem;
-		margin-right: 9rem;
-		display: flex;
-		flex-flow: column;
-		gap: 2rem;
-	}
-
-	.stack {
-		position: fixed;
-		bottom: 0;
-		right: 4.5rem;
-	}
-
-	@media (max-aspect-ratio: 1/1) {
-		.info {
-			margin: 2rem;
-		}
-		.stack {
-			bottom: -45vh;
-		}
 	}
 </style>

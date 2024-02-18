@@ -11,7 +11,7 @@ export const GET = async ({ url: { searchParams }, locals: { supabase, paid } })
 		})
 
 		if (!error) {
-			if (await paid()) throw redirect(303, '/')
+			if (await paid()) throw redirect(303, '/app')
 			else throw redirect(303, '/pay')
 		}
 

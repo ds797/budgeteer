@@ -3,8 +3,10 @@
 </script>
 
 <main style='width: {size}; height: {size}; fill: {fill}; stroke: {stroke}; color: {color};'>
-	<svg class='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'>
-		<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 22C12 18 12 13 16 12h-8C12 11 12 6 12 2'></path>
+	<svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<rect width="300" height="300" rx="100" fill="black"/>
+		<path d="M240 190C240 245.228 205.228 250 150 250C94.7715 250 60 245.228 60 190C60 163.267 77 125 112 102C179.183 102 121.504 102 150 102C178.496 102 120.817 102 188 102C223 125 240 163.267 240 190Z" fill="white"/>
+		<path d="M120 83H180L193.609 53.0593C194.419 51.2781 193.865 49.1733 192.284 48.0212C186.514 43.8174 179.414 41.8528 172.304 42.4927L171.535 42.5619C168.309 42.8522 165.147 43.6384 162.16 44.8927L147.703 50.9649C138.372 54.8836 128.027 55.6891 118.203 53.2619C112.859 51.9417 108.35 57.37 110.628 62.381L120 83Z" fill="white" stroke="white" stroke-width="10" stroke-linecap="round"/>
 	</svg>
 </main>
 

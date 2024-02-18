@@ -1,7 +1,7 @@
 // import { browser } from '$app/environment'
 import { get, writable } from 'svelte/store'
 
-export const route = writable({ current: { loading: true } })
+export const route = writable({})
 
 // Types: 'success', 'warning', 'info', 'error'
 const createNotifications = () => {

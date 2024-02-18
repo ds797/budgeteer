@@ -1,39 +1,10 @@
 <script>
-	import { goto, invalidateAll } from '$app/navigation'
-	import { route, notifications } from '$lib/stores/ui'
+	import { goto } from '$app/navigation'
+	import { route } from '$lib/stores/ui'
 	import Account from '$lib/svg/Account.svelte'
 
 	export let data
-
 	let card
-	let account = {
-		name: 'Account',
-		children: [{
-			name: 'Exit',
-			type: 'action',
-			dangerous: true,
-			click: async () => {
-				try {
-					const { error } = await data.supabase.auth.signOut()
-					if (error) {
-						notifications.add({
-							type: 'error',
-							message: error
-						})
-					} else {
-						invalidateAll()
-						goto('/')
-					}
-				} catch (error) {
-					notifications.add({
-						type: 'error',
-						message: error
-					})
-				}
-				return 1
-			}
-		}]
-	}
 
 	const move = e => {
 		let x = e.x / window.innerWidth - 0.5
@@ -42,20 +13,14 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Pricing</title>
+	<meta name="description" content="Next-gen financing for all." />
+</svelte:head>
+
 <svelte:window on:mousemove={move} />
 
 <main>
-	<div class="navbar">
-		<div class="left" />
-		<div class="middle">
-			<h1>Pricing</h1>
-		</div>
-		<div class="right">
-			<button class="none" on:click={() => $route.current = account}>
-				<Account />
-			</button>
-		</div>
-	</div>
 	<div class="container">
 		<div class="card" bind:this={card}>
 			<div class="header">
@@ -69,7 +34,10 @@
 			<div class="info">
 				<p>Simple, streamlined budgeting that allows you to act on your decisions as easily as if you controlled Budgeteer with your mind.</p>
 				<div class="buy">
-					<button class="fill" on:click={() => goto('/')}>Start</button>
+					<button class="fill" on:click={() => {
+						if (data.session) goto('/app')
+						else goto('/')
+					}}>Continue</button>
 				</div>
 			</div>
 		</div>
