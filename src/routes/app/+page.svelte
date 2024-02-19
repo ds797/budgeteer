@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
+	import { page } from '$app/stores'
 	import { links } from '$lib/stores/user'
 	import { queue, route, notifications } from '$lib/stores/ui'
 	import Links from '$lib/classes/Links'
@@ -28,7 +29,6 @@
 	}
 
 	const init = async () => {
-		console.log('eeneetl')
 		// Step 1: get budgets
 		$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }), supabase.invoke)
 
@@ -69,7 +69,22 @@
 		}, FREQUENCY)
 	}
 
-	onMount(() => queue.enq(init))
+	const cont = () => {
+		if (storage.get('links')) $links = storage.get('links')
+		setTimeout(() => {
+			setInterval(() => {
+				if (storage.get('links')) $links = storage.get('links')
+			}, FREQUENCY)
+		}, 30 * 1000)
+	}
+
+	onMount(() => {
+		// If any value is present, don't initialize
+		const redirect = $page.url.searchParams.get('redirect')
+		// TODO: if user closes master tab, won't update (localstorage 'tabs' array update every min if tab is open, then if no response remove from array? if only one then that is master)
+		if (redirect) queue.enq(cont)
+		else queue.enq(init)
+	})
 </script>
 
 <svelte:head>
