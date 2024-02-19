@@ -27,49 +27,56 @@
 </script>
 
 <main>
-	<div class="left">
-		<Month date={$date} set={v => {
-			$date.setMonth($date.getMonth() + v)
-			$date = $date
-			$links = $links
-		}} />
-	</div>
-	<div class="middle">
-		<button class="none" on:click={() => show = !show}>
-			<div class="in">
-				<h1>{parseFloat($inflow).toFixed(2)}</h1>
-				<div class="down">
-					<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
+	<div class="navbar">
+		<div class="left">
+			<Month date={$date} set={v => {
+				$date.setMonth($date.getMonth() + v)
+				$date = $date
+				$links = $links
+			}} />
+		</div>
+		<div class="middle">
+			<button class="none" on:click={() => show = !show}>
+				<div class="in">
+					<h1>{parseFloat($inflow).toFixed(2)}</h1>
+					<div class="down">
+						<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
+					</div>
 				</div>
-			</div>
-			<div class="bar" />
-			<div class="out">
-				<div class="up">
-					<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
+				<div class="bar" />
+				<div class="out">
+					<div class="up">
+						<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
+					</div>
+					<h1>{parseFloat(-$outflow).toFixed(2)}</h1>
 				</div>
-				<h1>{parseFloat(-$outflow).toFixed(2)}</h1>
-			</div>
-		</button>
+			</button>
+		</div>
+		<div class="right">
+			<button class="none" on:click={() => $route.current = { assistant: true }}>
+				<Sparkle />
+			</button>
+		</div>
 	</div>
-	<div class="right">
-		<button class="none" on:click={() => $route.current = { assistant: true }}>
-			<Sparkle />
-		</button>
-	</div>
+	{ #if show }
+		<div class="graph" transition:slide={{ duration: 600 }}>
+			<Graph />
+		</div>
+	{ /if }
 </main>
-{ #if show }
-	<div class="graph" transition:slide={{ duration: 600 }}>
-		<Graph />
-	</div>
-{ /if }
 
 <style>
 	main {
+		flex-flow: column;
+		align-items: stretch;
+		background: var(--bg-0);
+	}
+
+	.navbar {
 		height: 4rem;
-		flex-flow: row;
+		display: flex;
 		align-items: stretch;
 		gap: 0.5rem;
-		background: var(--bg-0);
 	}
 
 	.left, .right {

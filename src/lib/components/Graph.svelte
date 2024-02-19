@@ -32,7 +32,7 @@
 	}
 
 	let width = 1
-	let position = 0
+	let position = 30
 
 	const move = e => position = Math.floor(e.x / (width / 31))
 	const leave = () => position = 30

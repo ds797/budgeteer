@@ -79,7 +79,7 @@
 
 <style>
 	main {
-		height: 4rem;
+		min-height: 4rem;
 		flex-flow: row;
 		justify-content: center;
 		align-items: stretch;
