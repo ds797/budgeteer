@@ -148,6 +148,11 @@ button:hover {
 	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
 }
 
+button:hover svg {
+	/* filter: drop-shadow(1rem 1rem 1rem rgba(0, 0, 0, 1)); */
+	filter: drop-shadow(var(--shadow-strong));
+}
+
 input:focus {
 	outline: none;
 }

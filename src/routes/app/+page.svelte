@@ -96,7 +96,6 @@
 		setTimeout(check, MINUTE)
 		// If any value is present, don't initialize
 		const redirect = $page.url.searchParams.get('redirect')
-		// TODO: if user closes master tab, won't update (localstorage 'tabs' array update every min if tab is open, then if no response remove from array? if only one then that is master)
 		if (redirect) queue.enq(cont)
 		else queue.enq(init)
 	})
