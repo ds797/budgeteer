@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
+	import { v4 as uuidv4 } from 'uuid'
 	import { page } from '$app/stores'
 	import { links } from '$lib/stores/user'
 	import { queue, route, notifications } from '$lib/stores/ui'
@@ -11,7 +12,8 @@
 
 	$: ({ supabase, plaid, storage } = data)
 
-	const FREQUENCY = 5 * 60 * 1000
+	const MINUTE = 60 * 1000
+	const FREQUENCY = 5 * MINUTE
 
 	const refreshLinks = async () => {
 		// Within cooldown range OR been 3 * FREQUENCY since last active
@@ -69,16 +71,29 @@
 		}, FREQUENCY)
 	}
 
-	const cont = () => {
+	const stored = () => {
 		if (storage.get('links')) $links = storage.get('links')
-		setTimeout(() => {
-			setInterval(() => {
-				if (storage.get('links')) $links = storage.get('links')
-			}, FREQUENCY)
-		}, 30 * 1000)
+	}
+
+	const tab = uuidv4()
+
+	const check = () => {
+		let tabs = storage.get('tabs') ?? []
+		const now = new Date().getTime()
+		tabs = tabs.filter(t => now - t.time < MINUTE)
+		const index = tabs.findIndex(t => t.name === tab)
+		if (index === -1) tabs.push({ name: tab, time: now })
+		else tabs[index].time = now
+		if (tabs.length === 1 && !tabs[0].leader) {
+			tabs[0].leader = true
+			queue.enq(init)
+		} else stored()
+		storage.set('tabs', tabs)
 	}
 
 	onMount(() => {
+		check()
+		setTimeout(check, MINUTE)
 		// If any value is present, don't initialize
 		const redirect = $page.url.searchParams.get('redirect')
 		// TODO: if user closes master tab, won't update (localstorage 'tabs' array update every min if tab is open, then if no response remove from array? if only one then that is master)
