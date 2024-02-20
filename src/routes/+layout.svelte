@@ -345,7 +345,7 @@
 					return {
 						name: c.name,
 						type: 'action',
-						disabled: (($route.state.pickCategory.disabled?.length && $route.state.pickCategory.disabled) ?? []).find(d => d.group === g.name && d.name === c.name),
+						disabled: (($route.state.pickCategory.disabled?.length && $route.state.pickCategory.disabled) ?? []).find(d => d.group === g.name && d.category === c.name),
 						fill: ($route.state.pickCategory.overflow || $route.state.pickCategory.manual) && $route.state.pickCategory.category === c.name,
 						click: () => {
 							$route.state.pickCategory.group = g.name
@@ -484,7 +484,11 @@
 					})
 				}
 				// Auto sort
-				if (!$route.state.transaction.new.properties.manual) $links = $links.sort($route.state.transaction.new)
+				if (!$route.state.transaction.new.properties.manual) {
+					$route.state.transaction.new.properties.group = $links.fallback().group
+					$route.state.transaction.new.properties.category = $links.fallback().category
+					$links = $links.sort($route.state.transaction.new)
+				}
 
 				const data = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
 				if (data) {
@@ -573,8 +577,16 @@
 						account: $route.state.transaction.new.account,
 						properties: $route.state.transaction.new.properties
 					}
+					$links = $links.add.transaction(t)
+					if (!session && !$route.state.transaction.new.properties.manual) {
+						$route.state.transaction.new.properties.group = $links.fallback().group
+						$route.state.transaction.new.properties.category = $links.fallback().category
+						$route.state.transaction.new.properties.manual = true
+						notifications.add({ type: 'warning', message: `'${$route.state.transaction.new.name}' was sorted into Other. Create an account to auto-sort!` })
+						return 1
+					} else if (!session) return 1
+
 					queue.enq(async () => {
-						$links = $links.add.transaction(t)
 						$links = await $links.ai.transaction(t.id)
 						$links = $links.sort(...$links.which.transactions(u => u.id === t.id))
 						$links.links.find(l => !l.institution).transactions.push(t)
@@ -591,7 +603,7 @@
 		$links.selected.groups.forEach(g => {
 			g.categories.forEach(c => {
 				if (c.overflow?.group === group && c.overflow?.category === category)
-					categories.push(c, ...conflicts(g.name, c.name))
+					categories.push({ group: g.name, category: c.name }, ...conflicts(g.name, c.name))
 			})
 		})
 
@@ -608,10 +620,14 @@
 			$route.state.pickCategory = $route.state.category.new.overflow
 			let categories = conflicts($route.state.category.group?.name, $route.state.category.name)
 
-			$route.state.pickCategory.disabled = num($route.state.category.new.value) ? [
-				$route.state.category,
-				...categories
-			] : true
+			// $route.state.pickCategory.disabled = num($route.state.category.new.value) ? [
+			// 	$route.state.category,
+			// 	...categories
+			// ] : true
+			$route.state.pickCategory.disabled = [{
+				group: $route.state.category.group?.name,
+				category: $route.state.category.name
+			}, ...categories]
 			updatePickCategory()
 			$route.state.pickCategory.hint = $route.state.category.new.spend ? 'Underflow' : 'Overflow'
 			$route.state.pickCategory.overflow = true
@@ -623,12 +639,12 @@
 			delete $route.state.category.new.overflow.disabled
 
 			// Should we update PFCs?
-			const update = $route.state.category.new.group && $route.state.category.name !== $route.state.category.new.name
+			const update = $route.state.category.new.group?.name && $route.state.category.name !== $route.state.category.new.name
 
 			// Update category
-			const data = $links.update.category($route.state.category.group, $route.state.category.name, $route.state.category.new.group ? $route.state.category.new : null)
+			const data = $links.update.category($route.state.category.group?.name, $route.state.category.name, $route.state.category.new.group?.name ? $route.state.category.new : null)
 
-			if (update) queue.enq(async () => $links.ai.category($route.state.category.new.group, $route.state.category.new.name))
+			if (update) queue.enq(async () => $links.ai.category($route.state.category.new.group?.name, $route.state.category.new.name))
 			delete $route.state.category.new
 			if (data) {
 				$links = data
@@ -786,8 +802,6 @@
 	const MINUTE = 60 * 1000
 	const FREQUENCY = 5 * MINUTE
 
-	$: console.log($links.links)
-
 	const refreshLinks = async () => {
 		// Within cooldown range OR been 3 * FREQUENCY since last active
 		if ((storage.get('cooldown') && new Date().getTime() - storage.get('cooldown') < FREQUENCY)
@@ -844,7 +858,7 @@
 	}
 
 	const stored = () => {
-		if (storage.get('links')) $links = storage.get('links')
+		if (storage.get('links')) $links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }), supabase.invoke)
 	}
 
 	const tab = uuidv4()

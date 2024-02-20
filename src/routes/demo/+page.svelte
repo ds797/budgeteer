@@ -3,6 +3,7 @@
 	import { route } from '$lib/stores/ui'
 	import { links } from '$lib/stores/user'
 	import { random } from '$lib/utils/math'
+	import Links from '$lib/classes/Links'
 	import Loading from '$lib/components/Loading.svelte'
 	import Budgets from '$lib/components/Budgets.svelte'
 
@@ -11,6 +12,7 @@
 	onMount(() => {
 		const today = new Date()
 	
+		$links = new Links({}, m => notifications.add({ type: 'error', message: m }), data.supabase.invoke)
 		$links.links = [{
 			id: 'demo-link',
 			name: 'Demo Link',
@@ -24,6 +26,7 @@
 		}]
 		$links.budgets = [$links.default()]
 		$links.selected = $links.budgets[0]
+		$links.add.account('demo-checking')
 	
 		// // Wants > Dinners
 		let t = {

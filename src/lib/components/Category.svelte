@@ -30,7 +30,7 @@
 
 	const click = () => {
 		$route.state.category = category
-		$route.state.category.group = group.name
+		$route.state.category.group = group
 		$route.current = $route.category
 	}
 

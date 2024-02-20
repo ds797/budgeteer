@@ -47,8 +47,6 @@ export const load = async ({ fetch, data, depends }) => {
 		if (!data) return
 
 		data = JSON.parse(data)
-	
-		if (key === 'links') return new Links(data)
 
 		return data
 	}
@@ -85,7 +83,7 @@ export const load = async ({ fetch, data, depends }) => {
 		if (error) console.error(error)
 
 		// There's no "custom" link -- add it
-		if (!data.find(l => !l.institution)) data.push(new Links().custom())
+		if (!data.find(l => !l.institution)) data.push(get(links).custom())
 
 		return data ?? []
 	}

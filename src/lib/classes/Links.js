@@ -110,9 +110,7 @@ const PFCs = [
 ]
 
 export default class Links {
-	constructor(obj, err = m => console.error(m), invoke = () => {
-		return { error: `No 'invoke' function supplied` }
-	}) {
+	constructor(obj, err = m => console.error(m), invoke = async () => new Promise(r => r({ error: `No 'invoke' function supplied` }))) {
 		const self = this
 
 		// Methods
@@ -304,8 +302,6 @@ export default class Links {
 								t.properties.category = category.name
 								return
 							}
-					t.properties.group = self.fallback().group
-					t.properties.category = self.fallback().category
 				}
 				set(t)
 			}
@@ -641,10 +637,9 @@ export default class Links {
 		self.ai = {
 			category: async (group, category) => {
 				let c = self.selected.groups.find(g => g.name === group).categories.find(c => c.name === category)
-				console.log(c)
 
 				const { data } = await invoke('ai', { type: { category: { group, category } } })
-				const pfcs = JSON.parse(data)
+				const pfcs = JSON.parse(data ?? '[]')
 
 				c.pfc = pfcs.pfc.map((name, index) => {
 					return {
