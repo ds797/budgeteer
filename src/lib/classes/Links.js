@@ -526,6 +526,10 @@ export default class Links {
 					return
 				}
 
+				self.selected.groups.forEach(g => g.categories.forEach(c => {
+					if (c.overflow?.group === group && c.overflow?.category === category) c.overflow.category = data.name
+				}))
+
 				for (const t of self.which.transactions())
 					if (t.properties.group === g.name && t.properties.category === c.name) t.properties.category = data.name
 				c.description = data.description

@@ -387,17 +387,21 @@
 						click: () => {
 							// TODO: if route protected, don't set
 							delete $route.state.pickCategory.new
-							$links = $links.add.category($route.state.pickCategory.groupName, $route.state.pickCategory.categoryName, { description: $route.state.pickCategory.description || '', value: parseFloat($route.state.pickCategory.categoryValue) || 0 })
 							$route.state.pickCategory.group = $route.state.pickCategory.groupName
 							$route.state.pickCategory.category = $route.state.pickCategory.categoryName
-							$route.state.pickCategory.categoryName = undefined
-							$route.state.pickCategory.categoryValue = undefined
+							$route.state.pickCategory.manual = true
+							$links = $links.add.category($route.state.pickCategory.group, $route.state.pickCategory.category, { description: $route.state.pickCategory.description || '', value: parseFloat($route.state.pickCategory.categoryValue) || 0 })
+							if (!session) {
+								$route = $route
+								return 1
+							}
+
 							queue.enq(async () => {
 								$links = await $links.ai.category($route.state.pickCategory.group, $route.state.pickCategory.category)
 								$links = $links.sort(...$links.which.transactions(t => !t.properties.manual))
 								$route = $route
+								updateBudgets()
 							})
-							updateBudgets()
 							return 1
 						}
 					}]
@@ -577,19 +581,24 @@
 						account: $route.state.transaction.new.account,
 						properties: $route.state.transaction.new.properties
 					}
-					$links = $links.add.transaction(t)
-					if (!session && !$route.state.transaction.new.properties.manual) {
-						$route.state.transaction.new.properties.group = $links.fallback().group
-						$route.state.transaction.new.properties.category = $links.fallback().category
-						$route.state.transaction.new.properties.manual = true
-						notifications.add({ type: 'warning', message: `'${$route.state.transaction.new.name}' was sorted into Other. Create an account to auto-sort!` })
+					delete $route.state.transaction.new
+					if (!session && !t.properties.manual) {
+						t.properties.group = $links.fallback().group
+						t.properties.category = $links.fallback().category
+						t.properties.manual = true
+						$links = $links.add.transaction(t)
+						notifications.add({ type: 'warning', message: `'${t.name}' was sorted into Other. Create an account to auto-sort!` })
 						return 1
-					} else if (!session) return 1
+					} else if (!session) {
+						$links = $links.add.transaction(t)
+						return 1
+					}
 
 					queue.enq(async () => {
 						$links = await $links.ai.transaction(t.id)
 						$links = $links.sort(...$links.which.transactions(u => u.id === t.id))
 						$links.links.find(l => !l.institution).transactions.push(t)
+						$links = $links.add.transaction(t)
 					})
 					return 1
 				}
@@ -643,6 +652,12 @@
 
 			// Update category
 			const data = $links.update.category($route.state.category.group?.name, $route.state.category.name, $route.state.category.new.group?.name ? $route.state.category.new : null)
+
+			if (!session) {
+				delete $route.state.category.new
+				if (data) $links = data
+				return
+			}
 
 			if (update) queue.enq(async () => $links.ai.category($route.state.category.new.group?.name, $route.state.category.new.name))
 			delete $route.state.category.new
