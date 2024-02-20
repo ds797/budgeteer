@@ -7,10 +7,10 @@
 
 <main>
 	<div class="logo">
-		{ #if link.logo }
+		{ #if link.logo.split(',')[1] !== 'null' }
 			<img src={link.logo} alt="" />
 		{ :else }
-			<Bank size={'1rem'} />
+			<Bank size={'1.5rem'} />
 		{ /if }
 	</div>
 	<h3>{account.name}</h3>
@@ -25,8 +25,8 @@
 	}
 
 	.logo {
-		width: 1rem;
-		height: 1rem;
+		width: 1.5rem;
+		height: 1.5rem;
 	}
 
 	.logo img {
