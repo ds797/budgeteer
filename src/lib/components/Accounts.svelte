@@ -5,9 +5,11 @@
 
 <main>
 	{ #each $links.links as link }
-		{ #each link.accounts as account }
-			<Account {link} {account} />
-		{ /each }
+		{ #if link.institution }
+			{ #each link.accounts as account }
+				<Account {link} {account} />
+			{ /each }
+		{ /if }
 	{ /each }
 </main>
 

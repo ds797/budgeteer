@@ -21,11 +21,11 @@
 		return month(d1, one) || month(d1, two) || month(d1, three)
 	}
 
-	$: currentValues = Array(31).fill(undefined).map((_, i) => clamp($links.get.sum(t => month(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1), { max: 0 }))
-	$: averageValues = Array(31).fill(undefined).map((_, i) => clamp($links.get.sum(t => months(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1), { max: 0 }))
+	$: currentValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => t.amount < 0 && month(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1))
+	$: averageValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => t.amount < 0 && months(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1) / 3)
 
 	$: current = currentValues.map((_, i) => currentValues.slice(0, i).reduce((p, c) => p + c, 0))
-	$: average = averageValues.map((_, i) => averageValues.slice(0, i).reduce((p, c) => p + c, 0) / 3)
+	$: average = averageValues.map((_, i) => averageValues.slice(0, i).reduce((p, c) => p + c, 0))
 	$: top = min([average[average.length - 1], current[current.length - 1]])
 
 	const y = v => {
