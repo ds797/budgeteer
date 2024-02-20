@@ -1,5 +1,6 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'npm:plaid'
 import { service } from '../_shared/service.ts'
+import { storage } from '../_shared/storage.ts'
 import { v4 as uuidv4 } from 'npm:uuid'
 
 const plaidConfig = new Configuration({
@@ -33,10 +34,13 @@ export const getLinks = async (user_id: string, predicate: any = () => true) => 
 	if (error) throw new Error(error.message)
 
 	const links = data.filter((l: any) => l.user_id === user_id)
-	links.forEach((l: any) => {
+	for (let i = 0; i < links.length; i++) {
+		let l = links[i]
+
+		l.logo = await storage.get(l.institution)
 		delete l.access_token
 		delete l.cursor
-	})
+	}
 
 	return links.filter((l: any) => predicate(l))
 }
@@ -46,6 +50,7 @@ export const setLinks = async (user_id: string, ...links: any[]) => {
 		link.user_id = user_id
 
 		// id, access_token, institution, name, accounts, transactions
+		delete link.logo
 		const { error } = await service.from('links').upsert(link)
 		if (error) throw new Error(error)
 	}
@@ -92,14 +97,25 @@ const refreshLink = async (user_id: string, id: string, access_token: string, cu
 		// Get accounts
 		const { data: { accounts } } = await plaid.accountsGet(request)
 
-		// Get institution name
-		const { data: { institution: { name } } } = await plaid.institutionsGetById({
-			institution_id: item.institution_id,
-			country_codes: ['US', 'GB', 'ES', 'NL', 'FR', 'IE', 'CA', 'DE', 'IT', 'PL', 'DK', 'NO', 'SE', 'EE', 'LT', 'LV', 'PT', 'BE']
-		})
+		// Get institution name and logo
+		let logo: string
+		try {
+			const { data: { institution } } = await plaid.institutionsGetById({
+				institution_id: item.institution_id,
+				country_codes: ['US', 'GB', 'ES', 'NL', 'FR', 'IE', 'CA', 'DE', 'IT', 'PL', 'DK', 'NO', 'SE', 'EE', 'LT', 'LV', 'PT', 'BE'],
+				options: { include_optional_metadata: true }
+			})
 
-		link.institution = item.institution_id
-		link.name = name
+			link.institution = item.institution_id
+			link.name = institution.name
+			link.color = institution.primary_color
+			logo = institution.logo
+
+			// Upload logo
+			await storage.set(link.institution, logo)
+		} catch (error) {
+			throw new Error(error)
+		}
 
 		// TODO: refresh transactions? (expensive, but this code will do it)
 		// await plaid.transactionsRefresh(request)
@@ -149,6 +165,7 @@ const refreshLink = async (user_id: string, id: string, access_token: string, cu
 			...link
 		})
 
+		link.logo = `data:image/png;base64,${logo}`
 		delete link.access_token
 		delete link.cursor
 
@@ -180,6 +197,10 @@ export const refreshLinks = async (user_id: string, predicate: Function|undefine
 		links[i] = await refreshLink(user_id, id, access_token, cursor, transactions)
 	}
 
+	links.forEach((l: any) => {
+		delete l.access_token
+		delete l.cursor
+	})
 	return links
 }
 

@@ -34,7 +34,7 @@
 	}
 	button {
 		flex: 1;
-		margin: 0 0.5rem 0 1rem;
+		margin: 0 1vw 0 2vw;
 		align-self: flex-start;
 		display: flex;
 		justify-content: stretch;

@@ -5,12 +5,30 @@
 	import Loading from '$lib/components/Loading.svelte'
 	import Plus from '$lib/svg/Plus.svelte'
 	import Account from '$lib/svg/Account.svelte'
+	import Dashboard from '$lib/svg/Dashboard.svelte'
+	import Budget from '$lib/svg/Budget.svelte'
+	import Home from '$lib/svg/Home.svelte'
 	import Close from '$lib/svg/Close.svelte'
 
 	export let demo = false
+	export let session
 </script>
 
 <main>
+	{ #if session }
+		<button class="none" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
+			<Dashboard />
+			<p>Dashboard</p>
+		</button>
+		<button class="none" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
+			<Budget />
+			<p>Budget</p>
+		</button>
+	{ :else }
+		<button class="none" on:click={() => goto('/')}>
+			<Home />
+		</button>
+	{ /if }
 	{ #if $page.url.pathname === '/app' || $page.url.pathname === '/demo' }
 		<!-- Logged in -->
 		<div class="container">
@@ -61,6 +79,28 @@
 		justify-content: center;
 		align-items: stretch;
 		background: var(--bg-0);
+	}
+
+	main > button {
+		margin: 0.25rem;
+		width: 4.5rem;
+		border-radius: 1.5rem;
+	}
+
+	button {
+		display: flex;
+		flex-flow: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	button p {
+		font-size: 0.75rem;
+		font-weight: normal;
+	}
+
+	main > button.selected {
+		background: var(--accent-0-light);
 	}
 
 	.container {

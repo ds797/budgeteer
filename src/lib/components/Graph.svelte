@@ -64,7 +64,6 @@
 		box-sizing: border-box;
 		justify-content: stretch;
 		align-items: stretch;
-		background: var(--bg-0);
 	}
 
 	.tooltip {

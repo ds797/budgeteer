@@ -1,7 +1,5 @@
 <script>
 	import { goto } from '$app/navigation'
-	import { route } from '$lib/stores/ui'
-	import Account from '$lib/svg/Account.svelte'
 
 	export let data
 	let card

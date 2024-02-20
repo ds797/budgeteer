@@ -323,6 +323,7 @@ export default class Links {
 						id: link.id,
 						institution: link.institution ?? link.institution_id,
 						name: link.name,
+						logo: link.logo,
 						accounts: link.accounts,
 						transactions: link.transactions
 					})
@@ -446,8 +447,11 @@ export default class Links {
 		}
 		self.set = {
 			links: links => {
+				console.log(links)
 				self.links = []
-				links.push(links.splice(links.findIndex(l => !l.institution), 1)[0])
+				const index = links.findIndex(l => !l.institution)
+				if (index === -1) links.push(self.custom())
+				else links.push(links.splice(index, 1)[0])
 				self.add.link(...links)
 
 				return self

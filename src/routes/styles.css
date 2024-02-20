@@ -10,6 +10,7 @@
 	--bg-1: hsl(0, 0%, 100%);
 	--bg-2: hsl(224, 44%, 95%);
 	--accent-0: rgb(0, 0, 0);
+	--accent-0-light: rgb(0, 0, 0, 12.5%);
 	--accent-old: rgb(154, 154, 240);
 	--danger: #bb0000;
 	--text: rgba(20, 20, 20, 1);
