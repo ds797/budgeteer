@@ -781,29 +781,6 @@
 		}
 	}
 
-	onMount(async () => {
-		if ($page.url.pathname === '/demo') $route.current = undefined
-
-		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
-			updateAccount(_session)
-			if (_session?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth')
-				invalidateAll()
-			}
-
-			if ($page.url.pathname === '/' && _session) {
-				$route.current = undefined
-				goto('/app')
-			}
-			if ($page.url.pathname === '/app' && !_session) {
-				$route.current = undefined
-				goto('/')
-			}
-		})
-
-		return () => data.subscription.unsubscribe()
-	})
-
 	$: update($route)
 
 	const MINUTE = 60 * 1000
@@ -887,12 +864,35 @@
 	}
 
 	onMount(() => {
-		check()
-		setTimeout(check, MINUTE)
-		// If any value is present, don't initialize
-		const redirect = $page.url.searchParams.get('redirect')
-		if (redirect) queue.enq(cont)
-		else queue.enq(init)
+		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
+			updateAccount(_session)
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth')
+				invalidateAll()
+			}
+
+			if ($page.url.pathname === '/' && _session) {
+				$route.current = undefined
+				goto('/app')
+			}
+			if ($page.url.pathname === '/app' && !_session) {
+				$route.current = undefined
+				goto('/')
+			}
+		})
+
+		if (session) {
+			check()
+			setTimeout(check, MINUTE)
+			// If any value is present, don't initialize
+			const redirect = $page.url.searchParams.get('redirect')
+			if (redirect) queue.enq(cont)
+			else queue.enq(init)
+		} else {
+
+		}
+
+		return () => data.subscription.unsubscribe()
 	})
 </script>
 
@@ -945,5 +945,6 @@
 		display: flex;
 		justify-content: stretch;
 		align-items: stretch;
+		overflow-y: auto;
 	}
 </style>
