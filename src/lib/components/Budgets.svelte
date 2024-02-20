@@ -11,15 +11,15 @@
 
 <main>
 	<!-- TODO: don't need to queue this? -->
-	<List list={$links.get.groups()} change={() => !demo && queue.enq(data.supabase.updateLinks)} let:item={group}>
+	<List list={$links.get.groups()} change={() => !demo && queue.enq(data.supabase.updateBudgets)} let:item={group}>
 		<div transition:slide>
 			<button class="none" on:click={() => {
 				$route.state.group = group
 				$route.current = $route.group
 			}}>{group.name}</button>
-			{ #each group.categories as category }
+			<List list={group.categories} change={() => !demo && queue.enq(data.supabase.updateBudgets)} let:item={category}>
 				<Category {group} {category} />
-			{ /each }
+			</List>
 		</div>
 	</List>
 </main>

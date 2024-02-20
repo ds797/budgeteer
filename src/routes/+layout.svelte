@@ -384,7 +384,8 @@
 						disabled: !$route.state.pickCategory?.categoryName,
 						click: () => {
 							// TODO: if route protected, don't set
-							$links = $links.add.category($route.state.pickCategory.groupName, $route.state.pickCategory.categoryName, { description: $route.state.pickCategory.description || '', value: $route.state.pickCategory.categoryValue || 0 })
+							delete $route.state.pickCategory.new
+							$links = $links.add.category($route.state.pickCategory.groupName, $route.state.pickCategory.categoryName, { description: $route.state.pickCategory.description || '', value: parseFloat($route.state.pickCategory.categoryValue) || 0 })
 							$route.state.pickCategory.group = $route.state.pickCategory.groupName
 							$route.state.pickCategory.category = $route.state.pickCategory.categoryName
 							$route.state.pickCategory.categoryName = undefined
@@ -394,7 +395,6 @@
 								$links = $links.sort(...$links.which.transactions(t => !t.properties.manual))
 								$route = $route
 							})
-							delete $route.state.pickCategory.new
 							updateBudgets()
 							return 1
 						}
