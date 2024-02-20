@@ -361,6 +361,16 @@
 						value: $route.state.pickCategory?.categoryName,
 						set: v => $route.state.pickCategory.categoryName = v
 					}, {
+						name: 'Description',
+						fill: $route.state.pickCategory?.description,
+						children: [{
+							name: 'Description',
+							type: 'textarea',
+							placeholder: 'Add a description to help Budgeteer sort your transactions with higher accuracy.',
+							value: $route.state.pickCategory?.description,
+							set: v => $route.state.pickCategory.description = v
+						}]
+					}, {
 						name: 'Value',
 						type: 'money',
 						placeholder: 'Category Value',
@@ -374,7 +384,7 @@
 						disabled: !$route.state.pickCategory?.categoryName,
 						click: () => {
 							// TODO: if route protected, don't set
-							$links = $links.add.category($route.state.pickCategory.groupName, $route.state.pickCategory.categoryName, { value: $route.state.pickCategory.categoryValue })
+							$links = $links.add.category($route.state.pickCategory.groupName, $route.state.pickCategory.categoryName, { description: $route.state.pickCategory.description || '', value: $route.state.pickCategory.categoryValue || 0 })
 							$route.state.pickCategory.group = $route.state.pickCategory.groupName
 							$route.state.pickCategory.category = $route.state.pickCategory.categoryName
 							$route.state.pickCategory.categoryName = undefined
@@ -384,6 +394,7 @@
 								$links = $links.sort(...$links.which.transactions(t => !t.properties.manual))
 								$route = $route
 							})
+							delete $route.state.pickCategory.new
 							updateBudgets()
 							return 1
 						}
@@ -630,6 +641,16 @@
 			placeholder: 'Category Name',
 			value: $route.state.category.new?.name,
 			set: v => $route.state.category.new.name = v
+		}, {
+			name: 'Description',
+			fill: $route.state.category.new?.description,
+			children: [{
+				name: 'Description',
+				type: 'textarea',
+				placeholder: 'Add a description to help Budgeteer sort your transactions with higher accuracy.',
+				value: $route.state.category.new?.description,
+				set: v => $route.state.category.new.description = v
+			}]
 		}, {
 			name: 'Value',
 			type: 'input',

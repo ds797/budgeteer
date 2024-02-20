@@ -515,6 +515,7 @@ export default class Links {
 
 				const c = g.categories.find(c => c.name === category)
 				if (c.name === data.name
+					&& c.description === data.description
 					&& c.value === data.value
 					&& c.spend === data.spend
 					&& c.overflow?.group === data.overflow?.group
@@ -527,6 +528,7 @@ export default class Links {
 
 				for (const t of self.which.transactions())
 					if (t.properties.group === g.name && t.properties.category === c.name) t.properties.category = data.name
+				c.description = data.description
 				c.name = data.name ?? c.name
 				c.value = data.value ?? c.value
 				c.spend = data.spend ?? c.spend
@@ -634,8 +636,8 @@ export default class Links {
 		}
 		self.ai = {
 			category: async (group, category) => {
-				console.log(group, category, self.selected.groups)
 				let c = self.selected.groups.find(g => g.name === group).categories.find(c => c.name === category)
+				console.log(c)
 
 				const { data } = await invoke('ai', { type: { category: { group, category } } })
 				const pfcs = JSON.parse(data)

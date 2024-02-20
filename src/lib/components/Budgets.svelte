@@ -11,11 +11,7 @@
 
 <main>
 	<!-- TODO: don't need to queue this? -->
-	<List list={$links.get.groups()} change={() => {
-		if (demo) return
-
-		queue.enq(data.supabase.updateLinks)
-			}} let:item={group}>
+	<List list={$links.get.groups()} change={() => !demo && queue.enq(data.supabase.updateLinks)} let:item={group}>
 		<div transition:slide>
 			<button class="none" on:click={() => {
 				$route.state.group = group

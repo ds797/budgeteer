@@ -69,6 +69,12 @@
 		border-radius: 0.5rem;
 	}
 
+	textarea {
+		min-height: 5rem;
+		font-weight: normal;
+		resize: none;
+	}
+
 	.toggled {
 		background: var(--plink);
 		color: var(--neutral-high);
