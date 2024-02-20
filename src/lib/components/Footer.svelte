@@ -7,7 +7,7 @@
 	import Account from '$lib/svg/Account.svelte'
 	import Dashboard from '$lib/svg/Dashboard.svelte'
 	import Budget from '$lib/svg/Budget.svelte'
-	import Home from '$lib/svg/Home.svelte'
+	import Logo from '$lib/svg/Logo.svelte'
 	import Close from '$lib/svg/Close.svelte'
 
 	export let demo = false
@@ -23,10 +23,6 @@
 		<button class="none" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
 			<Budget />
 			<p>Budget</p>
-		</button>
-	{ :else }
-		<button class="none" on:click={() => goto('/')}>
-			<Home />
 		</button>
 	{ /if }
 	{ #if $page.url.pathname === '/app' || $page.url.pathname === '/demo' }
