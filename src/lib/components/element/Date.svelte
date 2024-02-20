@@ -2,6 +2,7 @@
 	import Chevron from '$lib/svg/Chevron.svelte'
 
 	export let calendars = 1
+	export let max
 	export let value = new Date()
 	export let set = v => v
 
@@ -34,10 +35,10 @@
 					<Chevron direction={'left'} size={'1.5rem'} />
 				</button>
 				{ #key internal.month }
-					<h2>{d.toLocaleString('default', { month: 'short' })}</h2>
+					<h2 class="month">{d.toLocaleString('default', { month: 'short' })}</h2>
 				{ /key }
 				<h2 class='year'>{d.getFullYear()}</h2>
-				<button class="none day" on:click={() => {
+				<button class="none day" class:disabled={max && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear()} on:click={() => {
 					d.setMonth(d.getMonth() + 1)
 					d = d
 				}}>
@@ -49,7 +50,7 @@
 					{ #each Array(42) as _, i }
 						{ @const day = new Date(new Date(d).setDate(i - before + 1)).setHours(0, 0, 0, 0) }
 						{ @const date = i - before + 1 }
-						<button class:disabled={date < 1 || date > days} class:fill={day === new Date(internal).setHours(0, 0, 0, 0)} on:click={() => set(new Date(day))}>
+						<button class:disabled={date < 1 || date > days || (max && max.getDate() < date && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear())} class:fill={day === new Date(internal).setHours(0, 0, 0, 0)} on:click={() => set(new Date(day))}>
 							{date < 1 ? prev - before + i + 1 : date > days ? i - days - before + 1 : date}
 						</button>
 					{ /each }
@@ -84,8 +85,9 @@
 		gap: 2rem !important;
 	}
 
-	h2 {
+	.text h2 {
 		margin: 0;
+		width: 3rem;
 	}
 
 	.container {
@@ -103,11 +105,29 @@
 	.text {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		gap: 0.25rem;
 	}
 
+	button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	button.day.disabled {
+		background: none;
+	}
+
+	.month {
+		align-items: flex-start;
+	}
+
 	.year {
+		display: flex;
+		flex-flow: column;
 		color: var(--text-weak);
+		align-items: flex-end;
 	}
 
 	.days {

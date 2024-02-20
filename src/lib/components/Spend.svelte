@@ -65,7 +65,7 @@
 	<div class="label">
 		<div class="left">
 			<p>Current spend</p>
-			<h2>{-current[current.length - 1]}</h2>
+			<h2>{(-current[current.length - 1]).toFixed(2)}</h2>
 		</div>
 		<div class="right">
 			<p><span class="value" style="color: {difference < 0 ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs(difference).toFixed(2)}</span> {difference < 0 ? 'above' : 'below'} average</p>

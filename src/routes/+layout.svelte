@@ -532,6 +532,7 @@
 			children: [{
 				name: 'Date',
 				type: 'date',
+				max: new Date(),
 				value: $route.state.transaction.new?.date,
 				set: v => $route.state.transaction.new.date = v
 			}]

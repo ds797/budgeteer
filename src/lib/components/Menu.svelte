@@ -156,7 +156,7 @@
 							</div>
 						{ :else if child.type === 'date' }
 							<div class="date">
-								<Date value={child.value} set={child.set} />
+								<Date max={child.max} value={child.value} set={child.set} />
 							</div>
 						<!-- { :else if child.type === 'color' && child.value !== undefined }
 							<Color value={child.value} set={child.set ?? blank} />
