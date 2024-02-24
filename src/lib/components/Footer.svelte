@@ -17,11 +17,11 @@
 <main>
 	{ #if session }
 		<button class="none" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
-			<Dashboard />
+			<Dashboard size={'1.5rem'} />
 			<p>Dashboard</p>
 		</button>
 		<button class="none" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
-			<Budget />
+			<Budget size={'1.5rem'} />
 			<p>Budget</p>
 		</button>
 	{ /if }
@@ -74,7 +74,7 @@
 		flex-flow: row;
 		justify-content: center;
 		align-items: stretch;
-		background: var(--bg-0);
+		/* background: var(--bg-0); */
 	}
 
 	main > button {
