@@ -2,7 +2,6 @@
 	import Bank from '$lib/svg/Bank.svelte'
 
 	export let link, account
-	console.log(link.logo)
 </script>
 
 <main>

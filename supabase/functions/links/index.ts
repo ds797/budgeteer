@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
 	} else if (type.remove) {
 		const ids = type.remove
 
-		await remove(user_id, (l: any) => ids.find(l.id))
+		await remove(user_id, (l: any) => ids.find((id: any) => id === l.id))
 
 		return respond({ success: true })
 	} else if (type.refresh) {

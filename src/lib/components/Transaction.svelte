@@ -21,7 +21,7 @@
 		$route.state.pickAccount = $route.state.transaction.new
 		$route.current = $route.transaction
 	}}>
-		<p>{transaction.amount < 0 ? '-' : '+'} {title(transaction.merchant_name ?? transaction.name ?? 'Untitled Transaction')}</p>
+		<p class="name">{transaction.amount < 0 ? '-' : '+'} {title(transaction.merchant_name ?? transaction.name ?? 'Untitled Transaction')}</p>
 		<p class="date">{format(transaction.date)}</p>
 		<div class="bar" />
 		<p>{money(Math.abs(transaction.amount))}</p>
@@ -45,6 +45,13 @@
 
 	p {
 		align-self: flex-start;
+	}
+
+	.name {
+		max-width: 40vw;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.date {

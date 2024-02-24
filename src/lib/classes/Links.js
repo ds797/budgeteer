@@ -434,7 +434,6 @@ export default class Links {
 						category: 'Uncategorized',
 						ignore: true
 					}
-					console.log('adding', t)
 					self.add.transaction(t)
 				}
 
@@ -443,7 +442,6 @@ export default class Links {
 		}
 		self.set = {
 			links: links => {
-				console.log(links)
 				self.links = []
 				const index = links.findIndex(l => !l.institution)
 				if (index === -1) links.push(self.custom())
@@ -652,15 +650,11 @@ export default class Links {
 					}
 				})
 
-				console.log('set pfcs', c.pfc)
-
 				return self
 			},
-			transaction: async id => {
-				let transaction = self.selected.transactions.find(t => t.id === id)
-
+			transaction: async transaction => {
 				const { data } = await invoke('ai', { type: { transaction: { name: transaction.name } } })
-				const pfc = JSON.parse(data)
+				const pfc = JSON.parse(data ?? '[]')
 
 				transaction.pfc = { detailed: pfc.pfc }
 				return self

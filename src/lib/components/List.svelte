@@ -19,8 +19,6 @@
 		list[i] = temp
 		change()
 	}
-
-	$: console.log(list)
 </script>
 
 <main>
