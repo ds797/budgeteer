@@ -1,7 +1,7 @@
 <script>
 	import { links, date } from '$lib/stores/user'
 	import { toDate } from '$lib/utils/convert'
-	import { min } from '$lib/utils/math'
+	import { max } from '$lib/utils/math'
 	import { month } from '$lib/utils/compare'
 	import Transaction from '$lib/components/Transaction.svelte'
 
@@ -21,12 +21,12 @@
 	let currentValues = Array(31).fill(0)
 	let averageValues = Array(31).fill(0)
 
-	$: currentValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => t.amount < 0 && month(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1))
-	$: averageValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => t.amount < 0 && months(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1) / 3)
+	$: currentValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => 0 < t.amount && month(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1))
+	$: averageValues = Array(31).fill(undefined).map((_, i) => $links.get.sum(t => 0 < t.amount && months(t.date, $date) && toDate(t.date).getTime() < new Date().getTime() && toDate(t.date).getDate() === i + 1) / 3)
 
 	$: current = currentValues.map((_, i) => currentValues.slice(0, i).reduce((p, c) => p + c, 0))
 	$: average = averageValues.map((_, i) => averageValues.slice(0, i).reduce((p, c) => p + c, 0))
-	$: top = min([average[average.length - 1], current[current.length - 1]])
+	$: top = max([average[average.length - 1], current[current.length - 1]])
 
 	const y = v => {
 		const multiplier = -1000 / top
@@ -50,7 +50,7 @@
 		const ts = $links.which.transactions(t => month(t.date, $date))
 		if (!ts.length) return []
 
-		return ts.filter(t => t.amount < 0).toSorted((a, b) => {
+		return ts.filter(t => 0 < t.amount).toSorted((a, b) => {
 			// console.log(a, b)
 			return a.amount - b.amount
 		})
@@ -63,22 +63,22 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class="label">
 		<div class="left">
-			<p>Current spend</p>
-			<h2>{(-current[current.length - 1]).toFixed(2)}</h2>
+			<p>Current saving</p>
+			<h2>{(current[current.length - 1]).toFixed(2)}</h2>
 		</div>
 		<div class="right">
-			<p><span class="value" style="color: {difference < 0 ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs(difference).toFixed(2)}</span> {difference < 0 ? 'above' : 'below'} average</p>
+			<p><span class="value" style="color: {difference < 0 ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs(difference).toFixed(2)}</span> {0 < difference ? 'above' : 'below'} average</p>
 		</div>
 	</div>
 	<svg class="graph" viewBox="0 0 300 1020" preserveAspectRatio="none">
-		<path class="average" style="fill: var(--text-bad);" d="M0, 1010 {path(average)}L300, 1010" />
+		<path class="average" style="fill: var(--text-good);" d="M0, 1010 {path(average)}L300, 1010" />
 		<path class="position" d="M{(new Date().getDate() - 1) * 10}, {1010 + y(current[new Date().getDate() - 1])} L{(new Date().getDate() - 1) * 10}, 1010" />
-		<path class="current" d="M0, 1010 {path(current, i => i <= new Date().getDate() - 1)}" />
 		<path class="bg" d="M0, 1010 L300, 1010"/>
+		<path class="current" d="M0, 1010 {path(current, i => i <= new Date().getDate() - 1)}" />
 	</svg>
 	<div class="gap" />
 	{ #if height == 2 }
-		<h3>Top Expenses</h3>
+		<h3>Top Earnings</h3>
 		<div class="transactions">
 			{ #each sorted as transaction (transaction.id) }
 				<div class="wrapper">
