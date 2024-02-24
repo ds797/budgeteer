@@ -1,5 +1,5 @@
 import { cors } from '../_shared/cors.ts'
-import { plaid, getLinks, setLinks, removeLinks, refreshLinks, createLinks } from '../_shared/plaid.ts'
+import { plaid, get, set, remove, refresh, create } from '../_shared/plaid.ts'
 import { user } from '../_shared/user.ts'
 import { respond, err } from '../_shared/response.ts'
 
@@ -13,30 +13,34 @@ Deno.serve(async (req: Request) => {
 	const { type } = await req.json()
 
 	if (type.get) {
-		const links = await getLinks(user_id, () => true)
+		const links = await get(user_id, () => true, { logos: true })
 
 		return respond(links)
 	} else if (type.set) {
 		const links = type.set
 
-		await setLinks(user_id, ...links)
+		await set(user_id, ...links)
 
 		return respond({ success: true })
 	} else if (type.remove) {
 		const ids = type.remove
 
-		await removeLinks(user_id, ...ids)
+		await remove(user_id, (l: any) => ids.find(l.id))
 
 		return respond({ success: true })
 	} else if (type.refresh) {
-		const links = await refreshLinks(user_id, () => true)
+		console.error('REF_INIT')
+		const links = await refresh(user_id, () => true)
+		console.error('REF_DONE')
 
 		return respond(links)
 	} else if (type.create) {
+		console.error('CRE_INIT')
 		const public_token = type.create
+		console.error('CRE_DONE')
 
 		try {
-			const links = await createLinks(user_id, ...public_token)
+			const links = await create(user_id, ...public_token)
 			return respond(links)
 		} catch (error) {
 			return err(error, 0)
