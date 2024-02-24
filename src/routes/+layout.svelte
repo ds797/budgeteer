@@ -1,13 +1,13 @@
 <script>
 	import './styles.css'
 	import { onMount } from 'svelte'
+	import { scale } from 'svelte/transition'
 	import { v4 as uuidv4 } from 'uuid'
 	import { page } from '$app/stores'
 	import { goto, invalidate, invalidateAll } from '$app/navigation'
 	import { browser } from '$app/environment'
 	import { links } from '$lib/stores/user'
 	import { route, queue, notifications } from '$lib/stores/ui'
-	import { num } from '$lib/utils/math'
 	import { toDate } from '$lib/utils/convert'
 	import Links from '$lib/classes/Links'
 	import Menu from '$lib/components/Menu.svelte'
@@ -19,7 +19,7 @@
 
 	export let data
 
-	$: ({ supabase, session, plaid, storage } = data)
+	$: ({ supabase, session, plaid, storage, pathname } = data)
 
 	const quit = () => {
 		if ($route.current?.quit) $route.current.quit()
@@ -905,13 +905,16 @@
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
+			// State changed
+			const change = _session?.user?.id !== session?.user?.id
+
 			updateAccount(_session)
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 				invalidateAll()
 			}
 
-			if ($page.url.pathname === '/' && _session) {
+			if ($page.url.pathname === '/' && change) {
 				$route.current = undefined
 				goto('/app')
 			}
@@ -955,7 +958,11 @@
 		<Header {data} />
 	</div>
 	<div class="fill">
-		<slot {data} />
+		{ #key pathname }
+			<div class="content" in:scale={{ duration: 800, delay: 100 }} out:scale={{ duration: 800 }}>
+				<slot {data} />
+			</div>
+		{ /key }
 	</div>
 	<div class="bottom">
 		<Footer {session} />
@@ -982,6 +989,16 @@
 
 	.fill {
 		flex: 1;
+		position: relative;
+	}
+
+	.content {
+		flex: 1;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
 		display: flex;
 		justify-content: stretch;
 		align-items: stretch;

@@ -2,12 +2,11 @@ import { get } from 'svelte/store'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import { links } from '$lib/stores/user'
 import { queue, notifications } from '$lib/stores/ui'
-import Links from '$lib/classes/Links'
 
 const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
 const PUBLIC_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnFwamZsaHVmdWRxcGlmZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4NDA0NzIsImV4cCI6MjAyMDQxNjQ3Mn0.1SppoHM5zG3j-P_RbaSOYaf7QyrJ00RxouWS34_c148'
 
-export const load = async ({ fetch, data, depends }) => {
+export const load = async ({ fetch, data, depends, url }) => {
 	depends('supabase:auth')
 
 	const supabase = createSupabaseLoadClient({
@@ -162,5 +161,7 @@ export const load = async ({ fetch, data, depends }) => {
 		queue.set(get(queue))
 	}
 
-	return { supabase, session, plaid, storage }
+	const { pathname } = url
+
+	return { supabase, session, plaid, storage, pathname }
 }

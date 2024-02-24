@@ -23,7 +23,7 @@
 	}}>
 		<Chevron size={'1.5rem'} direction={'left'} />
 	</button>
-		<h2 class="month" out:slide>{date.toLocaleString('default', { month: 'short' })}</h2>
+		<h2 class="month">{date.toLocaleString('default', { month: 'short' })}</h2>
 	<div class="column" style="flex-flow: {backward ? 'column-reverse' : 'column'};">
 		{ #if next }
 			<h2 class="year" on:introend={() => next = undefined} in:slide>{next.getFullYear()}</h2>
