@@ -1,8 +1,10 @@
 <script>
 	import { send, receive } from '$lib/utils/transition'
 	import { flip } from 'svelte/animate'
+
 	export let list = []
 	export let change = () => false
+	export let key = undefined
 
 	const up = i => {
 		const temp = list[i - 1]
@@ -17,10 +19,12 @@
 		list[i] = temp
 		change()
 	}
+
+	$: console.log(list)
 </script>
 
 <main>
-	{ #each list as item, index (item) }
+	{ #each list as item, index (key ? item[key] : item) }
 		<div in:receive={{ key: item }} out:send={{ key: item }} animate:flip>
 			<div class="order">
 				<button disabled={index === 0 || null} class="none up" on:click={() => up(index)}>

@@ -29,15 +29,11 @@ Deno.serve(async (req: Request) => {
 
 		return respond({ success: true })
 	} else if (type.refresh) {
-		console.error('REF_INIT')
 		const links = await refresh(user_id, () => true)
-		console.error('REF_DONE')
 
 		return respond(links)
 	} else if (type.create) {
-		console.error('CRE_INIT')
 		const public_token = type.create
-		console.error('CRE_DONE')
 
 		try {
 			const links = await create(user_id, ...public_token)
