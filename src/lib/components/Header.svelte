@@ -76,7 +76,7 @@
 				</button>
 			</div>
 			<div class="middle">
-				<h1>{document.title || $page.url.pathname.substring(1)}</h1>
+				<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
 			</div>
 			<div class="right">
 				<button class="none" on:click={() => $route.current = $route.account}>
@@ -128,5 +128,9 @@
 
 	.right {
 		justify-content: flex-end;
+	}
+
+	.backup {
+		text-transform: capitalize;
 	}
 </style>
