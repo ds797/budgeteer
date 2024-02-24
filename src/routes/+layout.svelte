@@ -478,12 +478,20 @@
 		$route.transaction.name = $route.state.transaction.id	? 'Edit Transaction' : 'Add Transaction'
 		$route.transaction.quit = async () => {
 			if ($route.state.transaction.id) {
-				if (!$route.state.transaction.new.name) $route.state.transaction.new.name = $route.state.transaction.name
-				else if ($route.state.transaction.name !== $route.state.transaction.new.name ?? $route.state.transaction.name) {
+				const old = $route.state.transaction.name
+				// Blank name field
+				if (!$route.state.transaction.new.name) $route.state.transaction.new.name = old
+
+				// Update transaction
+				const data = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
+				if (data) $links = data
+
+				// If transaction name changed, update categories
+				if ($route.state.transaction.new.name !== old) {
 					const id = $route.state.transaction.id
 
 					queue.enq(async () => {
-						$links = await $links.ai.transaction(id)
+						$links = await $links.ai.transaction($links.selected.transactions.find(t => t.id === $route.state.transaction.new.id))
 						$links = $links.sort(...$links.which.transactions(t => t.id === id))
 					})
 				}
@@ -494,10 +502,8 @@
 					$links = $links.sort($route.state.transaction.new)
 				}
 
-				const data = $links.update.transaction($route.state.transaction.id, $route.state.transaction.new)
 				if (data) {
-					$links = data
-					// Edit Custom
+					// Update Custom Link
 					$links.links.forEach(l => {
 						const t = l.transactions.find(t => t.id === $route.state.transaction.id)
 						if (t) Object.assign(t, $route.state.transaction.new)
@@ -596,7 +602,8 @@
 					}
 
 					queue.enq(async () => {
-						$links = await $links.ai.transaction(t.id)
+						console.log('invoking sort with 2', t)
+						$links = await $links.ai.transaction(t)
 						$links = $links.sort(...$links.which.transactions(u => u.id === t.id))
 						$links.links.find(l => !l.institution).transactions.push(t)
 						$links = $links.add.transaction(t)
@@ -834,7 +841,10 @@
 
 	const init = async () => {
 		// Step 1: get budgets
-		$links = new Links(storage.get('links'), m => notifications.add({ type: 'error', message: m }), supabase.invoke)
+		$links = new Links(storage.get('links'), m => {
+			console.error(m)
+			notifications.add({ type: 'error', message: m })
+		}, supabase.invoke)
 
 		let { budgets, selected } = await supabase.getBudgets()
 
