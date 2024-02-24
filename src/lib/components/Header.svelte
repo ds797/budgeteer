@@ -50,13 +50,23 @@
 		<Flow />
 	{ :else if $page.url.pathname === '/' }
 		<!-- Logged out -->
-		<div class="home">
-			<button on:click={() => goto('/demo')}>Demo</button>
-			<button class='fill' on:click={() => {
-				if (!data.session) $route.current = $route.start
-				else goto('/app')
-			}}>Start</button>
-			<button on:click={() => goto('/pricing')}>Pricing</button>
+		<div class="left">
+			<button class="none" on:click={() => goto('/')}>
+				<Logo />
+			</button>
+		</div>
+		<div class="middle">
+			<div class="home">
+				<button on:click={() => goto('/demo')}>Demo</button>
+				<button class='fill' on:click={() => {
+					if (!data.session) $route.current = $route.start
+					else goto('/app')
+				}}>Start</button>
+				<button on:click={() => goto('/pricing')}>Pricing</button>
+			</div>
+		</div>
+		<div class="right">
+
 		</div>
 	{ :else }
 		{ #if browser }
@@ -65,7 +75,7 @@
 					<Logo />
 				</button>
 			</div>
-			<div class="mid">
+			<div class="middle">
 				<h1>{document.title || $page.url.pathname.substring(1)}</h1>
 			</div>
 			<div class="right">
@@ -87,9 +97,9 @@
 	}
 
 	.home {
+		align-self: stretch;
 		flex: 1;
 		max-width: 20rem;
-		padding: 0.5rem;
 		display: flex;
 		justify-content: center;
 		align-items: stretch;
@@ -100,7 +110,7 @@
 		flex: 1;
 	}
 
-	.left, .mid, .right {
+	.left, .middle, .right {
 		flex: 1;
 		padding: 0.5rem;
 		display: flex;
@@ -112,13 +122,11 @@
 		justify-content: flex-start;
 	}
 
-	.right {
-		justify-content: flex-end;
+	.middle {
+		flex: 2;
 	}
 
-	.icon {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	.right {
+		justify-content: flex-end;
 	}
 </style>

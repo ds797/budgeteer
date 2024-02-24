@@ -18,7 +18,7 @@
 	}
 
 	.big {
-		font-size: 2rem;
+		font-size: max(1.5rem, 3vw);
 	}
 
 	.info {
@@ -31,7 +31,7 @@
 
 	.stack {
 		position: fixed;
-		bottom: 0;
+		bottom: calc(-25rem + 25vw);
 		right: 4.5rem;
 	}
 
@@ -40,7 +40,7 @@
 			margin: 2rem;
 		}
 		.stack {
-			bottom: -45vh;
+			bottom: calc(-30rem + 25vw);
 		}
 	}
 </style>
