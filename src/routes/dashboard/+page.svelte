@@ -1,18 +1,17 @@
 <script>
-	import Spend from '$lib/components/Spend.svelte'
-	import Save from '$lib/components/Save.svelte'
+	import Monthly from '$lib/components/Monthly.svelte'
 	import Accounts from '$lib/components/Accounts.svelte'
 </script>
 
 <main>
 	<div class="left">
 		<div class="card">
-			<Spend />
+			<Monthly spend={true} />
 		</div>
 	</div>
 	<div class="right">
 		<div class="card">
-			<Save height={1} />
+			<Monthly spend={false} height={1} />
 		</div>
 		<div class="card">
 			<Accounts />
@@ -45,7 +44,7 @@
 		margin: 0.5rem;
 		display: flex;
 		flex-flow: column;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
 		background: var(--frosted);
 		border-radius: 1rem;
