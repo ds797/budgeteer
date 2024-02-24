@@ -5,7 +5,7 @@
 	import { month } from '$lib/utils/compare'
 	import Transaction from '$lib/components/Transaction.svelte'
 
-	export let width = 2, height = 2;
+	export let height = 2;
 
 	const months = (d1, d2) => {
 		const one = new Date(d2)
@@ -70,12 +70,14 @@
 			<p><span class="value" style="color: {difference < 0 ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs(difference).toFixed(2)}</span> {difference < 0 ? 'above' : 'below'} average</p>
 		</div>
 	</div>
-	<svg class="graph" viewBox="0 0 300 1020" preserveAspectRatio="none">
-		<path class="average" style="fill: var(--text-bad);" d="M0, 1010 {path(average)}L300, 1010" />
-		<path class="position" d="M{(new Date().getDate() - 1) * 10}, {1010 + y(current[new Date().getDate() - 1])} L{(new Date().getDate() - 1) * 10}, 1010" />
-		<path class="current" d="M0, 1010 {path(current, i => i <= new Date().getDate() - 1)}" />
-		<path class="bg" d="M0, 1010 L300, 1010"/>
-	</svg>
+	<div class="wrapper">
+		<svg class="graph" viewBox="0 0 300 1020" preserveAspectRatio="none">
+			<path class="average" style="fill: var(--text-bad);" d="M0, 1010 {path(average)}L300, 1010" />
+			<path class="position" d="M{(new Date().getDate() - 1) * 10}, {1010 + y(current[new Date().getDate() - 1])} L{(new Date().getDate() - 1) * 10}, 1010" />
+			<path class="current" d="M0, 1010 {path(current, i => i <= new Date().getDate() - 1)}" />
+			<path class="bg" d="M0, 1010 L300, 1010"/>
+		</svg>
+	</div>
 	<div class="gap" />
 	{ #if height == 2 }
 		<h3>Top Expenses</h3>
@@ -131,8 +133,17 @@
 		font-weight: bold;
 	}
 
+	.wrapper {
+		flex: 1;
+		min-height: 3rem;
+		max-height: 8rem;
+		position: relative;
+	}
+
 	.graph {
-		height: 6rem;
+		position: absolute;
+		height: 100%;
+		width: 100%;
 		transition: all 0.4s ease-out;
 	}
 
