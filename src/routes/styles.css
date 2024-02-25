@@ -23,8 +23,9 @@
 	--noti-warning: rgb(255, 205, 0);
 	--noti-error: rgb(225, 50, 50);
 	--noti-info: rgb(50, 130, 225);
-	--shadow: 0.125rem 0.125rem 1rem #00000035;
-	--shadow-strong: 0.125rem 0.125rem 0.5rem #00000050;
+	--shadow: -0.125rem 0.125rem 1rem #00000035;
+	--shadow-strong: -0.125rem 0.125rem 0.5rem #00000050;
+	--shadow-stronger: -0.125rem 0.125rem 0.5rem #00000085;
 	--blur: blur(0.5rem);
 	--transition: all 0.2s ease-out;
 	--transition-fast: all 0.1s ease-out;
@@ -158,7 +159,6 @@ input:focus {
 
 button:focus {
 	outline: none;
-	transform: translate(0.125rem, -0.0625rem);
 	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
 }
 
@@ -180,12 +180,7 @@ input.none, button.none {
 	border: 0.125rem solid transparent;
 }
 
-button.none:hover {
-	box-shadow: none;
-	text-shadow: var(--shadow);
-}
-
-button.none:focus {
+button.none:hover, button.none:focus {
 	box-shadow: none;
 	text-shadow: var(--shadow);
 }

@@ -4,6 +4,7 @@
 	import { slide } from '$lib/utils/transition'
 	import List from '$lib/components/List.svelte'
 	import Category from '$lib/components/Category.svelte'
+	import Actions from '$lib/components/Actions.svelte'
 
 	export let data
 	export let demo = false
@@ -24,10 +25,17 @@
 	</List>
 </main>
 
+<div class="actions">
+	<Actions />
+</div>
+
 <style>
 	main {
 		flex: 1;
+		padding: 0 5vw;
+		box-sizing: border-box;
 		justify-content: flex-start;
+		overflow-y: auto;
 	}
 	div {
 		flex: 1;
@@ -39,5 +47,11 @@
 	button {
 		justify-self: flex-start;
 		font-size: 1.5rem;
+	}
+
+	.actions {
+		position: absolute;
+		right: 1.5rem;
+		bottom: 1rem;
 	}
 </style>
