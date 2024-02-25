@@ -41,8 +41,8 @@
 			<button class="none" on:click={async () => {
 				if (state) {
 					$route.current = { assistant: true }
-					await tick();
-					window.getSelection().removeAllRanges();
+					await tick()
+					window.getSelection().removeAllRanges()
 					state = false
 				} else state = !state
 			}}>
@@ -52,9 +52,9 @@
 		<div class="budgets" transition:pop={{ y: 30 }}>
 			<button class="none" on:click={async () => {
 				if (state) {
-					$route.current = $route.pickBudget
-					await tick();
-					window.getSelection().removeAllRanges();
+					$route.current = $route.choose.budget
+					await tick()
+					window.getSelection().removeAllRanges()
 					state = false
 				} else state = !state
 			}}>
@@ -64,9 +64,9 @@
 		<div class="links" transition:pop={{ y: 15 }}>
 			<button class="none" on:click={async () => {
 				if (state) {
-					$route.current = $route.selectAccounts
-					await tick();
-					window.getSelection().removeAllRanges();
+					$route.current = $route.links
+					await tick()
+					window.getSelection().removeAllRanges()
 					state = false
 				} else state = !state
 			}}>
@@ -83,8 +83,8 @@
 				} else {
 					$route.state.transaction = { properties: {} }
 					$route.state.transaction.new = structuredClone($route.state.transaction)
-					$route.state.pickCategory = $route.state.transaction.new.properties
-					$route.state.pickAccount = $route.state.transaction.new
+					$route.state.choose.category = $route.state.transaction.new.properties
+					$route.state.choose.account = $route.state.transaction.new
 					$route.current = $route.transaction
 					$route.current = $route.transaction
 

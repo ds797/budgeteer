@@ -13,7 +13,7 @@
 		<div />
 		<h3>You haven't linked any banks!</h3>
 		<div />
-		<button class="fill" on:click={() => $route.current = $route.selectAccounts}>Link Institution</button>
+		<button class="fill" on:click={() => $route.current = $route.links}>Link Institution</button>
 	{ /each }
 </main>
 

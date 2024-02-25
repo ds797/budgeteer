@@ -17,8 +17,8 @@
 	<button transition:slide class='none {transaction.properties.hide ? 'hidden' : (transaction.amount < 0 ? 'bad' : 'good')}' on:click={() => {
 		$route.state.transaction = transaction
 		$route.state.transaction.new = structuredClone(transaction)
-		$route.state.pickCategory = $route.state.transaction.new.properties
-		$route.state.pickAccount = $route.state.transaction.new
+		$route.state.choose.category = $route.state.transaction.new.properties
+		$route.state.choose.account = $route.state.transaction.new
 		$route.current = $route.transaction
 	}}>
 		<p class="name">{transaction.amount < 0 ? '-' : '+'} {title(transaction.merchant_name ?? transaction.name ?? 'Untitled Transaction')}</p>

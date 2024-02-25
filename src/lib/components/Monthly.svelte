@@ -7,6 +7,8 @@
 	import { month } from '$lib/utils/compare'
 	import Transaction from '$lib/components/Transaction.svelte'
 
+	// TODO: ignore hidden elements
+
 	export let height = 2;
 	export let spend = false;
 
