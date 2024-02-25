@@ -33,11 +33,6 @@
 		{ /if }
 	</div>
 	<div class="right">
-		{ #if demo }
-			<button class="none account" on:click={() => goto('/')}>
-				<Close stroke={'var(--accent-0)'} />
-			</button>
-		{ /if }
 	</div>
 </main>
 

@@ -2,15 +2,10 @@
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
 	import { links, date } from '$lib/stores/user'
-	import { route } from '$lib/stores/ui'
 	import { month } from '$lib/utils/compare'
-	import { slide } from '$lib/utils/transition'
-	import Month from '$lib/components/Month.svelte'
-	import Graph from '$lib/components/Graph.svelte'
 	import Arrow from '$lib/svg/Arrow.svelte'
-	import Account from '$lib/svg/Account.svelte'
 
-	let show = false
+	export let show = false
 
 	const inflow = tweened(0, {
 		duration: 600,
@@ -27,42 +22,21 @@
 </script>
 
 <main>
-	<div class="navbar">
-		<div class="left">
-			<Month date={$date} set={v => {
-				$date.setMonth($date.getMonth() + v)
-				$date = $date
-				$links = $links
-			}} />
+	<button class="none" on:click={() => show = !show}>
+		<div class="in">
+			<h1>{parseFloat($inflow).toFixed(2)}</h1>
+			<div class="down">
+				<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
+			</div>
 		</div>
-		<div class="middle">
-			<button class="none" on:click={() => show = !show}>
-				<div class="in">
-					<h1>{parseFloat($inflow).toFixed(2)}</h1>
-					<div class="down">
-						<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
-					</div>
-				</div>
-				<div class="bar" />
-				<div class="out">
-					<div class="up">
-						<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
-					</div>
-					<h1>{parseFloat(-$outflow).toFixed(2)}</h1>
-				</div>
-			</button>
+		<div class="bar" />
+		<div class="out">
+			<div class="up">
+				<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
+			</div>
+			<h1>{parseFloat(-$outflow).toFixed(2)}</h1>
 		</div>
-		<div class="right">
-			<button class="none" on:click={() => $route.current = $route.account}>
-				<Account />
-			</button>
-		</div>
-	</div>
-	{ #if show }
-		<div class="graph" transition:slide={{ duration: 600 }}>
-			<Graph />
-		</div>
-	{ /if }
+	</button>
 </main>
 
 <style>
@@ -139,11 +113,5 @@
 
 	.down {
 		transform: rotate(90deg);
-	}
-
-	.graph {
-		display: flex;
-		justify-content: stretch;
-		align-items: stretch;
 	}
 </style>
