@@ -1,11 +1,12 @@
+import { invalidateAll } from '$app/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import { links } from '$lib/stores/user'
 import { route, queue, notifications } from '$lib/stores/ui'
 import { toDate } from '$lib/utils/convert'
 
-const link = async ($route, $links) => {
+const link = async ($route, $links, state) => {
 	try {
-		const { token } = await plaid.link()
+		const { token } = await state.plaid.link()
 
 		if (!token) return 0
 
@@ -36,25 +37,20 @@ const save = {
 	}
 }
 
-export const initialize = $route => {
+export const initialize = ($route, $links, state) => {
 	$route.state = { choose: {} },
 	$route.link = {
 		name: 'Link Institution',
-		// TODO: remove this and fix in Menu
-		key: async e => {
-			if (e.key !== 'Enter') return
-
-			await link()
-		},
 		children: [{
 			name: 'Create Link',
 			description: 'Budgeteer uses Plaid to link your account.',
 			type: 'action',
+			submit: true,
 			click: async () => {
-				if ($page.url.pathname === '/demo') {
+				if (state.demo) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to link your personal accounts!' })
 					$route.current = undefined
-				} else return await link()
+				} else return await link($route, $links, state)
 			},
 			fill: true
 		}],
@@ -402,16 +398,16 @@ export const update = {
 			}
 		},
 		account: ($route, $links) => {
-			if (!$route.state.account) $route.state.account = {}
+			if (!$route.state.choose.account) $route.state.choose.account = {}
 
 			let any = false
 
-			$route.account.hint = $route.state.account.hint
-			$route.account.name = $links.get.parent($route.state.account.account)?.name ?? 'Select Account'
-			$route.account.fill = $route.state.account.account
-			$route.account.children = [...$links.links.map(l => {
-				if (($route.state.account.disabled ?? []).find(id => id === l.id)) return {}
-				if ($route.state.account.enabled && !$route.state.account.enabled.find(id => l.accounts.find(a => a.account_id === id))) return {}
+			$route.choose.account.hint = $route.state.choose.account.hint
+			$route.choose.account.name = $links.get.parent($route.state.choose.account.account)?.name ?? 'Select Account'
+			$route.choose.account.fill = $route.state.choose.account.account
+			$route.choose.account.children = [...$links.links.map(l => {
+				if (($route.state.choose.account.disabled ?? []).find(id => id === l.id)) return {}
+				if ($route.state.choose.account.enabled && !$route.state.choose.account.enabled.find(id => l.accounts.find(a => a.account_id === id))) return {}
 
 				any = true
 
@@ -419,14 +415,14 @@ export const update = {
 					name: l.name,
 					link: l,
 					type: 'account',
-					fill: l.accounts.find(a => a.account_id === $route.state.account.account),
+					fill: l.accounts.find(a => a.account_id === $route.state.choose.account.account),
 					children: [...l.accounts.map(a => {
 						return {
 							name: a.name,
 							type: 'action',
-							fill: $route.state.account.account === a.account_id,
+							fill: $route.state.choose.account.account === a.account_id,
 							click: () => {
-								$route.state.account.account = a.account_id
+								$route.state.choose.account.account = a.account_id
 								route.set($route)
 								return 2
 							}
@@ -442,7 +438,7 @@ export const update = {
 				}
 			})]
 			if (!any)
-				$route.account.children = [{
+				$route.choose.account.children = [{
 					name: 'Select Links',
 					description: 'You haven\'t selected any custom accounts for this budget.',
 					fill: true,
