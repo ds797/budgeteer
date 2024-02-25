@@ -15,58 +15,30 @@
 </script>
 
 <main>
-	{ #if session }
-		<button class="none" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
-			<Dashboard size={'1.5rem'} />
-			<p>Dashboard</p>
-		</button>
-		<button class="none" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
-			<Budget size={'1.5rem'} />
-			<p>Budget</p>
-		</button>
-	{ /if }
-	{ #if $page.url.pathname === '/app' || $page.url.pathname === '/demo' }
-		<!-- Logged in -->
-		<div class="container">
-			<div class="left">
-				<div style="opacity: {$serving ? 1 : 0}">
-					<div class="icon">
-						<div class="loading">
-							<Loading size={'1.25rem'} border={'0.25rem'} />
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="mid">
-				<button class="fill secondary" on:click={() => $route.current = $route.pickBudget}>Budgets</button>
-					<button class="fill primary" on:click={() => {
-					if (demo) {
-						notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
-						return
-					}
-					$route.state.transaction = { properties: {} }
-					$route.state.transaction.new = structuredClone($route.state.transaction)
-					$route.state.pickCategory = $route.state.transaction.new.properties
-					$route.state.pickAccount = $route.state.transaction.new
-					$route.current = $route.transaction
-				}}>
-					<Plus size={'1rem'} />
-				</button>
-				<button class="fill secondary" on:click={() => $route.current = $route.selectAccounts}>Links</button>
-			</div>
-			<div class="right">
-				{ #if demo }
-					<button class="none account" on:click={() => goto('/')}>
-						<Close stroke={'var(--accent-0)'} />
-					</button>
-				{ :else }
-					<button class="none icon" on:click={() => $route.current = $route.account}>
-						<Account />
-					</button>
-				{ /if }
-			</div>
+	<div class="left">
+		<div class="loading" style="opacity: {$serving ? 1 : 0};">
+			<Loading size={'1.25rem'} border={'0.25rem'} />
 		</div>
-	{ /if }
+	</div>
+	<div class="middle">
+		{ #if session }
+			<button class="none page" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
+				<Dashboard size={'1.5rem'} />
+				<p>Dashboard</p>
+			</button>
+			<button class="none page" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
+				<Budget size={'1.5rem'} />
+				<p>Budget</p>
+			</button>
+		{ /if }
+	</div>
+	<div class="right">
+		{ #if demo }
+			<button class="none account" on:click={() => goto('/')}>
+				<Close stroke={'var(--accent-0)'} />
+			</button>
+		{ /if }
+	</div>
 </main>
 
 <style>
@@ -74,87 +46,52 @@
 		flex-flow: row;
 		justify-content: center;
 		align-items: stretch;
-		/* background: var(--bg-0); */
 	}
 
-	main > button {
+	.left, .middle, .right {
+		flex: 1;
+		padding: 0 0.5rem;
+		display: flex;
+		align-items: center;
+	}
+
+	.left { justify-content: flex-start; }
+
+	.middle {
+		flex: 2;
+		justify-content: center;
+	}
+
+	.right { justify-content: flex-end; }
+
+	.loading {
+		padding: 0.25rem;
+		border: 0.125rem solid transparent;
+	}
+
+	.page {
 		margin: 0.25rem;
-		width: 4.5rem;
-		border-radius: 1.5rem;
-	}
-
-	button {
+		width: 4rem;
 		display: flex;
 		flex-flow: column;
 		justify-content: center;
 		align-items: center;
 	}
 
-	button p {
+	.page:hover {
+		transform: none;
+	}
+
+	.page:hover * {
+		transform: translateY(-0.125rem);
+	}
+
+	.page p {
 		font-size: 0.75rem;
 		font-weight: normal;
 	}
 
-	main > button.selected {
+	.selected {
 		background: var(--accent-0-light);
-	}
-
-	.container {
-		flex: 1;
-		height: 4rem;
-		display: flex;
-		justify-content: center;
-		align-items: stretch;
-	}
-
-	.left, .mid, .right {
-		padding: 0.5rem;
-		flex: 1;
-		display: flex;
-		align-items: center;
-	}
-
-	.left {
-		justify-content: flex-start;
-	}
-
-	.mid {
-		flex: 2;
-		justify-content: center;
-	}
-
-	.mid button {
-		max-width: 6rem;
-		height: 3rem;
-		margin: 0.5rem;
-	}
-
-	.right {
-		justify-content: flex-end;
-	}
-
-	.secondary {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.primary {
-		width: 3rem;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.icon {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.loading {
-		padding: 0.25rem;
-		border: 0.125rem solid transparent;
 	}
 </style>

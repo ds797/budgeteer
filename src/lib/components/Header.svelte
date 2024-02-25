@@ -69,6 +69,7 @@
 
 		</div>
 	{ :else }
+		<!-- Unknown page -->
 		{ #if browser }
 			<div class="left">
 				<button class="none" on:click={() => goto('/')}>
@@ -79,9 +80,11 @@
 				<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
 			</div>
 			<div class="right">
-				<button class="none" on:click={() => $route.current = $route.account}>
-					<Account />
-				</button>
+				{ #if data.session }
+					<button class="none" on:click={() => $route.current = $route.account}>
+						<Account />
+					</button>
+				{ /if }
 			</div>
 		{ /if }
 	{ /if }

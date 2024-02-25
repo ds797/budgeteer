@@ -21,9 +21,8 @@
 
 <style>
 	main {
-		padding: 0 5vw;
-		box-sizing: border-box;
 		flex: 1;
+		box-sizing: border-box;
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;

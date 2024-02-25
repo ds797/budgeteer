@@ -8,7 +8,7 @@
 	import Month from '$lib/components/Month.svelte'
 	import Graph from '$lib/components/Graph.svelte'
 	import Arrow from '$lib/svg/Arrow.svelte'
-	import Sparkle from '$lib/svg/Sparkle.svelte'
+	import Account from '$lib/svg/Account.svelte'
 
 	let show = false
 
@@ -53,8 +53,8 @@
 			</button>
 		</div>
 		<div class="right">
-			<button class="none" on:click={() => $route.current = { assistant: true }}>
-				<Sparkle />
+			<button class="none" on:click={() => $route.current = $route.account}>
+				<Account />
 			</button>
 		</div>
 	</div>
