@@ -513,12 +513,8 @@
 					updateLinks()
 					return
 				}
-				delete $route.state.transaction.new
-			} else {
-				delete $route.state.transaction.new
-				updateBudgets()
-				updateLinks()
 			}
+			delete $route.state.transaction.new
 		}
 		$route.transaction.children = [$route.pickCategory, $route.pickAccount, {
 			name: 'Name',
