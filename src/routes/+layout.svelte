@@ -7,6 +7,7 @@
 	import { goto, invalidate, invalidateAll } from '$app/navigation'
 	import { browser } from '$app/environment'
 	import { initialize, update } from '$lib/utils/routes'
+	import { generate } from '$lib/utils/generate'
 	import { links } from '$lib/stores/user'
 	import { route, queue, notifications } from '$lib/stores/ui'
 	import Links from '$lib/classes/Links'
@@ -113,11 +114,11 @@
 	}
 
 	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_, _session) => {
+		const { data: state } = supabase.auth.onAuthStateChange((_, _session) => {
 			// State changed
 			const change = _session?.user?.id !== session?.user?.id
 
-			update.account($route, _session)
+			if (_session) update.account($route, _session, data)
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 				invalidateAll()
@@ -127,13 +128,9 @@
 				$route.current = undefined
 				goto('/app')
 			}
-			if ($page.url.pathname === '/app' && !_session) {
-				$route.current = undefined
-				goto('/')
-			}
 		})
 
-		if (!demo) {
+		if (!demo && session) {
 			check()
 			setTimeout(check, MINUTE)
 			// If any value is present, don't initialize
@@ -141,10 +138,11 @@
 			if (redirect) queue.enq(cont)
 			else queue.enq(init)
 		} else {
-
+			$links = generate($links, data)
+			$route.current = undefined
 		}
 
-		return () => data.subscription.unsubscribe()
+		return () => state.subscription.unsubscribe()
 	})
 
 	$: {
@@ -155,7 +153,7 @@
 		}
 	}
 
-	initialize($route)
+	initialize($route, $links, data)
 
 	$: $route, update.all($route, $links, data)
 </script>
