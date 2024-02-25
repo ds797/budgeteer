@@ -1,6 +1,4 @@
 <script>
-	import { route } from '$lib/stores/ui'
-	import Loading from '$lib/components/Loading.svelte'
 	import Budgets from '$lib/components/Budgets.svelte'
 
 	export let data
@@ -12,11 +10,7 @@
 </svelte:head>
 
 <main>
-	{ #if $route.current?.loading || !data.session }
-		<Loading />
-	{ :else }
-		<Budgets {data} />
-	{ /if }
+	<Budgets {data} />
 </main>
 
 <style>
