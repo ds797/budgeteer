@@ -20,7 +20,7 @@
 
 	export let data
 
-	$: ({ supabase, session, plaid, storage, pathname, demo } = data)
+	$: ({ supabase, session, plaid, storage, pathname, demo, paid, paying } = data)
 
 	const quit = () => {
 		if ($route.current?.quit) $route.current.quit()
@@ -113,16 +113,17 @@
 		storage.set('tabs', tabs)
 	}
 
-	onMount(() => {
-		const { data: state } = supabase.auth.onAuthStateChange((_, _session) => {
+	onMount(async () => {
+		const { data: state } = supabase.auth.onAuthStateChange(async (_, _session) => {
 			// State changed
 			const change = _session?.user?.id !== session?.user?.id
 
-			if (_session) update.account($route, _session, data)
 			if (_session?.expires_at !== session?.expires_at) {
+				data.paying = await paid()
 				invalidate('supabase:auth')
 				invalidateAll()
 			}
+			if (_session) queue.enq(async () => update.account($route, paying, data))
 
 			if ($page.url.pathname === '/' && change) {
 				$route.current = undefined
@@ -130,7 +131,7 @@
 			}
 		})
 
-		if (!demo && session) {
+		if (!demo && paying) {
 			check()
 			setTimeout(check, MINUTE)
 			// If any value is present, don't initialize

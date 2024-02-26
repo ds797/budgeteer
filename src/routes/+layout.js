@@ -37,8 +37,16 @@ export const load = async ({ fetch, data, depends, url }) => {
 
 		return { data }
 	}
-
 	supabase.invoke = invoke
+
+	const paid = async () => {
+		let paid = false
+		if ((await invoke('paid'))?.data) paid = true
+
+		return paid
+	}
+
+	let paying = await paid()
 
 	let storage = {}
 
@@ -163,5 +171,5 @@ export const load = async ({ fetch, data, depends, url }) => {
 
 	const { pathname } = url
 
-	return { supabase, session, plaid, storage, pathname }
+	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying }
 }
