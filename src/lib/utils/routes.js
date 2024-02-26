@@ -1,4 +1,4 @@
-import { invalidateAll } from '$app/navigation'
+import { goto, invalidateAll } from '$app/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import { links } from '$lib/stores/user'
 import { route, queue, notifications } from '$lib/stores/ui'
@@ -743,7 +743,7 @@ export const update = {
 			}
 		}]
 	},
-	account: ($route, session, state) => {
+	account: ($route, paid, state) => {
 		$route.account = {
 			name: 'Account',
 			children: [{
@@ -751,6 +751,9 @@ export const update = {
 				type: 'action',
 				dangerous: true,
 				click: async () => {
+					const res = await state.supabase.auth.signOut()
+					console.log(res)
+					return 1
 					try {
 						const { error } = await state.supabase.auth.signOut()
 						if (error) {
@@ -772,7 +775,7 @@ export const update = {
 				}
 			}]
 		}
-		if (session) {
+		if (paid) {
 			$route.account.children.unshift({
 				name: 'Subscription',
 				children: [{
