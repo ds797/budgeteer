@@ -1,6 +1,8 @@
 <script>
 	import Monthly from '$lib/components/Monthly.svelte'
 	import Accounts from '$lib/components/Accounts.svelte'
+
+	export let data
 </script>
 
 <main>
@@ -14,7 +16,7 @@
 			<Monthly spend={false} height={1} />
 		</div>
 		<div class="card">
-			<Accounts />
+			<Accounts {data} />
 		</div>
 	</div>
 </main>

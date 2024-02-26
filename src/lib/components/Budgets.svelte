@@ -26,7 +26,7 @@
 </main>
 
 <div class="actions">
-	<Actions />
+	<Actions {data} />
 </div>
 
 <style>

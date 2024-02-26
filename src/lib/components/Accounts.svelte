@@ -1,7 +1,9 @@
 <script>
 	import { links } from '$lib/stores/user'
-	import { route } from '$lib/stores/ui'
+	import { route, notifications } from '$lib/stores/ui'
 	import Account from '$lib/components/Account.svelte'
+
+	export let data
 </script>
 
 <main>
@@ -13,7 +15,14 @@
 		<div />
 		<h3>You haven't linked any banks!</h3>
 		<div />
-		<button class="fill" on:click={() => $route.current = $route.links}>Link Institution</button>
+		<button class="fill" on:click={() => {
+			if (!data.paying) {
+				notifications.add({ type: 'error', message: 'Join Budgeteer to add custom links!' })
+				return
+			}
+
+			$route.current = $route.links
+		}}>Link Institution</button>
 	{ /each }
 </main>
 

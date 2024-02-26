@@ -7,7 +7,7 @@
 	import Link from '$lib/svg/Link.svelte'
 	import Menu from '$lib/svg/Menu.svelte'
 
-	export let demo = false
+	export let data
 
 	let state = true
 
@@ -39,6 +39,11 @@
 	{ #if state }
 		<div class="ai" transition:pop={{ y: 45 }}>
 			<button class="none" on:click={async () => {
+				if (!data.paying) {
+					notifications.add({ type: 'error', message: 'Join Budgeteer to get personalized budgeting assistance!' })
+					return
+				}
+
 				if (state) {
 					$route.current = { assistant: true }
 					await tick()
@@ -51,6 +56,11 @@
 		</div>
 		<div class="budgets" transition:pop={{ y: 30 }}>
 			<button class="none" on:click={async () => {
+				if (!data.paying) {
+					notifications.add({ type: 'error', message: 'Join Budgeteer to add more budgets!' })
+					return
+				}
+
 				if (state) {
 					$route.current = $route.choose.budget
 					await tick()
@@ -63,6 +73,11 @@
 		</div>
 		<div class="links" transition:pop={{ y: 15 }}>
 			<button class="none" on:click={async () => {
+				if (!data.paying) {
+					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom links!' })
+					return
+				}
+
 				if (state) {
 					$route.current = $route.links
 					await tick()
@@ -76,8 +91,13 @@
 	{ /if }
 	<div class="menu">
 		<button class="none" on:click={async () => {
+				if (!data.paying) {
+					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
+					return
+				}
+
 			if (state) {
-				if (demo) {
+				if (data.demo) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
 					return
 				} else {
