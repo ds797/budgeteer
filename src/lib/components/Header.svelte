@@ -55,7 +55,7 @@
 	<div class="banner">
 		{ #if ($page.url.pathname === '/app' || $page.url.pathname === '/dashboard') && !data.paying }
 			<div class="error" transition:slide>
-				<p>You're testing Budgeteer!</p>
+				<p>You're testing Budgeteer!<button class="none" on:click={() => goto('/subscribe')}>Subscribe</button>to get full access.</p>
 			</div>
 		{ /if }
 	</div>
@@ -133,6 +133,19 @@
 		background: var(--text-bad);
 		color: var(--bg-1);
 		text-align: center;
+	}
+
+	.error button {
+		color: var(--bg-1);
+		font-weight: normal;
+		border: none;
+		text-decoration: underline;
+		text-underline-offset: 0.125rem;
+	}
+
+	.error button:hover {
+		transform: none;
+		text-underline-offset: 0.0625rem;
 	}
 
 	.left, .middle, .right {
