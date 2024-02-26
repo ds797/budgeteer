@@ -1,17 +1,10 @@
 <script>
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
-	import { route, serving, notifications } from '$lib/stores/ui'
+	import { serving } from '$lib/stores/ui'
 	import Loading from '$lib/components/Loading.svelte'
-	import Plus from '$lib/svg/Plus.svelte'
-	import Account from '$lib/svg/Account.svelte'
 	import Dashboard from '$lib/svg/Dashboard.svelte'
 	import Budget from '$lib/svg/Budget.svelte'
-	import Logo from '$lib/svg/Logo.svelte'
-	import Close from '$lib/svg/Close.svelte'
-
-	export let demo = false
-	export let session
 </script>
 
 <main>
@@ -21,7 +14,7 @@
 		</div>
 	</div>
 	<div class="middle">
-		{ #if session }
+		{ #if $page.url.pathname !== '/' }
 			<button class="none page" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
 				<Dashboard size={'1.5rem'} />
 				<p>Dashboard</p>

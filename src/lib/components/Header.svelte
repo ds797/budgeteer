@@ -53,7 +53,7 @@
 
 <main>
 	<div class="banner">
-		{ #if $page.url.pathname === '/app' || $page.url.pathname === '/demo' && !data.session }
+		{ #if ($page.url.pathname === '/app' || $page.url.pathname === '/dashboard') && !data.paying }
 			<div class="error" transition:slide>
 				<p>You're testing Budgeteer!</p>
 			</div>
@@ -74,27 +74,20 @@
 			{ /if }
 		</div>
 		<div class="middle">
-			<div class="home">
-				{ #if $page.url.pathname === '/' }
-					<button on:click={() => goto('/app')}>Demo</button>
-					<button class='fill' on:click={() => {
-						if (!data.session) $route.current = $route.start
-						else goto('/app')
-					}}>Start</button>
-					<button on:click={() => goto('/pricing')}>Pricing</button>
-				{ :else if $page.url.pathname === '/app' }
-					<Flow bind:show />
-					{ #if show }
-						<div class="graph">
-							<Graph />
-						</div>
-					{ /if }
-				{ :else }
-					{ #if browser }
-						<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
-					{ /if }
+			{ #if $page.url.pathname === '/' }
+				<button on:click={() => goto('/app')}>Demo</button>
+				<button class='fill' on:click={() => {
+					if (!data.session) $route.current = $route.start
+					else goto('/pay')
+				}}>Start</button>
+				<button on:click={() => goto('/pricing')}>Pricing</button>
+			{ :else if $page.url.pathname === '/app' }
+				<Flow bind:show />
+			{ :else }
+				{ #if browser }
+					<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
 				{ /if }
-			</div>
+			{ /if }
 		</div>
 		<div class="right">
 			{ #if $page.url.pathname === '/app' && data.demo }
@@ -109,7 +102,11 @@
 		</div>
 	</div>
 	<div class="extra">
-
+		{ #if show }
+			<div class="graph" transition:slide={{ duration: 600 }}>
+				<Graph />
+			</div>
+		{ /if }
 	</div>
 </main>
 
@@ -138,20 +135,6 @@
 		text-align: center;
 	}
 
-	.home {
-		align-self: stretch;
-		flex: 1;
-		max-width: 20rem;
-		display: flex;
-		justify-content: center;
-		align-items: stretch;
-		gap: 0.5rem;
-	}
-
-	.home button {
-		flex: 1;
-	}
-
 	.left, .middle, .right {
 		flex: 1;
 		padding: 0.5rem;
@@ -166,6 +149,16 @@
 
 	.middle {
 		flex: 2;
+		align-self: stretch;
+		max-width: 20rem;
+		display: flex;
+		justify-content: center;
+		align-items: stretch;
+		gap: 0.5rem;
+	}
+
+	.middle button {
+		flex: 1;
 	}
 
 	.right {
