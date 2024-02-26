@@ -71,7 +71,7 @@
 		position: fixed;
 		bottom: 0;
 		left: 0;
-		flex-flow: column-reverse;
+		flex-flow: column;
 		justify-content: flex-end;
 		align-items: stretch;
 		z-index: 1000;
