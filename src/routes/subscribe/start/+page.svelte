@@ -36,6 +36,7 @@
 <style>
 	main {
 		flex-flow: row;
+		align-items: flex-start;
 	}
 
 	.loading {
@@ -56,12 +57,14 @@
 	}
 
 	.padding {
-		padding: 1rem;
+		padding: 0 1rem;
 		flex: 1;
 		display: flex;
 		flex-flow: column;
 		justify-content: stretch;
 		align-items: stretch;
+		border-radius: 1rem;
+		overflow: hidden;
 	}
 
 	.checkout {
