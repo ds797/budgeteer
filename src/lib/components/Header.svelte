@@ -78,7 +78,7 @@
 				<button on:click={() => goto('/app')}>Demo</button>
 				<button class='fill' on:click={() => {
 					if (!data.session) $route.current = $route.start
-					else goto('/pay')
+					else goto('/subscribe')
 				}}>Start</button>
 				<button on:click={() => goto('/pricing')}>Pricing</button>
 			{ :else if $page.url.pathname === '/app' }

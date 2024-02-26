@@ -23,7 +23,7 @@ Deno.serve(async (req: Request) => {
 				}
 			],
 			mode: 'subscription',
-			return_url: `${DOMAIN}/pay/finish`,	
+			return_url: `${DOMAIN}/subscribe/finish`,	
 			metadata: { user_id }
 		})
 

@@ -29,7 +29,7 @@
 				<p>Simple, streamlined budgeting that allows you to act on your decisions as easily as if you controlled Budgeteer with your mind.</p>
 				<div class="buy">
 					<p class="tos">By continuing, you agree to our <a href="/tos" target="_blank">terms</a>.</p>
-					<button class="fill" on:click={() => goto('/pay/start')}>Purchase</button>
+					<button class="fill" on:click={() => goto('/subscribe/start')}>Purchase</button>
 				</div>
 			</div>
 		</div>

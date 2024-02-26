@@ -12,7 +12,7 @@ export const GET = async ({ url: { searchParams }, locals: { supabase, paid } })
 
 		if (!error) {
 			if (await paid()) throw redirect(303, '/app')
-			else throw redirect(303, '/pay')
+			else throw redirect(303, '/subscribe')
 		}
 
 		throw redirect(303, `/?error=${encodeURIComponent(error)}`)
