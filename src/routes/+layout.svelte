@@ -1,15 +1,17 @@
 <script>
 	import './styles.css'
 	import { onMount } from 'svelte'
-	import { scale } from 'svelte/transition'
+	import { fade, scale } from 'svelte/transition'
+	import { quadOut } from 'svelte/easing'
 	import { v4 as uuidv4 } from 'uuid'
 	import { page } from '$app/stores'
-	import { goto, invalidate, invalidateAll } from '$app/navigation'
+	import { invalidate, invalidateAll } from '$app/navigation'
+	import { goto } from '$lib/utils/navigation'
 	import { browser } from '$app/environment'
 	import { initialize, update } from '$lib/utils/routes'
 	import { generate } from '$lib/utils/generate'
 	import { links } from '$lib/stores/user'
-	import { route, queue, notifications } from '$lib/stores/ui'
+	import { route, queue, notifications, loading } from '$lib/stores/ui'
 	import Links from '$lib/classes/Links'
 	import Menu from '$lib/components/element/Menu.svelte'
 	import Modal from '$lib/components/element/Modal.svelte'
@@ -157,9 +159,15 @@
 	initialize($route, $links, data)
 
 	$: $route, update.all($route, $links, data)
+
+	$: $page, $loading = false
 </script>
 
 <svelte:window on:keydown={active} on:mousemove={active} />
+
+{ #if $loading }
+	<div class="loading" transition:fade={{ duration: 200, easing: quadOut }} />
+{ /if }
 
 <main>
 	<Notifications />
@@ -194,6 +202,18 @@
 		height: 100%;
 		justify-content: stretch;
 		align-items: stretch;
+	}
+
+	.loading {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: var(--accent-0);
+		opacity: 30%;
+		z-index: 1001;
+		cursor: wait;
 	}
 
 	.top {

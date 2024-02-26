@@ -1,7 +1,5 @@
 <script>
-	import { goto, invalidateAll } from '$app/navigation'
-	import { route, notifications } from '$lib/stores/ui'
-	import Account from '$lib/svg/Account.svelte'
+	import { goto } from '$lib/utils/navigation'
 
 	let card
 
@@ -43,24 +41,6 @@
 		box-sizing: border-box;
 		align-items: stretch;
 	}
-
-	h1 {
-		text-shadow: var(--shadow);
-	}
-
-	.navbar {
-		display: flex;
-	}
-
-	.left, .middle, .right {
-		flex: 1;
-		display: flex;
-		align-items: center;
-	}
-
-	.left { justify-content: flex-start; }
-	.middle { justify-content: center; }
-	.right { justify-content: flex-end; }
 
 	.container {
 		flex: 1;

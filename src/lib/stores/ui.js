@@ -78,3 +78,5 @@ const createQueue = () => {
 export const queue = createQueue()
 
 export const assistant = writable({ thinking: false, chats: [] })
+
+export const loading = writable(false)

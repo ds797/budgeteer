@@ -1,6 +1,6 @@
 <script>
 	import { browser } from '$app/environment'
-	import { goto } from '$app/navigation'
+	import { goto } from '$lib/utils/navigation'
 	import { page } from '$app/stores'
 	import { links, date } from '$lib/stores/user'
 	import { route, notifications } from '$lib/stores/ui'
@@ -102,7 +102,7 @@
 		</div>
 	</div>
 	<div class="extra">
-		{ #if show }
+		{ #if show && $page.url.pathname === '/app' }
 			<div class="graph" transition:slide={{ duration: 600 }}>
 				<Graph />
 			</div>

@@ -1,5 +1,5 @@
 <script>
-	import { goto } from '$app/navigation'
+	import { goto } from '$lib/utils/navigation'
 	import { page } from '$app/stores'
 	import { serving } from '$lib/stores/ui'
 	import Loading from '$lib/components/Loading.svelte'

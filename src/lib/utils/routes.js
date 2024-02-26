@@ -1,4 +1,5 @@
-import { goto, invalidateAll } from '$app/navigation'
+import { invalidateAll } from '$app/navigation'
+import { goto } from '$lib/utils/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import { links } from '$lib/stores/user'
 import { route, queue, notifications } from '$lib/stores/ui'
