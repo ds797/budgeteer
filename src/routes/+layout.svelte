@@ -210,7 +210,6 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background: var(--accent-0);
 		opacity: 30%;
 		z-index: 1001;
 		cursor: wait;
