@@ -2,7 +2,7 @@
 	import { links } from '$lib/stores/user'
 	import { route, queue } from '$lib/stores/ui'
 	import { slide } from '$lib/utils/transition'
-	import List from '$lib/components/List.svelte'
+	import List from '$lib/components/element/List.svelte'
 	import Category from '$lib/components/Category.svelte'
 	import Actions from '$lib/components/Actions.svelte'
 
