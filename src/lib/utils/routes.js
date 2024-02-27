@@ -68,7 +68,7 @@ export const initialize = ($route, $links, state) => {
 	$route.category = {}
 	$route.account = {}
 }
-
+// TODO: categories when saving link???
 const format = d => `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
 const conflicts = ($links, group, category) => {
 	let categories = []

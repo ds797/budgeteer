@@ -74,106 +74,27 @@ export const slide = (
 	{ axis = 'height', delay = 0, duration = 300, easing = eases.cubicOut, fade = false }
 ) => {
 	const style = getComputedStyle(node);
-	const height = parseFloat(style[axis]);
 	const padding = { top: parseFloat(style.paddingTop), right: parseFloat(style.paddingRight), bottom: parseFloat(style.paddingBottom), left: parseFloat(style.paddingLeft) };
 	const opacity = +style.opacity;
 
-	if (axis === 'both') {
-		const width = parseFloat(style.width);
-		const height = parseFloat(style.height);
-		if (fade) {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					width: ${t * width}px;
-					height: ${t * height}px;
-					padding-top: ${t * padding.top}px;
-					padding-bottom: ${t * padding.bottom}px;
-					padding-left: ${t * padding.left}px;
-					padding-right: ${t * padding.right}px;
-					white-space: nowrap;
-				`
-			};
-		} else {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					width: ${t * width}px;
-					height: ${t * height}px;
-					padding-top: ${t * padding.top}px;
-					padding-bottom: ${t * padding.bottom}px;
-					padding-left: ${t * padding.left}px;
-					padding-right: ${t * padding.right}px;
-					opacity: ${t * opacity};
-					white-space: nowrap;
-				`
-			};
-		}
-	}
-
-	if (fade) {
-		if (axis === 'height') {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					height: ${t * height}px;
-					padding-top: ${t * padding.top}px;
-					padding-bottom: ${t * padding.bottom}px;
-					opacity: ${t * opacity};
-					white-space: nowrap;
-				`
-			};
-		} else if (axis === 'width') {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					width: ${t * height}px;
-					padding-left: ${t * padding.left}px;
-					padding-right: ${t * padding.right}px;
-					opacity: ${t * opacity};
-					white-space: nowrap;
-				`
-			};
-		}
-	} else {
-		if (axis === 'height') {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					height: ${t * height}px;
-					padding-top: ${t * padding.top}px;
-					padding-bottom: ${t * padding.bottom}px;
-				`
-			};
-		} else if (axis === 'width') {
-			return {
-				delay,
-				duration,
-				easing,
-				css: t => `
-					overflow: hidden;
-					width: ${t * height}px;
-					padding-left: ${t * padding.left}px;
-					padding-right: ${t * padding.right}px;
-				`
-			};
-		}
-	}
+	const width = parseFloat(style.width);
+	const height = parseFloat(style.height);
+	return {
+		delay,
+		duration,
+		easing,
+		css: t => `
+			overflow: hidden;
+			width: ${axis !== 'height' ? t * width : width}px;
+			height: ${axis !== 'width' ? t * height : height}px;
+			padding-top: ${t * padding.top}px;
+			padding-bottom: ${t * padding.bottom}px;
+			padding-left: ${t * padding.left}px;
+			padding-right: ${t * padding.right}px;
+			opacity: ${fade ? t * opacity : opacity};
+			white-space: nowrap;
+		`
+	};
 }
 
 export const motion = (node, { movement, transition }) => {
