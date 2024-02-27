@@ -74,7 +74,9 @@ export const slide = (
 	{ axis = 'height', delay = 0, duration = 300, easing = eases.cubicOut, fade = false }
 ) => {
 	const style = getComputedStyle(node);
+	const margin = { top: parseFloat(style.marginTop), right: parseFloat(style.marginRight), bottom: parseFloat(style.marginBottom), left: parseFloat(style.marginLeft) };
 	const padding = { top: parseFloat(style.paddingTop), right: parseFloat(style.paddingRight), bottom: parseFloat(style.paddingBottom), left: parseFloat(style.paddingLeft) };
+	const border = { top: parseFloat(style.borderTop), right: parseFloat(style.borderRight), bottom: parseFloat(style.borderBottom), left: parseFloat(style.borderLeft) };
 	const opacity = +style.opacity;
 
 	const width = parseFloat(style.width);
@@ -87,10 +89,16 @@ export const slide = (
 			overflow: hidden;
 			width: ${axis !== 'height' ? t * width : width}px;
 			height: ${axis !== 'width' ? t * height : height}px;
-			padding-top: ${t * padding.top}px;
-			padding-bottom: ${t * padding.bottom}px;
-			padding-left: ${t * padding.left}px;
-			padding-right: ${t * padding.right}px;
+			margin-top: ${axis !== 'width' ? t * margin.top : margin.top}px;
+			margin-bottom: ${axis !== 'width' ? t * margin.bottom : margin.bottom}px;
+			margin-left: ${axis !== 'height' ? t * margin.left : margin.left}px;
+			margin-right: ${axis !== 'height' ? t * margin.right : margin.right}px;
+			padding-top: ${axis !== 'width' ? t * padding.top : padding.top}px;
+			padding-bottom: ${axis !== 'width' ? t * padding.bottom : padding.bottom}px;
+			padding-left: ${axis !== 'height' ? t * padding.left : padding.left}px;
+			padding-right: ${axis !== 'height' ? t * padding.right : padding.right}px;
+			border-width: ${axis !== 'width' ? t * border.top : border.top}px ${axis !== 'height' ? t * border.right : border.right}px ${axis !== 'width' ? t * border.bottom : border.bottom}px ${axis !== 'height' ? t * border.left : border.left}px;
+			// border-width: ${t * border.top}px ${t * border.top}px ${t * border.top}px ${t * border.top}px;
 			opacity: ${fade ? t * opacity : opacity};
 			white-space: nowrap;
 		`
