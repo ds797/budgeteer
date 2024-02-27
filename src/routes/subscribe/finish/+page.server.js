@@ -6,5 +6,5 @@ export const load = async () => {
 		setTimeout(r, 5000)
 	})
 
-	throw redirect(303, '/app')
+	throw redirect(303, '/budget')
 }

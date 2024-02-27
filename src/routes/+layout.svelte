@@ -129,7 +129,7 @@
 
 			if ($page.url.pathname === '/' && change) {
 				$route.current = undefined
-				goto('/app')
+				goto('/budget')
 			}
 		})
 
@@ -161,9 +161,14 @@
 	$: $route, update.all($route, $links, data)
 
 	$: $page, $loading = false
+
+	let innerWidth = 1
+	let innerHeight = 1
+
+	$: data.mobile = innerWidth / innerHeight < 1 ? true : false
 </script>
 
-<svelte:window on:keydown={active} on:mousemove={active} />
+<svelte:window bind:innerWidth bind:innerHeight on:keydown={active} on:mousemove={active} />
 
 { #if $loading }
 	<div class="loading" transition:fade={{ duration: 200, easing: quadOut }} />

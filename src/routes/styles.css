@@ -23,9 +23,9 @@
 	--noti-warning: rgb(255, 205, 0);
 	--noti-error: rgb(225, 50, 50);
 	--noti-info: rgb(50, 130, 225);
-	--shadow: -0.125rem 0.125rem 1rem #00000035;
-	--shadow-strong: -0.125rem 0.125rem 0.5rem #00000050;
-	--shadow-stronger: -0.125rem 0.125rem 1rem #00000095;
+	--shadow: 0 0.125rem 1rem #00000035;
+	--shadow-strong: 0 0.125rem 0.5rem #00000050;
+	--shadow-stronger: 0 0.125rem 1rem #00000095;
 	--blur: blur(0.5rem);
 	--transition: all 0.2s ease-out;
 	--transition-fast: all 0.1s ease-out;
@@ -144,8 +144,8 @@ input, button, textarea {
 }
 
 button:hover {
-	transform: translate(0.125rem, -0.0625rem);
-	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
+	transform: translateY(-0.125rem);
+	box-shadow: var(--shadow);
 }
 
 button:hover svg {
@@ -159,7 +159,7 @@ input:focus {
 
 button:focus {
 	outline: none;
-	box-shadow: -0.125rem 0.0625rem 0.25rem #0008;
+	box-shadow: var(--shadow);
 }
 
 input {
