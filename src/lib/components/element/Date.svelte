@@ -5,6 +5,7 @@
 	export let max
 	export let value = new Date()
 	export let set = v => v
+	export let style = {}
 
 	let d = new Date(value)
 
@@ -28,49 +29,32 @@
 
 		<div class='container'>
 			<div class='text'>
-				<button class="none day" on:click={() => {
+				<button class="none arrow" on:click={() => {
 					d.setMonth(d.getMonth() - 1)
 					d = d
-				}}>
+				}} style={style?.arrows ?? ''}>
 					<Chevron direction={'left'} size={'1.5rem'} />
 				</button>
 				{ #key internal.month }
 					<h2 class="month">{d.toLocaleString('default', { month: 'short' })}</h2>
 				{ /key }
 				<h2 class='year'>{d.getFullYear()}</h2>
-				<button class="none day" class:disabled={max && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear()} on:click={() => {
+				<button class="none arrow" class:disabled={max && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear()} on:click={() => {
 					d.setMonth(d.getMonth() + 1)
 					d = d
-				}}>
+				}} style={style?.arrows ?? ''}>
 					<Chevron direction={'right'} size={'1.5rem'} />
 				</button>
 			</div>
-			<div class='month'>
-				<div class='days'>
+			<div class='month' style={style?.month ?? ''}>
+				<div class='days' style={style?.days ?? ''}>
 					{ #each Array(42) as _, i }
 						{ @const day = new Date(new Date(d).setDate(i - before + 1)).setHours(0, 0, 0, 0) }
 						{ @const date = i - before + 1 }
-						<button class:disabled={date < 1 || date > days || (max && max.getDate() < date && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear())} class:fill={day === new Date(internal).setHours(0, 0, 0, 0)} on:click={() => set(new Date(day))}>
+						<button class:disabled={date < 1 || date > days || (max && max.getDate() < date && max.getMonth() <= d.getMonth() && max.getFullYear() <= d.getFullYear())} class:fill={day === new Date(internal).setHours(0, 0, 0, 0)} on:click={() => set(new Date(day))} style={style?.day ?? ''}>
 							{date < 1 ? prev - before + i + 1 : date > days ? i - days - before + 1 : date}
 						</button>
 					{ /each }
-					<!-- { #each Array(before) as _, i }
-						{ @const month = new Date(new Date(d).setMonth(d.getMonth() - 1)) }
-						<button class="day disabled">
-							{count(month) - start(d) + i + 1}	
-						</button>
-					{ /each }
-					{ #each Array(days) as _, index }
-						{ @const day = new Date(new Date(d).setDate(index + 1)).setHours(0, 0, 0, 0) }
-						<button class="day" class:fill={day === new Date(internal).setHours(0, 0, 0, 0)} on:click={() => set(new Date(day))}>
-							{index + 1}
-						</button>
-					{ /each }
-					{ #each Array(after) as _, i }
-						<button class="day disabled">
-							{i + 1}	
-						</button>
-					{ /each } -->
 				</div>
 			</div>
 		</div>
@@ -135,11 +119,6 @@
 		grid-template-columns: repeat(7, 1fr);
 		grid-template-rows: repeat(6, 1fr);
 		gap: 0.25rem;
-	}
-
-	.day {
-		width: 2rem;
-		height: 2rem;
 	}
 
 	.disabled {

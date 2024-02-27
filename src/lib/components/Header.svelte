@@ -5,7 +5,7 @@
 	import { links, date } from '$lib/stores/user'
 	import { route, notifications } from '$lib/stores/ui'
 	import { slide } from '$lib/utils/transition'
-	import Month from '$lib/components/Month.svelte'
+	import Month from '$lib/components/element/Month.svelte'
 	import Flow from '$lib/components/Flow.svelte'
 	import Graph from '$lib/components/Graph.svelte'
 	import Logo from '$lib/svg/Logo.svelte'
@@ -14,7 +14,7 @@
 
 	export let data
 
-	let show = false
+	let graph = false
 
 	let email = ''
 	const enter = async email => { // TODO: valid email?
@@ -49,11 +49,13 @@
 			}
 		}]
 	}
+
+	$: url = $page.url.pathname
 </script>
 
 <main>
 	<div class="banner">
-		{ #if ($page.url.pathname === '/app' || $page.url.pathname === '/dashboard') && !data.paying }
+		{ #if (url === '/home' || url === '/budget' || url === '/invest') && !data.paying }
 			<div class="error" transition:slide>
 				<p>You're testing Budgeteer!<button class="none" on:click={() => goto('/subscribe')}>Subscribe</button>to get full access.</p>
 			</div>
@@ -61,12 +63,12 @@
 	</div>
 	<div class="header">
 		<div class="left">
-			{ #if $page.url.pathname === '/app' }
+			{ #if !data.mobile }
 				<Month date={$date} set={v => {
 					$date.setMonth($date.getMonth() + v)
 					$date = $date
 					$links = $links
-				}} />
+				}} color={'var(--accent-0)'} bg={'var(--text-weak)'} />
 			{ :else }
 				<button class="none" on:click={() => goto('/')}>
 					<Logo />
@@ -75,14 +77,14 @@
 		</div>
 		<div class="middle">
 			{ #if $page.url.pathname === '/' }
-				<button on:click={() => goto('/app')}>Demo</button>
+				<button on:click={() => goto('/budget')}>Demo</button>
 				<button class='fill' on:click={() => {
 					if (!data.session) $route.current = $route.start
 					else goto('/subscribe')
 				}}>Start</button>
 				<button on:click={() => goto('/pricing')}>Pricing</button>
-			{ :else if $page.url.pathname === '/app' }
-				<Flow bind:show />
+			{ :else if $page.url.pathname === '/budget' }
+				<Flow mobile={data.mobile} bind:graph />
 			{ :else }
 				{ #if browser }
 					<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
@@ -90,7 +92,7 @@
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if $page.url.pathname === '/app' && data.demo }
+			{ #if $page.url.pathname === '/budget' && data.demo }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>
@@ -102,7 +104,7 @@
 		</div>
 	</div>
 	<div class="extra">
-		{ #if show && $page.url.pathname === '/app' }
+		{ #if graph && $page.url.pathname === '/budget' }
 			<div class="graph" transition:slide={{ duration: 600 }}>
 				<Graph />
 			</div>

@@ -1,15 +1,21 @@
 <script>
 	import { tick } from 'svelte'
 	import { quintOut } from 'svelte/easing'
+	import { scale } from 'svelte/transition'
+	import { links, date } from '$lib/stores/user'
 	import { route, notifications } from '$lib/stores/ui'
+	import { outside } from '$lib/utils/use'
+	import Month from '$lib/components/element/Month.svelte'
+	import Calendar from '$lib/svg/Calendar.svelte'
 	import Sparkle from '$lib/svg/Sparkle.svelte'
 	import Budget from '$lib/svg/Budget.svelte'
 	import Link from '$lib/svg/Link.svelte'
 	import Menu from '$lib/svg/Menu.svelte'
+	import Crossfade from '$lib/components/element/Crossfade.svelte'
 
 	export let data
 
-	let state = true
+	let state = false
 
 	const split = value => {
 		const split = typeof value === 'string' && value.match(/^\s*(-?[\d.]+)([^\s]*)\s*$/)
@@ -33,14 +39,54 @@
 				opacity: ${target_opacity - od * u}`
 		}
 	}
+
+	const enter = i => {
+		return {
+			y: i * 15,
+			delay: i * 2
+		}
+	}
+
+	const exit = i => {
+		return {
+			y: i * 15,
+			delay: (count - i - 1) * 25
+		}
+	}
+
+	let count = 5
+	let month = false
+
+	$: if (state === false) month = false
 </script>
 
-<main>
+<main use:outside on:child={() => state = false} on:outside={() => state = false}>
 	{ #if state }
-		<div class="ai" transition:pop={{ y: 45 }}>
+		<div class="month" in:pop={enter(4)} out:pop={exit(4)}>
+			<button class="none" class:month={month} on:click={async () => {
+				if (state) {
+					month = true
+				}
+			}}>
+				<Crossfade condition={month} delay={enter(4).delay}>
+					<svelte:fragment slot='true'>
+						<Month date={$date} set={v => {
+							$date.setMonth($date.getMonth() + v)
+							$date = $date
+							$links = $links
+						}} color={'var(--bg-1)'} bg={'var(--bg-1)'} />
+					</svelte:fragment>
+					<svelte:fragment slot='false'>
+						<Calendar size={'1.5rem'} color={'var(--bg-1)'} />
+					</svelte:fragment>
+				</Crossfade>
+			</button>
+		</div>
+		<div class="ai" in:pop={enter(3)} out:pop={exit(3)}>
 			<button class="none" on:click={async () => {
 				if (!data.paying) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to get personalized budgeting assistance!' })
+					state = !state
 					return
 				}
 
@@ -48,16 +94,17 @@
 					$route.current = { assistant: true }
 					await tick()
 					window.getSelection().removeAllRanges()
-					state = false
-				} else state = !state
-			}}>
+				}
+				state = !state
+			}} transition:scale={{ duration: 300, delay: enter(3).delay }}>
 				<Sparkle size={'1.5rem'} color={'var(--bg-1)'} />
 			</button>
 		</div>
-		<div class="budgets" transition:pop={{ y: 30 }}>
+		<div class="budgets" in:pop={enter(2)} out:pop={exit(2)}>
 			<button class="none" on:click={async () => {
 				if (!data.paying) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to add more budgets!' })
+					state = !state
 					return
 				}
 
@@ -65,16 +112,17 @@
 					$route.current = $route.choose.budget
 					await tick()
 					window.getSelection().removeAllRanges()
-					state = false
-				} else state = !state
-			}}>
+				}
+				state = !state
+			}} transition:scale={{ duration: 300, delay: enter(2).delay }}>
 				<Budget size={'1.5rem'} color={'var(--bg-1)'} />
 			</button>
 		</div>
-		<div class="links" transition:pop={{ y: 15 }}>
+		<div class="links" in:pop={enter(1)} out:pop={exit(1)}>
 			<button class="none" on:click={async () => {
 				if (!data.paying) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom links!' })
+					state = !state
 					return
 				}
 
@@ -82,23 +130,19 @@
 					$route.current = $route.links
 					await tick()
 					window.getSelection().removeAllRanges()
-					state = false
-				} else state = !state
-			}}>
+				}
+				state = !state
+			}} transition:scale={{ duration: 300, delay: enter(1).delay }}>
 				<Link size={'1.5rem'} color={'var(--bg-1)'} />
 			</button>
 		</div>
 	{ /if }
 	<div class="menu">
 		<button class="none" on:click={async () => {
+			if (state) {
 				if (!data.paying) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
-					return
-				}
-
-			if (state) {
-				if (data.demo) {
-					notifications.add({ type: 'error', message: 'Join Budgeteer to add custom transactions!' })
+					state = !state
 					return
 				} else {
 					$route.state.transaction = { properties: {} }
@@ -112,7 +156,6 @@
 					window.getSelection().removeAllRanges()
 				}
 			}
-
 			state = !state
 		}}>
 			<Menu size={'1.5rem'} color={'var(--bg-1)'} open={state} />
@@ -128,6 +171,7 @@
 	main {
 		gap: 0.5rem;
 		flex-flow: column;
+		align-items: flex-end;
 	}
 
 	div {
@@ -157,5 +201,9 @@
 
 	button:hover {
 		transform: translateY(-0.06125rem);
+	}
+
+	button.month:hover {
+		transform: none;
 	}
 </style>

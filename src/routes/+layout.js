@@ -3,6 +3,8 @@ import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import { links } from '$lib/stores/user'
 import { queue, notifications } from '$lib/stores/ui'
 
+// export const ssr = false
+
 const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
 const PUBLIC_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnFwamZsaHVmdWRxcGlmZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4NDA0NzIsImV4cCI6MjAyMDQxNjQ3Mn0.1SppoHM5zG3j-P_RbaSOYaf7QyrJ00RxouWS34_c148'
 
@@ -173,7 +175,9 @@ export const load = async ({ fetch, data, depends, url }) => {
 		queue.set(get(queue))
 	}
 
+	let mobile = true
+
 	const { pathname } = url
 
-	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying }
+	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying, mobile }
 }
