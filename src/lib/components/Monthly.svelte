@@ -45,8 +45,8 @@
 		? currentValues.slice(0, i + 1).reduce((p, c) => p - c, 0)
 		: currentValues.slice(0, i + 1).reduce((p, c) => p + c, 0))
 	$: average = averageValues.map((_, i) => spend
-		? averageValues.slice(0, i).reduce((p, c) => p - c, 0)
-		: averageValues.slice(0, i).reduce((p, c) => p + c, 0))
+		? averageValues.slice(0, i + 1).reduce((p, c) => p - c, 0)
+		: averageValues.slice(0, i + 1).reduce((p, c) => p + c, 0))
 	$: top = max([average[average.length - 1], current[current.length - 1]])
 
 	const y = v => {
