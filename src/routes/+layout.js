@@ -175,9 +175,7 @@ export const load = async ({ fetch, data, depends, url }) => {
 		queue.set(get(queue))
 	}
 
-	let mobile = true
-
 	const { pathname } = url
 
-	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying, mobile }
+	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying }
 }

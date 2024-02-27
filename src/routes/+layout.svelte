@@ -165,7 +165,9 @@
 	let innerWidth = 1
 	let innerHeight = 1
 
-	$: data.mobile = innerWidth / innerHeight < 1 ? true : false
+	const updateMobile = () => data.mobile = innerWidth / innerHeight < 1 ? true : false
+
+	$: updateMobile(innerWidth, innerHeight, $page)
 </script>
 
 <svelte:window bind:innerWidth bind:innerHeight on:keydown={active} on:mousemove={active} />
