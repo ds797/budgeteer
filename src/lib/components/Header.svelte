@@ -64,7 +64,7 @@
 	<div class="header">
 		<div class="left">
 			{ #if !data.mobile }
-				<Month date={$date} set={v => {
+				<Month date={$date} max={new Date()} set={v => {
 					$date.setMonth($date.getMonth() + v)
 					$date = $date
 					$links = $links

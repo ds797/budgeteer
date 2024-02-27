@@ -70,7 +70,7 @@
 			}}>
 				<Crossfade condition={month} delay={enter(4).delay}>
 					<svelte:fragment slot='true'>
-						<Month date={$date} set={v => {
+						<Month date={$date} max={new Date()} set={v => {
 							$date.setMonth($date.getMonth() + v)
 							$date = $date
 							$links = $links

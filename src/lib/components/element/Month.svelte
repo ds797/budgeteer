@@ -3,6 +3,7 @@
 	import { slide } from '$lib/utils/transition'
 
 	export let date = new Date()
+	export let max = undefined
 	export let set = v => {
 		date.setMonth(date.getMonth() + v)
 		date = date
@@ -32,7 +33,7 @@
 			<h3 class="year" style="color: {bg};" out:slide>{date.getFullYear()}</h3>
 		{ /if }
 	</div>
-	<button class="none next" on:click={() => {
+	<button class="none next" class:disabled={max && max.getFullYear() <= date.getFullYear() && max.getMonth() <= date.getMonth()} on:click={() => {
 		let d = new Date(date)
 		d.setMonth(date.getMonth() + 1)
 		if (d.getFullYear() !== date.getFullYear()) {
@@ -41,7 +42,7 @@
 		}
 		set(1)
 	}}>
-		<Chevron size={'1.5rem'} direction={'right'} {color} />
+		<Chevron size={'1.5rem'} direction={'right'} color={(max && max.getFullYear() <= date.getFullYear() && max.getMonth() <= date.getMonth()) ? 'var(--text-bg)' : color} />
 	</button>
 </main>
 
@@ -53,6 +54,10 @@
 
 	h3::first-letter {
 		text-transform: capitalize;
+	}
+
+	button.disabled {
+		background: none;
 	}
 
 	.column {
