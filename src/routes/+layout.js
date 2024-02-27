@@ -145,6 +145,8 @@ export const load = async ({ fetch, data, depends, url }) => {
 	}
 
 	supabase.updateLinks = () => {
+		if (!paying) return
+
 		const update = async () => {
 			storage.set('links', get(links))
 			await supabase.setLinks(get(links))
@@ -156,6 +158,8 @@ export const load = async ({ fetch, data, depends, url }) => {
 	}
 
 	supabase.updateBudgets = () => {
+		if (!paying) return
+
 		const update = async () => {
 			storage.set('links', get(links))
 			await supabase.setBudgets({
