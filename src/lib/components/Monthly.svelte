@@ -92,7 +92,7 @@
 		<svg class="graph" viewBox="0 0 300 1020" preserveAspectRatio="none">
 			<path class="average" style="fill: {spend ? 'var(--text-bad)' : 'var(--text-good)'};" d="M0, 1010 {path(average)}L300, 1010" />
 			<path class="position" d="M{(date.getDate() - 1) * 10}, {1010 + y(current[date.getDate() - 1])} L{(date.getDate() - 1) * 10}, 1010" />
-			<path class="current" d="M0, 1010 {path(current, i => i <= date.getDate() - 1)}" />
+			<path class="current" d="M0, {1010 + y(current[0])} {path(current, i => i <= date.getDate() - 1)}" />
 			<path class="bg" d="M0, 1010 L300, 1010"/>
 		</svg>
 	</div>
