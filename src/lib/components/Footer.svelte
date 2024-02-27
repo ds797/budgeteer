@@ -15,11 +15,11 @@
 	</div>
 	<div class="middle">
 		{ #if $page.url.pathname !== '/' }
-			<button class="none page" class:selected={$page.url.pathname === '/dashboard'} on:click={() => goto('/dashboard')}>
+			<button class="none page" class:selected={$page.url.pathname === '/home'} on:click={() => goto('/home')}>
 				<Dashboard size={'1.5rem'} />
-				<p>Dashboard</p>
+				<p>Home</p>
 			</button>
-			<button class="none page" class:selected={$page.url.pathname === '/app'} on:click={() => goto('/app')}>
+			<button class="none page" class:selected={$page.url.pathname === '/budget'} on:click={() => goto('/budget')}>
 				<Budget size={'1.5rem'} />
 				<p>Budget</p>
 			</button>
