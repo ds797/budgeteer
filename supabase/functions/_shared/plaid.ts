@@ -102,7 +102,6 @@ export const remove = async (user_id: string, predicate: Function = () => false)
 
 		try {
 			const response = await plaid.itemRemove({ access_token })
-			console.error(response)
 			if (response.status != 200) throw new Error(response.error)
 		} catch (error) {
 			throw new Error(error)

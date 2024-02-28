@@ -48,7 +48,7 @@ Deno.serve(async (req: Request) => {
 			const links = await create(user_id, ...public_token)
 			return respond(links)
 		} catch (error) {
-			return err(error, 0)
+			return err(error.message, 0)
 		}
 	} else if (type.token) {
 		const config = {

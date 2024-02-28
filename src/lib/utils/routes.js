@@ -11,7 +11,9 @@ const link = async ($route, $links, state) => {
 
 		if (!token) return 0
 
-		const { data } = await supabase.invoke('links', { type: { create: [token] } })
+		const { data } = await state.supabase.invoke('links', { type: { create: [token] } })
+		if (!data) return
+
 		$links = $links.add.link(data)
 		links.set($links)
 		route.set($route)
@@ -80,6 +82,13 @@ const conflicts = ($links, group, category) => {
 	})
 
 	return categories
+}
+const sort = ($links) => {
+	const index = $links.links.findIndex(l => !l.institution)
+	if (index === -1) $links.links.push($links.custom())
+	else $links.links.push($links.links.splice(index, 1)[0])
+
+	return $links.links
 }
 
 export const update = {
@@ -515,7 +524,7 @@ export const update = {
 	},
 	links: ($route, $links, state) => {
 		$route.links.name = 'Links'
-		$route.links.children = [...$links.links.map(l => {
+		$route.links.children = [...sort($links).map(l => {
 			return {
 				name: l.name,
 				link: l,
