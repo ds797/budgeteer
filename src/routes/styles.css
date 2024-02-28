@@ -19,6 +19,9 @@
 	--text-bad: rgb(233, 80, 80);
 	--text-okay: rgb(230, 187, 59);
 	--text-good: rgb(80, 200, 80);
+	--text-bad-light: rgba(233, 80, 80, 0.6);
+	--text-okay-light: rgba(230, 187, 59, 0.6);
+	--text-good-light: rgba(80, 200, 80, 0.6);
 	--noti-success: rgb(50, 225, 50);
 	--noti-warning: rgb(255, 205, 0);
 	--noti-error: rgb(225, 50, 50);
