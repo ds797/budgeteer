@@ -667,10 +667,10 @@ export const update = {
 
 		if ($route.current === $route.category) {
 			$route.state.choose.category = $route.state.category.new.overflow
-			let categories = conflicts($links, $route.state.category.group?.name, $route.state.category.name)
+			let categories = conflicts($links, $route.state.category.group, $route.state.category.name)
 
 			$route.state.choose.category.disabled = [{
-				group: $route.state.category.group?.name,
+				group: $route.state.category.group,
 				category: $route.state.category.name
 			}, ...categories]
 			this.choose.category($route, $links, state)
@@ -680,26 +680,30 @@ export const update = {
 
 		$route.category.name = 'Edit Category'
 		$route.category.quit = () => {
-			// Remove circular reference
+			// Remove circular references
 			delete $route.state.category.new.overflow.disabled
+			console.log($route.state.category.new)
 
 			// Should we update PFCs?
-			const update = $route.state.category.new.group?.name && $route.state.category.name !== $route.state.category.new.name
+			const update = $route.state.category.new.group && $route.state.category.name !== $route.state.category.new.name
 
 			// Update category
-			const data = $links.update.category($route.state.category.group?.name, $route.state.category.name, $route.state.category.new.group?.name ? $route.state.category.new : null)
+			const data = $links.update.category($route.state.category.group, $route.state.category.name, $route.state.category.new.group ? $route.state.category.new : null)
+			if (data) links.set(data)
 
-			if (state.demo) {
+			if (!state.paying) {
 				delete $route.state.category.new
-				if (data) links.set(data)
 				return
 			}
 
-			if (update) queue.enq(async () => $links.ai.category($route.state.category.new.group?.name, $route.state.category.new.name))
-			delete $route.state.category.new
-			if (data) {
-				links.set(data)
-				save.budgets(state)
+			if (update) {
+				queue.enq(async () => {
+					$links.ai.category($route.state.category.new.group, $route.state.category.new.name)
+					delete $route.state.category.new
+				})
+			}	else {
+				delete $route.state.category.new
+				if (data) save.budgets(state)
 			}
 
 			return
@@ -730,8 +734,11 @@ export const update = {
 			name: $route.state.category.new?.spend ? 'Spending' : 'Saving',
 			type: 'switch',
 			value: $route.state.category.new?.spend,
-			set: v => $route.state.category.new.spend = v,
-			// bg: !$route.state.category.new?.spend ? 'var(--text-good)' : 'var(--text-bad)'
+			set: v => {
+				$route.state.category.new.spend = v
+				route.set($route)
+			},
+			bg: !$route.state.category.new?.spend ? 'var(--text-good-light)' : 'var(--text-bad-light)'
 		}, $route.choose.category, { type: 'spacer' }, {
 			name: 'Remove Category',
 			type: 'action',
