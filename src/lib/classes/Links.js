@@ -174,7 +174,6 @@ export default class Links {
 					balances: { available: 0 },
 					name: 'Custom Account'
 				}],
-				custom: true,
 				name: 'Custom',
 				transactions: []
 			}
@@ -315,7 +314,7 @@ export default class Links {
 						continue
 					}
 
-					self.links.push({
+					self.links.unshift({
 						id: link.id,
 						institution: link.institution ?? link.institution_id,
 						name: link.name,
@@ -550,6 +549,7 @@ export default class Links {
 							b.transactions = b.transactions.filter(t => t.account !== a.account_id)
 						}
 					}
+					self.selected.accounts = self.selected.accounts.filter(a => !link.accounts.find(b => b.account_id === a))
 					self.links = self.links.filter(l => l.id !== id)
 				}
 			
