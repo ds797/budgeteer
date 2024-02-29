@@ -69,6 +69,7 @@
 			left: 0px;
 			transform: {transform};"
 		use:outside on:outside={e => {
+			if (!open) return
 			show = -1
 			dispatch('close', e.detail.target)
 		}} transition:scale>
