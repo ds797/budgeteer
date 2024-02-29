@@ -8,16 +8,31 @@
 
 	export let menu = {}
 	export let open = false
-	export let offset = 1
 
 	let show = -1
 
 	let dispatch = createEventDispatcher()
 
+	let node, context
+
+	$: parent = (node && node.parentNode) ?? {}
+
+	const calc = () => {
+		let offset = 0
+		if (width < (parent ?? {}).offsetLeft + (parent ?? {}).offsetWidth / 2
+			+ (context ?? {}).offsetWidth / 2)
+			offset = -1
+		else if ((parent ?? {}).offsetLeft + (parent ?? {}).offsetWidth / 2
+			- (context ?? {}).offsetWidth / 2 < 0)
+			offset = 1
+		return `translateX(${offset * 50 - 50}%)`
+	}
+
+	$: transform = calc(width, parent)
+
 	const scale = (node, { delay = 0, duration = 350, easing = backOut, start = 0.3, opacity = 0 } = {}) => {
 		const style = getComputedStyle(node)
 		const target_opacity = +style.opacity
-		const transform = style.transform === 'none' ? '' : style.transform
 		const sd = 1 - start
 		const od = target_opacity * (1 - opacity)
 		return {
@@ -33,147 +48,109 @@
 	}
 
 	let height, width
-	let tip = { x: null, y: null }
-	let anchor = { x: 0, y: 0 }
 
-	let node
+	const key = e => {
+		if (e.key !== 'Escape') return
 
-	const calc = () => {
-		const parent = node?.parentNode
-		if (!parent) return
-
-		const r = parent.getBoundingClientRect()
-		const x = r.x + r.width / 2
-		const y = r.y + r.height / 2
-
-		anchor = {
-			y: Math.floor(x / (width / 3)) - 1
-		}
-		switch (Math.floor(x / (width / 4))) {
-			case 0:
-				anchor.x = -1
-				break
-			case 1:
-			case 2:
-				anchor.x = 0
-				break
-			case 3:
-				anchor.x = 1
-		}
-		switch (Math.floor(y / (height / 4))) {
-			case 0:
-				anchor.y = -1
-				break
-			case 1:
-			case 2:
-				anchor.y = 0
-				break
-			case 3:
-				anchor.y = 1
-		}
-		if (anchor.x === 0 && anchor.y === 0) anchor.y = -1 // Middle
-
-		switch (anchor.x) {
-			case -1:
-				tip.x = r.x
-				break
-			case 0:
-				tip.x = x
-				break
-			case 1:
-				tip.x = r.x + r.width
-				break
-		}
-		switch (anchor.y) {
-			case -1:
-				tip.y = r.y + r.height
-				break
-			case 0:
-				tip.y = y
-				break
-			case 1:
-				tip.y = r.y
-				break
-		}
+		e.stopPropagation()
+		dispatch('close')
 	}
-
-	$: calc(width, height)
 </script>
 
-<svelte:window bind:innerWidth={width} bind:innerHeight={height} />
+<svelte:window bind:innerWidth={width} bind:innerHeight={height} on:keydown={key} />
 
 <div class="invisible" bind:this={node} />
-{ #if open }
-	<main style="
-		top: {tip.y === null ? '50%' : `calc(${tip.y}px - ${anchor.y * offset}rem)`};
-		left: {tip.x === null ? '50%' : `calc(${tip.x}px + ${anchor.x * offset}rem)`};
-		transform-origin: {anchor.y === 1 ? 'bottom' : anchor.y === 0 ? 'center' : 'top'} {anchor.x === 1 ? 'right' : anchor.x === 0 ? 'center' : 'left'};
-		transform: translate({(anchor.x - 1) * 50}%, {(anchor.y + 1) * 50}%);" use:outside on:outside={e => {
-		show = -1
-		dispatch('close', e.detail.target)
-	}} transition:scale>
-		{ #each (menu?.children ?? []) as child, index }
-			{ #if show === -1 || show === index }
-				{ #if show === -1 && index !== 0 }
-					<div class="bar" transition:slide />
-				{ /if }
-				<div class="child" transition:slide>
-					{ #if child.type === 'action' }
-						<button on:click={child.click}>{child.name}</button>
-					{ :else if child.type === 'value' }
-						<div class="left">
-							<p>{child.name}</p>
-						</div>
-						<div class="right value" style="{child.color && `color: ${child.color};`}">
-							<p>{child.value}</p>
-						</div>
-					{ :else if child.type === 'toggle' }
-						<div class="left">
-							<p>{child.name}</p>
-						</div>
-						<div class="right">
-							<Checkbox size={'1rem'} fg='var(--accent-0)' bg='var(--bg-1)' value={child.value} set={child.set} />
-						</div>
-					{ :else if child.type === 'date' }
-						<div class="more">
-							<button on:click={() => show === index ? show = -1 : show = index}>
-								<div class="left">
-									<p>{child.name}</p>	
-								</div>
-								<div class="right value">
-									<p>{child.value ? child.value.toLocaleDateString(undefined, {
-										day: '2-digit',
-										month: '2-digit',
-										year: '2-digit'
-									}) : ''}</p>
-								</div>
-							</button>
-							{ #if show === index }
-								<div class="bar" />
-								<div class="center">
-									<div transition:slide={{ axis: 'both', duration: 5000 }}>
-										<Date max={child.max} value={child.value} set={v => {
-											child.set(v)
-											show = -1
-										}} style={{
-											day: 'padding: 0.125rem 0.25rem; font-weight: normal; border: 0.1rem solid var(--accent-0);'
-										}} />
-									</div>
-								</div>
-							{ /if }
-						</div>
-					{ :else }
-						<p>{child.name}</p>
+<div class="wrap">
+	{ #key open }
+		<main bind:this={context} style="
+			opacity: {open ? 100 : 0}%;
+			pointer-events: {open ? 'all' : 'none'};
+			top: 0px;
+			left: 0px;
+			transform: {transform};"
+		use:outside on:outside={e => {
+			show = -1
+			dispatch('close', e.detail.target)
+		}} transition:scale>
+			{ #each (menu?.children ?? []) as child, index }
+				{ #if show === -1 || show === index }
+					{ #if show === -1 && index !== 0 }
+						<div class="bar" transition:slide />
 					{ /if }
-				</div>
-			{ /if }
-		{ /each }
-	</main>
-{ /if }
+					<div class="child" transition:slide>
+						{ #if child.type === 'action' }
+							<button on:click={child.click}>{child.name}</button>
+						{ :else if child.type === 'value' }
+							<div class="left">
+								<p>{child.name}</p>
+							</div>
+							<div class="right value" style="{child.color && `color: ${child.color};`}">
+								<p>{child.value}</p>
+							</div>
+						{ :else if child.type === 'toggle' }
+							<div class="left">
+								<p>{child.name}</p>
+							</div>
+							<div class="right">
+								<Checkbox size={'1rem'} fg='var(--accent-0)' bg='var(--bg-1)' value={child.value} set={child.set} />
+							</div>
+						{ :else if child.type === 'date' }
+							<div class="more">
+								<button on:click={() => show === index ? show = -1 : show = index}>
+									<div class="left">
+										<p>{child.name}</p>	
+									</div>
+									<div class="right value">
+										<p>{child.value ? child.value.toLocaleDateString(undefined, {
+											day: '2-digit',
+											month: '2-digit',
+											year: '2-digit'
+										}) : ''}</p>
+									</div>
+								</button>
+								{ #if show === index }
+									<div class="bar" />
+									<div class="center">
+										<div transition:slide={{ axis: 'both', duration: 5000 }}>
+											<Date max={child.max} value={child.value} set={v => {
+												child.set(v)
+												show = -1
+											}} style={{
+												day: 'padding: 0.125rem 0.25rem; font-weight: normal; border: 0.1rem solid var(--accent-0);'
+											}} />
+										</div>
+									</div>
+								{ /if }
+							</div>
+						{ :else }
+							<p>{child.name}</p>
+						{ /if }
+					</div>
+				{ /if }
+			{ /each }
+		</main>
+	{ /key }
+</div>
 
 <style>
+	* {
+		transition: top 0s left 0s;
+	}
+
+	.invisible {
+		max-width: 1rem;
+	}
+
+	.wrap {
+		justify-self: center;
+		align-self: center;
+		max-width: 0;
+		max-height: 0;
+		position: relative;
+	}
+
 	main {
-		position: fixed;
+		position: absolute;
 		width: auto;
 		padding: 0.125rem 0;
 		background: var(--accent-0-light);
