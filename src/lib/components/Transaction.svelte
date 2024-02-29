@@ -1,7 +1,7 @@
 <script>
 	import { slide } from '$lib/utils/transition'
 	import { money, title } from '$lib/utils/string'
-	import { toDate } from '$lib/utils/convert'
+	import { toDate } from '$lib/utils/date'
 	import { route } from '$lib/stores/ui'
 
 	export let transaction

@@ -2,7 +2,7 @@
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
 	import { links } from '$lib/stores/user'
-	import { toDate } from '$lib/utils/convert'
+	import { toDate } from '$lib/utils/date'
 	import { max } from '$lib/utils/math'
 	import { month } from '$lib/utils/compare'
 	import Transaction from '$lib/components/Transaction.svelte'

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { clamp, num } from '$lib/utils/math'
-import { fromDate } from '$lib/utils/convert'
+import { fromDate } from '$lib/utils/date'
 
 const PFCs = [
 	'INCOME_DIVIDENDS',

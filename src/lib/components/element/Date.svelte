@@ -1,4 +1,5 @@
 <script>
+	import { start, count } from '$lib/utils/date'
 	import Chevron from '$lib/svg/Chevron.svelte'
 
 	export let calendars = 1
@@ -8,14 +9,6 @@
 	export let style = {}
 
 	let d = new Date(value)
-
-	const start = d => {
-		const first = new Date(d.getFullYear(), d.getMonth(), 1)
-
-		return first.getDay()
-	}
-
-	const count = d => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
 
 	$: internal = value
 	$: internal, value.getTime() !== internal.getTime() && set(internal)

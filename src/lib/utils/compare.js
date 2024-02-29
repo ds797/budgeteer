@@ -1,4 +1,4 @@
-import { toDate } from '$lib/utils/convert'
+import { toDate } from '$lib/utils/date'
 
 export const month = (one, two) => {
 	one = toDate(one)

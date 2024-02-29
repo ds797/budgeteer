@@ -3,7 +3,7 @@ import { goto } from '$lib/utils/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import { links } from '$lib/stores/user'
 import { route, queue, notifications } from '$lib/stores/ui'
-import { toDate, fromDate } from '$lib/utils/convert'
+import { toDate, fromDate } from '$lib/utils/date'
 
 const link = async ($route, $links, state) => {
 	if (state.demo) return
