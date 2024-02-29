@@ -68,9 +68,9 @@
 			// Step 3: When possible, get links from Plaid and
 			// ...update DB now that the user most likely has
 			// ...some links already
-			queue.enq(supabase.links.update)
+			queue.enq(refreshLinks)
 		} else {
-			budgets = [$links.default()]
+			budgets = [$links.default.budget()]
 			selected = budgets[0]
 			await supabase.budgets.set({ budgets, selected })
 		}
@@ -86,10 +86,8 @@
 			groups: $links.groups
 		})
 
-		setTimeout(() => {
-			setInterval(() => {
-				queue.enq(refreshLinks)
-			}, FREQUENCY)
+		setInterval(() => {
+			queue.enq(refreshLinks)
 		}, FREQUENCY)
 	}
 
