@@ -6,20 +6,27 @@ import { route, queue, notifications } from '$lib/stores/ui'
 import { toDate } from '$lib/utils/convert'
 
 const link = async ($route, $links, state) => {
+	if (state.demo) return
+
 	try {
 		const { token } = await state.plaid.link()
 
 		if (!token) return 0
 
-		const { data } = await state.supabase.invoke('links', { type: { create: [token] } })
-		if (!data) return
+		notifications.add({ type: 'info', message: 'Your account is being linked in the background. You\'ll get a notification when it\'s ready for use.' })
 
-		$links = $links.add.link(data)
-		links.set($links)
-		route.set($route)
-		save.links(state)
+		queue.enq(async () => {
+			const { data } = await state.supabase.invoke('links', { type: { create: [token] } })
+			if (!data) return
 
-		notifications.add({ type: 'success', message: 'Successfully linked your account to Budgeteer' })
+			$links = $links.add.link(data)
+			links.set($links)
+			route.set($route)
+			save.links(state)
+			await state.supabase.links.update()
+
+			notifications.add({ type: 'success', message: 'Successfully linked your account to Budgeteer' })
+		})
 	} catch (error) {
 		notifications.add({ type: 'error', message: error })
 	}
@@ -31,12 +38,12 @@ const save = {
 	links: state => {
 		if (state.demo) return
 
-		queue.enq(state.supabase.updateLinks)
+		queue.enq(state.supabase.links.update)
 	},
 	budgets: state => {
 		if (state.demo) return
 
-		queue.enq(state.supabase.updateBudgets)
+		queue.enq(state.supabase.budgets.update)
 	}
 }
 
@@ -480,7 +487,9 @@ export const update = {
 						type: 'action',
 						dangerous: true,
 						click: () => {
-							$links = $links.remove.budget(b.name)
+							const name = b.name
+							$links = $links.remove.budget(name)
+							queue.enq(async () => state.supabase.budgets.remove(name))
 							links.set($links)
 							route.set($route)
 							return 1
@@ -501,7 +510,10 @@ export const update = {
 					type: 'input',
 					placeholder: 'Budget Name',
 					value: $route.state.choose.budget.name,
-					set: v => $route.state.choose.budget.name = v
+					set: v => {
+						$route.state.choose.budget.name = v
+						route.set($route)
+					}
 				}, {
 					name: 'Add',
 					type: 'action',
@@ -509,14 +521,18 @@ export const update = {
 					disabled: !$route.state.choose.budget.name,
 					fill: true,
 					click: () => {
-						$links = $links.add.budget({
+						const data = $links.add.budget({
 							...$links.default(),
 							name: $route.state.choose.budget.name
 						})
-						links.set($links)
+						if (data) {
+							links.set(data)
+							save.budgets(state)
+							$route.state.choose.budget.name = ''
+						}
+
 						route.set($route)
-						save.budgets(state)
-						return 1
+						return data ? 1 : 0
 					}
 				}]
 			}]
