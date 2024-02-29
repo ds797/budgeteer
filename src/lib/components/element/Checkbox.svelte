@@ -28,7 +28,7 @@
 </script>
 
 <main style="width: {size}; height: {size}; background: {value ? fg : 'none'}; border: 0.1rem solid {fg};">
-	<button class="none" on:click={() => set(!value)}>
+	<button class="none checkbox" on:click={() => set(!value)}>
 		<svg viewBox="0 0 24 24" fill="none" stroke={value ? bg : fg}>
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M{one[0]} {one[1]}L{one[2]} {one[3]}"></path>
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M{two[0]} {two[1]}L{two[2]} {two[3]}"></path>
@@ -45,7 +45,7 @@
 		border-radius: 0.25rem;
 	}
 
-	button {
+	button.checkbox {
 		margin: 0;
 		padding: 0;
 		border: none;
