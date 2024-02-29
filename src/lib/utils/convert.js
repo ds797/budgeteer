@@ -5,3 +5,5 @@ export const toDate = s => {
 
 	return new Date(year, month - 1, date)
 }
+
+export const fromDate = d => `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${(d.getDate()).toString().padStart(2, '0')}`

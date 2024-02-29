@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { clamp, num } from '$lib/utils/math'
-import { format } from '$lib/utils/string'
+import { fromDate } from '$lib/utils/convert'
 
 const PFCs = [
 	'INCOME_DIVIDENDS',
@@ -114,73 +114,73 @@ export default class Links {
 		const self = this
 
 		// Methods
-		self.fallback = () => {
-			return {
-				group: 'Other',
-				category: 'Uncategorized'
-			}
+		self.fallback = {
+			group: 'Other',
+			category: 'Uncategorized'
 		}
-		self.default = () => {
-			return {
-				name: 'Default budget',
-				accounts: [],
-				transactions: [],
-				groups: [{
-					name: 'Bills',
-					categories: [{
-						name: 'Mortgage',
-						pfc: [{
-							name: 'LOAN_PAYMENTS_MORTGAGE_PAYMENT',
-							confidence: 1
-						}],
-						value: 2000,
-						overflow: { group: 'Needs', category: 'Groceries' }
+		self.default = {
+			budget: () => {
+				return {
+					name: 'Default budget',
+					accounts: [],
+					transactions: [],
+					groups: [{
+						name: 'Bills',
+						categories: [{
+							name: 'Mortgage',
+							pfc: [{
+								name: 'LOAN_PAYMENTS_MORTGAGE_PAYMENT',
+								confidence: 1
+							}],
+							value: 2000,
+							overflow: { group: 'Needs', category: 'Groceries' }
+						}]
+					}, {
+						name: 'Needs',
+						categories: [{
+							name: 'Groceries',
+							pfc: [{
+								name: 'FOOD_AND_DRINK_GROCERIES',
+								confidence: 1
+							}],
+							value: 0,
+							overflow: { group: 'Wants', category: 'Dinners Out' }
+						}]
+					}, {
+						name: 'Wants',
+						categories: [{
+							name: 'Dinners Out',
+							pfc: [{
+								name: 'FOOD_AND_DRINK_RESTAURANT',
+								confidence: 1
+							}],
+							value: 0,
+							spend: true,
+							overflow: {}
+						}]
+					}, {
+						name: self.fallback.group,
+						categories: [{ name: self.fallback.category, overflow: {} }],
+						protected: true
 					}]
-				}, {
-					name: 'Needs',
-					categories: [{
-						name: 'Groceries',
-						pfc: [{
-							name: 'FOOD_AND_DRINK_GROCERIES',
-							confidence: 1
-						}],
-						value: 0,
-						overflow: { group: 'Wants', category: 'Dinners Out' }
-					}]
-				}, {
-					name: 'Wants',
-					categories: [{
-						name: 'Dinners Out',
-						pfc: [{
-							name: 'FOOD_AND_DRINK_RESTAURANT',
-							confidence: 1
-						}],
-						value: 0,
-						spend: true,
-						overflow: {}
-					}]
-				}, {
-					name: self.fallback().group,
-					categories: [{ name: self.fallback().category, overflow: {} }],
-					protected: true
-				}]
-			}
-		}
-		self.custom = () => {
-			return {
-				id: uuidv4(),
-				accounts: [{
-					account_id: uuidv4(),
-					balances: { available: 0 },
-					name: 'Custom Account'
-				}],
-				name: 'Custom',
-				transactions: []
+				}
+			},
+			account: () => {
+				return {
+					id: uuidv4(),
+					accounts: [{
+						account_id: uuidv4(),
+						balances: { available: 0 },
+						name: 'Custom Account'
+					}],
+					name: 'Custom',
+					transactions: []
+				}
 			}
 		}
 
-		self.links = obj?.links ?? [self.custom()]
-		self.budgets = obj?.budgets ?? [self.default()]
+		self.links = obj?.links ?? [self.default.account()]
+		self.budgets = obj?.budgets ?? [self.default.budget()]
 		self.investments = obj?.investments ?? []
 		self.selected = obj?.selected ?? self.budgets[0]
 
@@ -401,12 +401,12 @@ export default class Links {
 						t.properties.group = t.properties.group ?? 'Other'
 						t.properties.category = t.properties.category ?? 'Uncategorized'
 					} else t.properties = { group: 'Other', category: 'Uncategorized', ignore: true }
-					if (typeof t.date === 'object') t.date = format(t.date)
+					if (typeof t.date === 'object') t.date = fromDate(t.date)
 
 					self.selected.transactions.push({
 						id: t.transaction_id ?? t.id ?? uuidv4(),
 						amount: t.amount,
-						date: t.date ?? format(new Date()),
+						date: t.date ?? fromDate(new Date()),
 						account: t.account_id ?? t.account,
 						merchant: t.merchant_name ?? t.merchant,
 						name: t.name,
@@ -445,7 +445,7 @@ export default class Links {
 			links: links => {
 				self.links = []
 				const index = links.findIndex(l => !l.institution)
-				if (index === -1) links.push(self.custom())
+				if (index === -1) links.push(self.default.account())
 				else links.push(links.splice(index, 1)[0])
 				self.add.link(...links)
 
@@ -461,7 +461,7 @@ export default class Links {
 			transaction: (id, data) => {
 				const transaction = self.selected.transactions.find(t => t.id === id)
 
-				if (typeof data.date === 'object') data.date = format(data.date)
+				if (typeof data.date === 'object') data.date = fromDate(data.date)
 
 				if (transaction.account === data.account
 					&& transaction.amount === data.amount
@@ -573,7 +573,7 @@ export default class Links {
 				}
 
 				if (self.budgets.length === 0)
-					self.budgets = [self.default()]
+					self.budgets = [self.default.budget()]
 
 				self.selected = self.budgets[0]
 

@@ -3,7 +3,7 @@ import { goto } from '$lib/utils/navigation'
 import { v4 as uuidv4 } from 'uuid'
 import { links } from '$lib/stores/user'
 import { route, queue, notifications } from '$lib/stores/ui'
-import { toDate } from '$lib/utils/convert'
+import { toDate, fromDate } from '$lib/utils/convert'
 
 const link = async ($route, $links, state) => {
 	if (state.demo) return
@@ -78,7 +78,6 @@ export const initialize = ($route, $links, state) => {
 	$route.account = {}
 }
 // TODO: categories when saving link???
-const format = d => `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
 const conflicts = ($links, group, category) => {
 	let categories = []
 	$links.selected.groups.forEach(g => {
@@ -138,8 +137,8 @@ export const update = {
 				}
 				// Auto sort
 				if (!$route.state.transaction.new.properties.manual) {
-					$route.state.transaction.new.properties.group = $links.fallback().group
-					$route.state.transaction.new.properties.category = $links.fallback().category
+					$route.state.transaction.new.properties.group = $links.fallback.category().group
+					$route.state.transaction.new.properties.category = $links.fallback.category().category
 					links.set($links.sort($route.state.transaction.new))
 				}
 
@@ -177,7 +176,7 @@ export const update = {
 			}
 		}, {
 			hint: 'Date',
-			name: format($route.state.transaction.new?.date ?? new Date()),
+			name: fromDate($route.state.transaction.new?.date ?? new Date()),
 			children: [{
 				name: 'Date',
 				type: 'date',
@@ -522,7 +521,7 @@ export const update = {
 					fill: true,
 					click: () => {
 						const data = $links.add.budget({
-							...$links.default(),
+							...$links.default.budget(),
 							name: $route.state.choose.budget.name
 						})
 						if (data) {
