@@ -1,45 +1,8 @@
 import { cors } from '../_shared/cors.ts'
-import { plaid, get, set, remove, refresh, create } from '../_shared/plaid.ts'
+import { plaid, get, set, remove, refresh, create, investments } from '../_shared/plaid.ts'
 import { user } from '../_shared/user.ts'
 import { service } from '../_shared/service.ts'
 import { respond, err } from '../_shared/response.ts'
-
-const format = (d: Date) => `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${(d.getDate()).toString().padStart(2, '0')}`
-
-const investments = async (user_id: string, ids: any[]) => {
-	const links = await get(user_id, (l: any) => ids.find((m: any) => m === l.id), { secrets: true })
-	const holdings: any = []
-	const transactions: any = []
-	const start: Date = new Date()
-	start.setDate(-7)
-	const end: Date = new Date()
-	for (const { id, access_token, institution } of links) {
-		if (!institution) continue
-
-		try {
-			const { data: hs } = await plaid.investmentsHoldingsGet({ access_token })
-			const { data: ts } = await plaid.investmentsTransactionsGet({
-				access_token,
-				start_date: format(start),
-				end_date: format(end)
-			})
-			holdings.push({ id, holdings: hs.holdings, securities: hs.securities })
-			transactions.push(ts.investment_transactions)
-		} catch (error) {
-			if (error.response)
-				if (error.response.data.error_type === 'ITEM_ERROR') continue
-				else throw new Error(error.response.data.error_message)
-			throw new Error(error.message)
-		}
-	}
-
-	const { error } = await service.from('investments').upsert(holdings.map((h: any) => {
-		return { ...h, user_id, transactions: transactions.filter((t: any) => t.account_id === h.account_id).flat() }
-	}))
-	if (error) throw new Error(error.message)
-
-	return { ...holdings, transactions: transactions.flat() }
-}
 
 // Cases: get, set, remove, refresh
 Deno.serve(async (req: Request) => {
