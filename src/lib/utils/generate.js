@@ -97,6 +97,152 @@ const paychecks = (value = random(2200, 1300), offset = 0) => {
 	return ts
 }
 
+const investments = () => {
+	const count = 12
+	const stocks = [{
+		name: 'Budgeteer',
+		ticker: 'BGTR',
+		price: random(100, 125)
+	}, {
+		name: 'Microsoft',
+		ticker: 'MSFT',
+		price: random(400, 500)
+	}, {
+		name: 'Apple',
+		ticker: 'AAPL',
+		price: random(150, 225)
+	}, {
+		name: 'NVIDIA',
+		ticker: 'NVDA',
+		price: random(750, 850)
+	}, {
+		name: 'Amazon',
+		ticker: 'AMZN',
+		price: random(150, 200)
+	}, {
+		name: 'Alphabet',
+		ticker: 'GOOG',
+		price: random(100, 175)
+	}, {
+		name: 'Meta',
+		ticker: 'META',
+		price: random(450, 550)
+	}, {
+		name: 'Tesla',
+		ticker: 'TSLA',
+		price: random(175, 225)
+	}, {
+		name: 'AMD',
+		ticker: 'AMD',
+		price: random(175, 225)
+	}, {
+		name: 'Intel',
+		ticker: 'INTC',
+		price: random(35, 60)
+	}, {
+		name: 'PayPal',
+		ticker: 'PYPL',
+		price: random(50, 80)
+	}, {
+		name: 'Salesforce',
+		ticker: 'CRM',
+		price: random(275, 350)
+	}, {
+		name: 'Netflix',
+		ticker: 'NFLX',
+		price: random(550, 650)
+	}, {
+		name: 'Adobe',
+		ticker: 'ADBE',
+		price: random(525, 625)
+	}, {
+		name: 'Cisco',
+		ticker: 'CSCO',
+		price: random(40, 65)
+	}, {
+		name: 'IBM',
+		ticker: 'IBM',
+		price: random(150, 250)
+	}, {
+		name: 'UBER',
+		ticker: 'UBER',
+		price: random(70, 100)
+	}, {
+		name: 'SONY',
+		ticker: 'SONY',
+		price: random(80, 105)
+	}, {
+		name: 'Airbnb',
+		ticker: 'ABNB',
+		price: random(140, 200)
+	}, {
+		name: 'Shopify',
+		ticker: 'SHOP',
+		price: random(70, 100)
+	}, {
+		name: 'Spotify',
+		ticker: 'SPOT',
+		price: random(225, 300)
+	}, {
+		name: 'Cloudflare',
+		ticker: 'NET',
+		price: random(85, 125)
+	}]
+
+	const holdings = []
+	const securities = []
+	const transactions = []
+	for (let i = 0; i < count; i++) {
+		const index = random(12 - i)
+		const stock = stocks[index]
+		let total = 0
+
+		for (let j = 0; j < random(9, 3); j++) {
+			const date = new Date()
+			const offset = -random(7)
+			date.setDate(offset)
+			const price = offset * 0.1 / 7 * stock.price // Upward trend
+				+ (random(3) - 1) * 0.05 * stock.price // Variability`
+				+ stock.price
+			const quantity = ((total - 10) < 0 ? 1 : random(1) === 0 ? -1 : 1) * random(1, 10)
+			total += quantity
+			const amount = price * quantity
+
+			transactions.push({
+				account_id: 'demo-checking',
+				security_id: stock.ticker,
+				amount,
+				date,
+				price,
+				type: amount < 0 ? 'sell' : 'buy',
+				quantity
+			})
+		}
+
+		stocks.splice(index, 1)
+		holdings.push({
+			account_id: 'demo-checking',
+			security_id: stock.ticker,
+			quantity: total
+		})
+		securities.push({
+			security_id: stock.ticker,
+			name: stock.name,
+			ticker: stock.ticker,
+			close_price: stock.price
+		})
+	}
+
+	transactions.sort((a, b) => a - b)
+
+	return [{
+		id: 'demo-link',
+		holdings,
+		securities,
+		transactions
+	}]
+}
+
 export const generate = (links, data) => {
 	const today = new Date()
 
@@ -112,8 +258,9 @@ export const generate = (links, data) => {
 		}],
 		transactions: []
 	}]
-	links.budgets = [links.default()]
+	links.budgets = [links.default.budget()]
 	links.selected = links.budgets[0]
+	links.investments = investments()
 	links.add.account('demo-checking')
 
 	// Wants > Dinners
@@ -137,12 +284,6 @@ export const generate = (links, data) => {
 		links.add.transaction(t)
 		links.links.find(l => l.id === 'demo-link').transactions.push(t)
 	}
-
-	// Bills > Mortgage
-	// links.add.category('Bills', '2Mortgage', {
-	// 	value: 1000,
-	// 	overflow: { group: 'Wants', category: 'Dinners' }
-	// })
 
 	return links
 }
