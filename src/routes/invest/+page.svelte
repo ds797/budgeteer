@@ -16,6 +16,11 @@
 	})
 </script>
 
+<svelte:head>
+	<title>Invest</title>
+	<meta name="description" content="Next-gen financing for all." />
+</svelte:head>
+
 <main>
 	<div class="investments">
 		{ #each $links.investments as link }

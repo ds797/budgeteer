@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-	<title>Budgeteer</title>
+	<title>Budget</title>
 	<meta name="description" content="Next-gen financing for all." />
 </svelte:head>
 

@@ -5,6 +5,11 @@
 	export let data
 </script>
 
+<svelte:head>
+	<title>Dashboard</title>
+	<meta name="description" content="Next-gen financing for all." />
+</svelte:head>
+
 <main>
 	<div class="left">
 		<div class="card">

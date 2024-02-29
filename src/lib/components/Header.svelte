@@ -92,7 +92,7 @@
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if $page.url.pathname === '/budget' && data.demo }
+			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && data.demo }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>
