@@ -52,7 +52,7 @@
 
 <main>
 	<div>
-		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = !open)}/>
+		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = !open)} />
 		<div>
 			<button bind:this={flow} class="none" on:click={() => open = !open}>
 				{ #if !mobile }
