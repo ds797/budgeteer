@@ -1,5 +1,6 @@
 <script>
 	import { slide } from '$lib/utils/transition'
+	import { toDate } from '$lib/utils/date'
 	import Context from '$lib/components/element/Context.svelte'
 	import Arrow from '$lib/svg/Arrow.svelte'
 	import Close from '$lib/svg/Close.svelte'
@@ -9,6 +10,12 @@
 	export let close
 
 	let node
+
+	const format = d => {
+		d = toDate(d)
+
+		return `${d.getMonth() + 1}/${d.getDate()}`
+	}
 
 	const icon = (type, amount) => {
 		switch (type) {
@@ -57,6 +64,7 @@
 			{ /if }
 			<p class="bold">{transaction.type}</p>
 		</div>
+		<p class="date">{format(transaction.date)}</p>
 		<div class="bar" />
 		<p>{Math.abs(transaction.amount).toFixed(2)}</p>
 	</button>
@@ -99,5 +107,10 @@
 
 	.transaction .bold {
 		text-transform: capitalize;
+	}
+
+	.date {
+		color: var(--text-weak);
+		font-weight: 500;
 	}
 </style>
