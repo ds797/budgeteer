@@ -52,24 +52,22 @@
 
 <main>
 	<div>
+		<button bind:this={flow} class="none" on:click={() => open = !open}>
+			{ #if !mobile }
+				<h3 class="left">{$inflow.toFixed(2)}</h3>
+			{ /if }
+			<div class="down">
+				<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
+			</div>
+			<div class="bar" />
+			<div class="up">
+				<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
+			</div>
+			{ #if !mobile }
+				<h3 class="right">{$outflow.toFixed(2)}</h3>
+			{ /if }
+		</button>
 		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = !open)} />
-		<div>
-			<button bind:this={flow} class="none" on:click={() => open = !open}>
-				{ #if !mobile }
-					<h3 class="left">{$inflow.toFixed(2)}</h3>
-				{ /if }
-				<div class="down">
-					<Arrow stroke={'var(--text-good)'} size={'1.5rem'} />
-				</div>
-				<div class="bar" />
-				<div class="up">
-					<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
-				</div>
-				{ #if !mobile }
-					<h3 class="right">{$outflow.toFixed(2)}</h3>
-				{ /if }
-			</button>
-		</div>
 	</div>
 </main>
 
@@ -82,12 +80,11 @@
 
 	div {
 		display: flex;
-		justify-content: center;
-		align-items: stretch;
+		flex-flow: column;
+		align-items: center;
 	}
 
 	button {
-		flex: 1;
 		display: flex;
 		justify-content: center;
 		align-items: stretch;
