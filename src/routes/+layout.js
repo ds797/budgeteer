@@ -3,7 +3,7 @@ import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import { links } from '$lib/stores/user'
 import { queue, notifications } from '$lib/stores/ui'
 
-// export const ssr = false
+export const ssr = false
 
 const PUBLIC_SUPABASE_URL = 'https://mabqpjflhufudqpifesa.supabase.co'
 const PUBLIC_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hYnFwamZsaHVmdWRxcGlmZXNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ4NDA0NzIsImV4cCI6MjAyMDQxNjQ3Mn0.1SppoHM5zG3j-P_RbaSOYaf7QyrJ00RxouWS34_c148'
@@ -50,129 +50,163 @@ export const load = async ({ fetch, data, depends, url }) => {
 
 	let paying = await paid()
 
-	let storage = {}
+	let storage = {
+		get: key => {
+			let data = localStorage.getItem(key)
+			if (!data) return
 
-	storage.get = key => {
-		let data = localStorage.getItem(key)
-		if (!data) return
+			data = JSON.parse(data)
 
-		data = JSON.parse(data)
-
-		return data
+			return data
+		},
+		set: (key, data) => {
+			data = JSON.stringify(data)
+			localStorage.setItem(key, data)
+		}
 	}
 
-	storage.set = (key, data) => {
-		data = JSON.stringify(data)
-		localStorage.setItem(key, data)
-	}
+	supabase.budgets = {
+		get: async () => {
+			let { data, error } = await supabase.from('budgets').select('*')
 
-	supabase.getBudgets = async () => {
-		let { data, error } = await supabase.from('budgets').select('*')
+			if (error) console.error(error)
 
-		if (error) console.error(error)
+			if (!data.length) return {}
 
-		if (!data.length) return {}
+			let budgets = []
+			let selected
+			for (const b of data) {
+				budgets.push(b)
+				if (b.selected) selected = b
+				delete b.selected
+			}
 
-		let budgets = JSON.parse(data[0].budgets)
-		budgets.selected = budgets.budgets[budgets.selected]
+			return { budgets, selected }
+		},
+		set: async ({ budgets, selected }) => {
+			selected = budgets.findIndex(b => b.name === selected.name)
 
-		return budgets
-	}
-
-	supabase.setBudgets = async budgets => {
-		budgets.selected = budgets.budgets.findIndex(b => b.name === budgets.selected.name)
-
-		const { error } = await supabase.from('budgets').upsert({ budgets: JSON.stringify(budgets) })
-
-		if (error) console.error(error)
-	}
-
-	supabase.getLinks = async () => {
-		const { data, error } = await supabase.invoke('links', { type: { get: true } })
-
-		if (error) console.error(error)
-
-		// There's no "custom" link -- add it
-		if (!data.find(l => !l.institution)) data.push(get(links).custom())
-
-		return data ?? []
-	}
-
-	supabase.setLinks = async links => {
-		const { error } = await supabase.invoke('links', { type: { set: links.links } })
-
-		if (error) throw new Error(error)
-	}
-
-	let plaid = {}
-
-	plaid.unlink = async id => {
-		await invoke('links', { type: { remove: [id] } })
-	}
-
-	plaid.link = async () => {
-		const { data: token } = await invoke('links', { type: { token: true } })
-
-		return new Promise((resolve, reject) => {
-			const handler = Plaid.create({
-				token,
-				onSuccess: async (token, metadata) => {
-					resolve({ token, metadata })
-				},
-				onExit: (err, metadata) => {
-					// console.log(
-					// 	`Exited early. Error: ${JSON.stringify(err)} Metadata: ${JSON.stringify(
-					// 		metadata
-					// 	)}`
-					// )
-
-					if (err) reject({ err, metadata })
-
-					else resolve({ exit: true, metadata })
-
-					// TODO: Add notification to stack
-					// showOutput(`Link existed early with status ${metadata.status}`)
+			const { error } = await supabase.from('budgets').upsert([...budgets.map((b, i) => {
+				return {
+					name: b.name,
+					user_id: session.user.id,
+					accounts: b.accounts,
+					groups: b.groups,
+					transactions: b.transactions,
+					selected: selected === i
 				}
-			})
-	
-			handler.open()
-		})
-	}
+			})])
 
-	plaid.getLinks = async () => {
-		storage.set('cooldown', new Date().getTime())
-		const { data } = await invoke('links', { type: { refresh: true } })
+			if (error) console.error(error)
+		},
+		update: () => {
+			if (!paying) return
 
-		return data ?? []
-	}
+			const update = async () => {
+				storage.set('links', get(links))
+				await supabase.budgets.set({
+					budgets: get(links).budgets,
+					selected: get(links).selected
+				})
+			}
+			if (get(queue).find((f, i) => i !== 0 && f.toString() === update.toString())) return
 
-	supabase.updateLinks = () => {
-		if (!paying) return
+			queue.enq(update)
+			queue.set(get(queue))
+		},
+		remove: async name => {
+			const { error } = await supabase.from('budgets').delete().eq('name', name)
 
-		const update = async () => {
-			storage.set('links', get(links))
-			await supabase.setLinks(get(links))
+			if (error) console.error(error)
 		}
-		if (get(queue).find((f, i) => i !== 0 && f.toString() === update.toString())) return
-
-		queue.enq(update)
-		queue.set(get(queue))
 	}
 
-	supabase.updateBudgets = () => {
-		if (!paying) return
+	supabase.links = {
+		get: async () => {
+			const { data: { links: ls }, error } = await supabase.invoke('links', { type: { get: true } })
 
-		const update = async () => {
-			storage.set('links', get(links))
-			await supabase.setBudgets({
-				budgets: get(links).budgets,
-				selected: get(links).selected
-			})
+			if (error) console.error(error)
+
+			// There's no "custom" link -- add it
+			if (!ls.find(l => !l.institution)) ls.push(get(links).custom())
+
+			return ls ?? []
+		},
+		set: async links => {
+			const { error } = await supabase.invoke('links', { type: { set: links.links } })
+
+			if (error) throw new Error(error)
+		},
+		update: async () => {
+			if (!paying) return
+
+			const update = async () => {
+				storage.set('links', get(links))
+				await supabase.links.set(get(links))
+			}
+			if (get(queue).find((f, i) => i !== 0 && f.toString() === update.toString())) return
+
+			queue.enq(update)
 		}
-		if (get(queue).find((f, i) => i !== 0 && f.toString() === update.toString())) return
+	}
 
-		queue.enq(update)
-		queue.set(get(queue))
+	supabase.investments = {
+		get: async () => {
+			let { data, error } = await supabase.from('investments').select('*')
+
+			if (error) console.error(error)
+
+			if (!data.length) return
+
+			let investments = []
+			for (const i of data) {
+				investments.push(i)
+			}
+
+			return investments
+		}
+	}
+
+	let plaid = {
+		link: async () => {
+			const { data: token } = await invoke('links', { type: { token: true } })
+
+			return new Promise((resolve, reject) => {
+				const handler = Plaid.create({
+					token,
+					onSuccess: async (token, metadata) => {
+						resolve({ token, metadata })
+					},
+					onExit: (err, metadata) => {
+						// console.log(
+						// 	`Exited early. Error: ${JSON.stringify(err)} Metadata: ${JSON.stringify(
+						// 		metadata
+						// 	)}`
+						// )
+
+						if (err) reject({ err, metadata })
+
+						else resolve({ exit: true, metadata })
+
+						// TODO: Add notification to stack
+						// showOutput(`Link existed early with status ${metadata.status}`)
+					}
+				})
+		
+				handler.open()
+			})
+		},
+		unlink: async id => {
+			await invoke('links', { type: { remove: [id] } })
+		},
+		links: {
+			get: async () => {
+				storage.set('cooldown', new Date().getTime())
+				const { data } = await invoke('links', { type: { refresh: true } })
+
+				return data ?? []
+			}
+		},
 	}
 
 	const { pathname } = url
