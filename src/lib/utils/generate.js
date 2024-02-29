@@ -1,7 +1,6 @@
 import Links from '$lib/classes/Links'
 import { random } from '$lib/utils/math'
-
-const count = d => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
+import { count } from '$lib/utils/date'
 
 const dinners = (offset = 0) => {
 	const today = new Date()
@@ -98,7 +97,7 @@ const paychecks = (value = random(2200, 1300), offset = 0) => {
 }
 
 const investments = () => {
-	const count = 12
+	const amount = 12
 	const stocks = [{
 		name: 'Budgeteer',
 		ticker: 'BGTR',
@@ -192,16 +191,17 @@ const investments = () => {
 	const holdings = []
 	const securities = []
 	const transactions = []
-	for (let i = 0; i < count; i++) {
+	for (let i = 0; i < amount; i++) {
 		const index = random(12 - i)
 		const stock = stocks[index]
 		let total = 0
 
 		for (let j = 0; j < random(9, 3); j++) {
 			const date = new Date()
-			const offset = -random(7)
-			date.setDate(offset)
-			const price = offset * 0.1 / 7 * stock.price // Upward trend
+			const offset = -random(date.getDate() - 1)
+			date.setDate(date.getDate() + offset)
+			console.log(date)
+			const price = offset * 0.1 / 31 * stock.price // Upward trend
 				+ (random(3) - 1) * 0.05 * stock.price // Variability`
 				+ stock.price
 			const quantity = ((total - 10) < 0 ? 1 : random(1) === 0 ? -1 : 1) * random(1, 10)
