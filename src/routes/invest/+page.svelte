@@ -1,9 +1,19 @@
 <script>
+	import { onMount } from 'svelte'
 	import { links } from '$lib/stores/user'
 	import Investment from '$lib/components/investment/Investment.svelte'
 	import Data from '$lib/components/investment/Data.svelte'
 
+	export let data
+
 	let selected = {}
+	const history = []
+
+	onMount(async () => {
+		console.log('Mounting')
+		// const { data: history } = await data.supabase.invoke('stocks', { type: { history: { ticker: 'TSLA' } } })
+		console.log(history)
+	})
 </script>
 
 <main>
@@ -21,7 +31,7 @@
 		{ #if selected.holding }
 			<Data holding={selected.holding} security={selected.security} transactions={(selected.transactions ?? []).filter(t => t.security_id === selected.security.security_id)} />
 		{ :else }
-			<p>Select a stock from the list to view details!</p>
+			<p>Select an investment from the list to view details!</p>
 		{ /if }
 	</div>
 </main>
@@ -32,6 +42,10 @@
 		flex-flow: row;
 		align-items: stretch;
 		gap: 1vw;
+	}
+
+	p {
+		text-align: center;
 	}
 
 	.investments { flex: 1 }
