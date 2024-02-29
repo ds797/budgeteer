@@ -145,7 +145,7 @@
 								<div class="container">
 									<div class="bar" />
 									<div class="account">
-										{ #each child.link.accounts as account }
+										{ #each child.link.accounts.filter(a => a?.balances?.available) as account }
 											<div class="label">
 												<p class="name">{account.name}</p>
 												<p class="balance {account.balances.available < 0 ? 'bad' : 'good'}">{account.balances.available.toFixed(2)}</p>

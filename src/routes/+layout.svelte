@@ -43,12 +43,11 @@
 			|| (storage.get('active') && 3 * FREQUENCY < new Date().getTime() - storage.get('active')))
 			return
 
-		const ls = await plaid.getLinks()
+		const { links: ls, investments: is } = await plaid.links.get()
 		if (!ls.length) return
 
-		// ls.push($links.links.find(l => !l.institution))
 		$links.set.links(ls)
-		$links = $links
+		$links = $links.set.investments(is)
 	}
 
 	const init = async () => {
@@ -58,23 +57,22 @@
 			notifications.add({ type: 'error', message: m })
 		}, supabase.invoke)
 
-		let { budgets, selected } = await supabase.getBudgets()
+		let { budgets, selected } = await supabase.budgets.get()
 
 		if (budgets) {
 			// Step 2: budgets exist, so user must be set up -
 			// ...get links from DB
-			const data = await supabase.getLinks()
-
-			$links.set.links(data)
+			$links.set.links(await supabase.links.get())
+			$links.set.investments(await supabase.investments.get())
 			
 			// Step 3: When possible, get links from Plaid and
 			// ...update DB now that the user most likely has
 			// ...some links already
-			queue.enq(supabase.updateLinks)
+			queue.enq(supabase.links.update)
 		} else {
 			budgets = [$links.default()]
 			selected = budgets[0]
-			await supabase.setBudgets({ budgets, selected })
+			await supabase.budgets.set({ budgets, selected })
 		}
 		
 		$links.budgets = budgets
@@ -82,7 +80,7 @@
 
 		storage.set('links', $links)
 
-		supabase.setBudgets({
+		supabase.budgets.set({
 			budgets: $links.budgets,
 			selected: $links.selected,
 			groups: $links.groups

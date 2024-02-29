@@ -5,6 +5,7 @@
 	import Loading from '$lib/components/Loading.svelte'
 	import Dashboard from '$lib/svg/Dashboard.svelte'
 	import Budget from '$lib/svg/Budget.svelte'
+	import Stock from '$lib/svg/Stock.svelte'
 </script>
 
 <main>
@@ -22,6 +23,10 @@
 			<button class="none page" class:selected={$page.url.pathname === '/budget'} on:click={() => goto('/budget')}>
 				<Budget size={'1.5rem'} />
 				<p>Budget</p>
+			</button>
+			<button class="none page" class:selected={$page.url.pathname === '/invest'} on:click={() => goto('/invest')}>
+				<Stock size={'1.5rem'} />
+				<p>Invest</p>
 			</button>
 		{ /if }
 	</div>

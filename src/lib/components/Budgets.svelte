@@ -12,13 +12,13 @@
 
 <main>
 	<!-- TODO: don't need to queue this? -->
-	<List list={$links.get.groups()} change={() => !demo && queue.enq(data.supabase.updateBudgets)} let:item={group} key={'name'}>
+	<List list={$links.get.groups()} change={() => !demo && queue.enq(data.supabase.budgets.update)} let:item={group} key={'name'}>
 		<div transition:slide>
 			<button class="none" on:click={() => {
 				$route.state.group = group
 				$route.current = $route.group
 			}}>{group.name}</button>
-			<List list={group.categories} change={() => !demo && queue.enq(data.supabase.updateBudgets)} let:item={category} key={'name'}>
+			<List list={group.categories} change={() => !demo && queue.enq(data.supabase.budgets.update)} let:item={category} key={'name'}>
 				<Category {group} {category} />
 			</List>
 		</div>

@@ -181,6 +181,7 @@ export default class Links {
 
 		self.links = obj?.links ?? [self.custom()]
 		self.budgets = obj?.budgets ?? [self.default()]
+		self.investments = obj?.investments ?? []
 		self.selected = obj?.selected ?? self.budgets[0]
 
 		self.select = name => {
@@ -330,15 +331,16 @@ export default class Links {
 				for (const budget of budgets) {
 					if (self.budgets.find(b => b.name === budget.name)) {
 						err('Budget already exists')
-						return self
+						return
 					}
 
 					self.budgets.push({
+						id: uuidv4(),
 						name: budget.name,
 						accounts: budget.accounts ?? [],
 						transactions: budget.transactions ?? [],
 						groups: budget.groups ?? [],
-						protected: budget.protected
+						protected: budget.protected ?? false
 					})
 					self.selected = self.budgets.at(-1)
 				}
@@ -446,6 +448,11 @@ export default class Links {
 				if (index === -1) links.push(self.custom())
 				else links.push(links.splice(index, 1)[0])
 				self.add.link(...links)
+
+				return self
+			},
+			investments: investments => {
+				self.investments = investments
 
 				return self
 			}
@@ -562,7 +569,7 @@ export default class Links {
 						return self
 					}
 
-					self.budgets = self.budgets.filter(b => b.name !== name)
+					self.budgets = self.budgets.filter(b => b.name !== id)
 				}
 
 				if (self.budgets.length === 0)
