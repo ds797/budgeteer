@@ -66,6 +66,7 @@ const createQueue = () => {
 		set,
 		update,
 		enq: f => {
+			// TODO: Functions with different arguments will be equal
 			for (const g of queue)
 				if (f.toString() === g.toString()) return
 			queue.push(f)
