@@ -57,7 +57,8 @@
 
 <main>
 	<div class="banner">
-		{ #if (url === '/home' || url === '/budget' || url === '/invest') && demo }
+		<!-- Check if browser defined to prevent including banner in SSR page -->
+		{ #if browser && (url === '/home' || url === '/budget' || url === '/invest') && demo }
 			<div class="error" transition:slide>
 				<p>You're testing Budgeteer!<button class="none" on:click={() => goto('/subscribe')}>Subscribe</button>to get full access.</p>
 			</div>
