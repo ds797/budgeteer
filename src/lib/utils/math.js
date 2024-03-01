@@ -58,14 +58,14 @@ export const digify = string => {
 }
 
 export const min = array => {
-	let min = 0
+	let min = Infinity
 	for (const v of array) if (v < min) min = v
 
 	return min
 }
 
 export const max = array => {
-	let max = 0
+	let max = -Infinity
 	for (const v of array) if (v > max) max = v
 
 	return max
