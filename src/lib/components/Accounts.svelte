@@ -8,7 +8,7 @@
 
 <main>
 	{ #each $links.links.filter(l => l.institution) as link }
-		{ #each link.accounts as account }
+		{ #each link.accounts.filter(a => a?.balances?.available) as account }
 			<Account {link} {account} />
 		{ /each }
 	{ :else }
