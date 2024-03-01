@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte'
 	import { links } from '$lib/stores/user'
 	import Investment from './Investment.svelte'
 	import Data from './Data.svelte'
@@ -7,13 +6,6 @@
 	export let data
 
 	let selected = {}
-	const history = []
-
-	onMount(async () => {
-		console.log('Mounting')
-		// const { data: history } = await data.supabase.invoke('stocks', { type: { history: { ticker: 'TSLA' } } })
-		console.log(history)
-	})
 </script>
 
 <svelte:head>
@@ -29,6 +21,8 @@
 				{ @const transactions = link.transactions }
 				<Investment {holding} {security} {transactions} selected={holding.account_id === selected.holding?.account_id && holding.security_id === selected.holding?.security_id} on:click={e => selected = e.detail} />
 			{ /each }
+		{ :else }
+			<p>You don't have any investments!</p>
 		{ /each }
 	</div>
 	<div class="bar" />
