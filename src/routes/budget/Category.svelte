@@ -70,11 +70,11 @@
 			</button>
 		</div>
 		{ #if category.value && parseFloat(category.value) !== 0 }
-			<div class="bar">
+			<div class="progress">
 				<Progress max={$max} value={$progress} />
 			</div>
 		{ :else }
-			<div class="progress" />
+			<div class="bar" />
 		{ /if }
 		<div class="container">
 			<h3>$</h3>
@@ -95,17 +95,19 @@
 		</div>
 	</div>
 	{ #if !category.hide }
-		{ #each $links.order(group.name, category.name, t => month(t.date, $date)) as transaction (transaction.id) }
-			<div class="wrapper">
+		<div class="wrapper">
+			{ #each $links.order(group.name, category.name, t => month(t.date, $date)) as transaction (transaction.id) }
 				<Transaction {transaction} />
-			</div>
-		{ /each }
+			{ /each }
+		</div>
 	{ /if }
 </main>
 
 <style>
+	main {
+		align-items: stretch;
+	}
 	.category {
-		width: 100%;
 		display: flex;
 		justify-content: space-evenly;
 		align-items: center;
@@ -146,11 +148,11 @@
 		transform: scaleX(-1);
 	}
 
-	.bar {
+	.progress {
 		flex: 1;
 	}
 
-	.progress {
+	.bar {
 		flex: 1;
 		height: 0.125rem;
 		background: var(--text-bg);
@@ -162,7 +164,13 @@
 	}
 
 	.wrapper {
-		align-self: stretch;
 		margin-right: 1rem;
+	}
+
+	.exception {
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 </style>
