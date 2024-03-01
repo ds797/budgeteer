@@ -9,7 +9,7 @@
 	import { month } from '$lib/utils/compare'
 	import Progress from '$lib/components/element/Progress.svelte'
 	import Chevron from '$lib/components/svg/Chevron.svelte'
-	import Transaction from './Transaction.svelte'
+	import Transaction from '$lib/components/budget/Transaction.svelte'
 
 	export let group, category
 

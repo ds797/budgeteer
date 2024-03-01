@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte'
 	import { fly } from 'svelte/transition'
-	import Bill from '../svg/Bill.svelte'
+	import Bill from '$lib/components/svg/Bill.svelte'
 
 	let bills = Array(50).fill(undefined).map(() => {
 		return {}
