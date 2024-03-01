@@ -20,16 +20,16 @@
 	const icon = (type, amount) => {
 		switch (type) {
 			case 'buy':
-				return { direction: -90, good: true }
+				return { direction: 90, good: true }
 			case 'sell':
-				return { direction: 90, good: false }
+				return { direction: -90, good: false }
 			case 'cancel':
 				// TODO: Not ideal for readability
 				return { direction: null, good: false }
 			case 'cash':
-				return { direction: -90, good: true }
+				return { direction: 90, good: true }
 			case 'fee':
-				return { direction: 90, good: false }
+				return { direction: -90, good: false }
 			case 'transfer':
 				return { direction: amount < 0 ? -180 : 0, good: amount < 0 ? false : true }
 		}
@@ -37,7 +37,7 @@
 
 	let menu = { name: 'Transaction' }
 
-	const i = icon(transaction.type, transaction.amount)
+	$: i = icon(transaction.type, transaction.amount)
 </script>
 
 <main>
