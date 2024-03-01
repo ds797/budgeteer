@@ -81,8 +81,9 @@
 			{ #if $page.url.pathname === '/' }
 				<button on:click={() => goto('/budget')}>Demo</button>
 				<button class='fill' on:click={() => {
-					if (!data.session) $route.current = $route.start
-					else goto('/subscribe')
+					if (data.paying) goto('/home')
+					else if (data.session) goto('/subscribe')
+					else $route.current = $route.start
 				}}>Start</button>
 				<button on:click={() => goto('/pricing')}>Pricing</button>
 			{ :else if $page.url.pathname === '/budget' }
@@ -94,7 +95,7 @@
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && !data.session }
+			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && !data.paying }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>

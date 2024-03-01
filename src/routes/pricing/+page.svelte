@@ -33,7 +33,8 @@
 				<p>Simple, streamlined budgeting that allows you to act on your decisions as easily as if you controlled Budgeteer with your mind.</p>
 				<div class="buy">
 					<button class="fill" on:click={() => {
-						if (data.session) goto('/budget')
+						if (data.paying) goto('/home')
+						else if (data.session) goto('/subscribe')
 						else goto('/')
 					}}>Continue</button>
 				</div>
