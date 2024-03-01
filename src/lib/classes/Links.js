@@ -115,8 +115,9 @@ export default class Links {
 
 		// Methods
 		self.fallback = {
-			group: 'Other',
-			category: 'Uncategorized'
+			category: () => {
+				return { group: 'Other', category: 'Uncategorized' }
+			}
 		}
 		self.default = {
 			budget: () => {
