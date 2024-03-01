@@ -13,6 +13,7 @@
 	import Close from '$lib/svg/Close.svelte'
 
 	export let data
+	export let demo = false
 
 	let graph = false
 
@@ -51,11 +52,12 @@
 	}
 
 	$: url = $page.url.pathname
+	$: console.log(url)
 </script>
 
 <main>
 	<div class="banner">
-		{ #if (url === '/home' || url === '/budget' || url === '/invest') && !data.paying }
+		{ #if (url === '/home' || url === '/budget' || url === '/invest') && demo }
 			<div class="error" transition:slide>
 				<p>You're testing Budgeteer!<button class="none" on:click={() => goto('/subscribe')}>Subscribe</button>to get full access.</p>
 			</div>
@@ -92,7 +94,7 @@
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && data.demo }
+			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && !data.session }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>

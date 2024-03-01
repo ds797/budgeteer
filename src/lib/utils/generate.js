@@ -200,7 +200,6 @@ const investments = () => {
 			const date = new Date()
 			const offset = -random(date.getDate() - 1)
 			date.setDate(date.getDate() + offset)
-			console.log(date)
 			const price = offset * 0.1 / 31 * stock.price // Upward trend
 				+ (random(3) - 1) * 0.05 * stock.price // Variability`
 				+ stock.price

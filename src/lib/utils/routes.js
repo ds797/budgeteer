@@ -6,7 +6,7 @@ import { route, queue, notifications } from '$lib/stores/ui'
 import { toDate, fromDate } from '$lib/utils/date'
 
 const link = async ($route, $links, state) => {
-	if (state.demo) return
+	if (!state.paying) return
 
 	try {
 		const { token } = await state.plaid.link()
@@ -36,12 +36,12 @@ const link = async ($route, $links, state) => {
 
 const save = {
 	links: state => {
-		if (state.demo) return
+		if (!state.paying) return
 
 		queue.enq(state.supabase.links.update)
 	},
 	budgets: state => {
-		if (state.demo) return
+		if (!state.paying) return
 
 		queue.enq(state.supabase.budgets.update)
 	}
@@ -57,7 +57,7 @@ export const initialize = ($route, $links, state) => {
 			type: 'action',
 			submit: true,
 			click: async () => {
-				if (state.demo) {
+				if (!state.paying) {
 					notifications.add({ type: 'error', message: 'Join Budgeteer to link your personal accounts!' })
 					$route.current = undefined
 				} else return await link($route, $links, state)
@@ -236,14 +236,14 @@ export const update = {
 					}
 					delete $route.state.transaction.new
 					if (t.properties.manual) {
-						if (state.demo) {
+						if (!state.paying) {
 							links.set($links.add.transaction(t))
 						} else {
 							links.set($links.add.transaction(t))
 							save.links(state)
 						}
 					} else {
-						if (state.demo) {
+						if (!state.paying) {
 							t.properties.group = $links.fallback().group
 							t.properties.category = $links.fallback().category
 							t.properties.manual = true
@@ -341,7 +341,7 @@ export const update = {
 								$links = $links.add.category($route.state.choose.category.group, $route.state.choose.category.category, { description: $route.state.choose.category.description || '', value: parseFloat($route.state.choose.category.categoryValue) || 0 })
 								links.set($links)
 
-								if (state.demo) {
+								if (!state.paying) {
 									route.set($route)
 									return 1
 								}

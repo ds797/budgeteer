@@ -22,7 +22,7 @@
 
 	export let data
 
-	$: ({ supabase, session, plaid, storage, pathname, demo, paid, paying } = data)
+	$: ({ supabase, session, plaid, storage, pathname, paid, paying } = data)
 
 	const quit = () => {
 		if ($route.current?.quit) $route.current.quit()
@@ -129,7 +129,7 @@
 			}
 		})
 
-		if (!demo && paying) {
+		if (paying) {
 			check()
 			setTimeout(check, MINUTE)
 			// If any value is present, don't initialize
@@ -186,7 +186,7 @@
 		</Modal>
 	{ /if }
 	<div class="top">
-		<Header {data} />
+		<Header {data} demo={!paying} />
 	</div>
 	<div class="fill">
 		{ #key pathname }

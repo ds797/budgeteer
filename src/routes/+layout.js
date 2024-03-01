@@ -211,5 +211,5 @@ export const load = async ({ fetch, data, depends, url }) => {
 
 	const { pathname } = url
 
-	return { supabase, session, plaid, storage, pathname, demo: !session, paid, paying }
+	return { supabase, session, plaid, storage, pathname, paid, paying }
 }
