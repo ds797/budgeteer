@@ -1,5 +1,5 @@
 <script>
-	import Chevron from '$lib/svg/Chevron.svelte'
+	import Chevron from '$lib/components/svg/Chevron.svelte'
 	import { slide } from '$lib/utils/transition'
 
 	export let date = new Date()

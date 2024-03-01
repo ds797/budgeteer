@@ -1,5 +1,5 @@
 <script>
-	import Transaction from '$lib/components/investment/Transaction.svelte'
+	import Transaction from './Transaction.svelte'
 
 	export let holding
 	export let security

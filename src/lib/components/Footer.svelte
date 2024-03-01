@@ -3,9 +3,9 @@
 	import { page } from '$app/stores'
 	import { serving } from '$lib/stores/ui'
 	import Loading from '$lib/components/Loading.svelte'
-	import Dashboard from '$lib/svg/Dashboard.svelte'
-	import Budget from '$lib/svg/Budget.svelte'
-	import Stock from '$lib/svg/Stock.svelte'
+	import Dashboard from '$lib/components/svg/Dashboard.svelte'
+	import Budget from '$lib/components/svg/Budget.svelte'
+	import Stock from '$lib/components/svg/Stock.svelte'
 </script>
 
 <main>

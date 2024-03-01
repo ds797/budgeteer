@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing'
 	import { links, date } from '$lib/stores/user'
 	import { month } from '$lib/utils/compare'
-	import Arrow from '$lib/svg/Arrow.svelte'
+	import Arrow from '$lib/components/svg/Arrow.svelte'
 	import Context from '$lib/components/element/Context.svelte'
 
 	export let mobile = false
@@ -23,8 +23,8 @@
 		easing: cubicOut
 	})
 
-	$: $inflow = $links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date))
-	$: $outflow = $links.get.sum(t => !t.properties.hide && t.amount < 0 && month(t.date, $date))
+	$: $inflow = Math.abs($links.get.sum(t => !t.properties.hide && t.amount > 0 && month(t.date, $date)))
+	$: $outflow = Math.abs($links.get.sum(t => !t.properties.hide && t.amount < 0 && month(t.date, $date)))
 
 	$: menu = {
 		name: 'Flow',
@@ -36,7 +36,7 @@
 		}, {
 			name: 'Outflow',
 			type: 'value',
-			value: $outflow.toFixed(2),
+			value: Math.abs($outflow).toFixed(2),
 			color: 'var(--text-bad)'
 		}, {
 			name: 'Graph',
@@ -64,7 +64,7 @@
 				<Arrow stroke={'var(--text-bad)'} size={'1.5rem'} />
 			</div>
 			{ #if !mobile }
-				<h3 class="right">{$outflow.toFixed(2)}</h3>
+				<h3 class="right">{Math.abs($outflow).toFixed(2)}</h3>
 			{ /if }
 		</button>
 		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = !open)} />

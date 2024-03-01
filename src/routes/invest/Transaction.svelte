@@ -2,8 +2,8 @@
 	import { slide } from '$lib/utils/transition'
 	import { toDate } from '$lib/utils/date'
 	import Context from '$lib/components/element/Context.svelte'
-	import Arrow from '$lib/svg/Arrow.svelte'
-	import Close from '$lib/svg/Close.svelte'
+	import Arrow from '$lib/components/svg/Arrow.svelte'
+	import Close from '$lib/components/svg/Close.svelte'
 
 	export let transaction, index
 	export let open

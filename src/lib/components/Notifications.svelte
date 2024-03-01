@@ -3,9 +3,9 @@
 	import { notifications } from '$lib/stores/ui'
 	import { crossfade } from 'svelte/transition'
 	import { flip } from 'svelte/animate'
-	import AlertCircle from '$lib/svg/AlertCircle.svelte'
-	import CloseCircle from '$lib/svg/CloseCircle.svelte'
-	import CheckmarkCircle from '$lib/svg/CheckmarkCircle.svelte'
+	import AlertCircle from '$lib/components/svg/AlertCircle.svelte'
+	import CloseCircle from '$lib/components/svg/CloseCircle.svelte'
+	import CheckmarkCircle from '$lib/components/svg/CheckmarkCircle.svelte'
   import { cubicOut } from 'svelte/easing';
 
 	let visible = []

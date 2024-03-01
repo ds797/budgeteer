@@ -6,11 +6,11 @@
 	import { route, notifications } from '$lib/stores/ui'
 	import { slide } from '$lib/utils/transition'
 	import Month from '$lib/components/element/Month.svelte'
-	import Flow from '$lib/components/Flow.svelte'
-	import Graph from '$lib/components/Graph.svelte'
-	import Logo from '$lib/svg/Logo.svelte'
-	import Account from '$lib/svg/Account.svelte'
-	import Close from '$lib/svg/Close.svelte'
+	import Flow from '$lib/components/budget/Flow.svelte'
+	import Graph from '$lib/components/budget/Graph.svelte'
+	import Logo from '$lib/components/svg/Logo.svelte'
+	import Account from '$lib/components/svg/Account.svelte'
+	import Close from '$lib/components/svg/Close.svelte'
 
 	export let data
 	export let demo = false

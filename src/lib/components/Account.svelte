@@ -1,5 +1,5 @@
 <script>
-	import Bank from '$lib/svg/Bank.svelte'
+	import Bank from '$lib/components/svg/Bank.svelte'
 
 	export let link, account
 </script>

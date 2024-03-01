@@ -244,8 +244,8 @@ export const update = {
 						}
 					} else {
 						if (!state.paying) {
-							t.properties.group = $links.fallback().group
-							t.properties.category = $links.fallback().category
+							t.properties.group = $links.fallback.category().group
+							t.properties.category = $links.fallback.category().category
 							t.properties.manual = true
 							links.set($links.add.transaction(t))
 							notifications.add({ type: 'warning', message: `'${t.name}' was sorted into Other. Create an account to auto-sort!` })

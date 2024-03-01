@@ -8,8 +8,8 @@
 	import { money } from '$lib/utils/string'
 	import { month } from '$lib/utils/compare'
 	import Progress from '$lib/components/element/Progress.svelte'
-	import Transaction from '$lib/components/Transaction.svelte'
-	import Chevron from '../svg/Chevron.svelte'
+	import Chevron from '$lib/components/svg/Chevron.svelte'
+	import Transaction from './Transaction.svelte'
 
 	export let group, category
 

@@ -1,13 +1,13 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 	import { slide } from '$lib/utils/transition'
-	import Chevron from '$lib/svg/Chevron.svelte'
-	import Check from '$lib/svg/Check.svelte'
+	import Chevron from '$lib/components/svg/Chevron.svelte'
+	import Check from '$lib/components/svg/Check.svelte'
 	import Input from '$lib/components/element/Input.svelte'
 	import Switch from '$lib/components/element/Switch.svelte'
 	import Loading from '$lib/components/Loading.svelte'
 	import Date from '$lib/components/element/Date.svelte'
-	import Sparkle from '$lib/svg/Sparkle.svelte'
+	import Sparkle from '$lib/components/svg/Sparkle.svelte'
 
 	export let menu = {};
 	let reverse = false;

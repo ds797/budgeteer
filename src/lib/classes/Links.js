@@ -160,8 +160,8 @@ export default class Links {
 							overflow: {}
 						}]
 					}, {
-						name: self.fallback.group,
-						categories: [{ name: self.fallback.category, overflow: {} }],
+						name: self.fallback.category().group,
+						categories: [{ name: self.fallback.category().category, overflow: {} }],
 						protected: true
 					}]
 				}

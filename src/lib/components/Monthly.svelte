@@ -5,7 +5,7 @@
 	import { toDate } from '$lib/utils/date'
 	import { max } from '$lib/utils/math'
 	import { month } from '$lib/utils/compare'
-	import Transaction from '$lib/components/Transaction.svelte'
+	import Transaction from '$lib/components/budget/Transaction.svelte'
 
 	// TODO: ignore hidden elements
 

@@ -1,6 +1,6 @@
 <script>
 	import { start, count } from '$lib/utils/date'
-	import Chevron from '$lib/svg/Chevron.svelte'
+	import Chevron from '$lib/components/svg/Chevron.svelte'
 
 	export let calendars = 1
 	export let max

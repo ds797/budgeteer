@@ -1,5 +1,5 @@
 <script>
-	import Check from '../../svg/Check.svelte';
+	import Check from '$lib/components/svg/Check.svelte';
 
 	export let type = 'text';
 	export let value = '';

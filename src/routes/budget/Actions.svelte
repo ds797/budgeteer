@@ -5,13 +5,13 @@
 	import { links, date } from '$lib/stores/user'
 	import { route, notifications } from '$lib/stores/ui'
 	import { outside } from '$lib/utils/use'
-	import Month from '$lib/components/element/Month.svelte'
-	import Calendar from '$lib/svg/Calendar.svelte'
-	import Sparkle from '$lib/svg/Sparkle.svelte'
-	import Budget from '$lib/svg/Budget.svelte'
-	import Link from '$lib/svg/Link.svelte'
-	import Menu from '$lib/svg/Menu.svelte'
 	import Crossfade from '$lib/components/element/Crossfade.svelte'
+	import Month from '$lib/components/element/Month.svelte'
+	import Calendar from '$lib/components/svg/Calendar.svelte'
+	import Sparkle from '$lib/components/svg/Sparkle.svelte'
+	import Budget from '$lib/components/svg/Budget.svelte'
+	import Link from '$lib/components/svg/Link.svelte'
+	import Menu from '$lib/components/svg/Menu.svelte'
 
 	export let data
 

@@ -4,8 +4,8 @@
 	import { month } from '$lib/utils/compare'
 	import { links, date } from '$lib/stores/user'
 	import { notifications, assistant } from '$lib/stores/ui'
-	import Account from '$lib/svg/Account.svelte'
-	import Sparkle from '$lib/svg/Sparkle.svelte'
+	import Account from '$lib/components/svg/Account.svelte'
+	import Sparkle from '$lib/components/svg/Sparkle.svelte'
 	import Loading from '$lib/components/Loading.svelte'
 
 	export let session

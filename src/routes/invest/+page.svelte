@@ -1,8 +1,8 @@
 <script>
 	import { onMount } from 'svelte'
 	import { links } from '$lib/stores/user'
-	import Investment from '$lib/components/investment/Investment.svelte'
-	import Data from '$lib/components/investment/Data.svelte'
+	import Investment from './Investment.svelte'
+	import Data from './Data.svelte'
 
 	export let data
 
