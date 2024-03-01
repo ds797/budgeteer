@@ -267,8 +267,7 @@ export const create = async (user_id: string, ...tokens: any[]) => {
 
 export const investments = async (user_id: string, ids: any[]) => {
 	const links = await get(user_id, (l: any) => ids.find((m: any) => m === l.id), { secrets: true })
-	const holdings: any = []
-	const transactions: any = []
+	const is: any = []
 	const start: Date = new Date()
 	start.setDate(-7)
 	const end: Date = new Date()
@@ -282,8 +281,12 @@ export const investments = async (user_id: string, ids: any[]) => {
 				start_date: format(start),
 				end_date: format(end)
 			})
-			holdings.push({ id, holdings: hs.holdings, securities: hs.securities })
-			transactions.push(ts.investment_transactions)
+			is.push({
+				id,
+				holdings: hs.holdings,
+				securities: hs.securities,
+				transactions: ts.investment_transactions
+			})
 		} catch (error) {
 			if (error.response)
 				if (error.response.data.error_type === 'ITEM_ERROR') continue
@@ -292,10 +295,10 @@ export const investments = async (user_id: string, ids: any[]) => {
 		}
 	}
 
-	const { error } = await service.from('investments').upsert(holdings.map((h: any) => {
-		return { ...h, user_id, transactions: transactions.filter((t: any) => t.account_id === h.account_id).flat() }
+	const { error } = await service.from('investments').upsert(is.map((i: any) => {
+		return { ...i, user_id }
 	}))
 	if (error) throw new Error(error.message)
 
-	return { ...holdings, transactions: transactions.flat() }
+	return is
 }

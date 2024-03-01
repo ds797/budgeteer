@@ -24,9 +24,7 @@ Deno.serve(async (req: Request) => {
 	if (type.get) {
 		const links = await get(user_id, () => true, { logos: true })
 
-		const is = await investments(user_id, links.map((l: any) => l.id))
-
-		return respond({ links, investments: is })
+		return respond({ links, investments: await investments(user_id, links.map((l: any) => l.id)) })
 	} else if (type.set) {
 		const links = type.set
 
