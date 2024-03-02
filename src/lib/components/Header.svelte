@@ -52,7 +52,6 @@
 	}
 
 	$: url = $page.url.pathname
-	$: console.log(url)
 </script>
 
 <main>
@@ -79,7 +78,7 @@
 			{ /if }
 		</div>
 		<div class="middle">
-			{ #if $page.url.pathname === '/' }
+			{ #if url === '/' }
 				<button on:click={() => goto('/budget')}>Demo</button>
 				<button class='fill' on:click={() => {
 					if (data.paying) goto('/home')
@@ -87,16 +86,16 @@
 					else $route.current = $route.start
 				}}>Start</button>
 				<button on:click={() => goto('/pricing')}>Pricing</button>
-			{ :else if $page.url.pathname === '/budget' }
+			{ :else if url === '/budget' }
 				<Flow mobile={data.mobile} bind:graph />
 			{ :else }
 				{ #if browser }
-					<h1 class="backup">{document.title || $page.url.pathname.substring(1)}</h1>
+					<h1 class="backup">{document.title || url.substring(1)}</h1>
 				{ /if }
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if $page.url.pathname === '/home' || $page.url.pathname === '/budget' || $page.url.pathname === '/invest' && !data.paying }
+			{ #if (url === '/home' || url === '/budget' || url === '/invest') && !data.paying }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>
@@ -108,7 +107,7 @@
 		</div>
 	</div>
 	<div class="extra">
-		{ #if graph && $page.url.pathname === '/budget' }
+		{ #if graph && url === '/budget' }
 			<div class="graph" transition:slide={{ duration: 600 }}>
 				<Graph />
 			</div>
