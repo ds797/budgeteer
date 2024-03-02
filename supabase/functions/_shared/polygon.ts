@@ -7,7 +7,7 @@ export const history = async (ticker: string, interval: string|undefined = 'day'
 		throw new Error('Invalid interval!')
 
 	const start = new Date()
-	start.setDate(-7)
+	start.setDate(-8) // Week, inclusive
 	const end = new Date()
 
 	const data = await polygon.stocks.aggregates(ticker, multiplier, interval, start.getTime(), end.getTime())

@@ -28,7 +28,7 @@
 	<div class="bar" />
 	<div class="data">
 		{ #if selected.holding }
-			<Data holding={selected.holding} security={selected.security} transactions={(selected.transactions ?? []).filter(t => t.security_id === selected.security.security_id)} />
+			<Data {data} holding={selected.holding} security={selected.security} transactions={(selected.transactions ?? []).filter(t => t.security_id === selected.security.security_id)} />
 		{ :else }
 			<p>Select an investment from the list to view details!</p>
 		{ /if }

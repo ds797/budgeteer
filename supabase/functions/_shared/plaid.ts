@@ -269,7 +269,7 @@ export const investments = async (user_id: string, ids: any[]) => {
 	const links = await get(user_id, (l: any) => ids.find((m: any) => m === l.id), { secrets: true })
 	const is: any = []
 	const start: Date = new Date()
-	start.setDate(-7)
+	start.setDate(start.getDate() - 31)
 	const end: Date = new Date()
 	for (const { id, access_token, institution } of links) {
 		if (!institution) continue

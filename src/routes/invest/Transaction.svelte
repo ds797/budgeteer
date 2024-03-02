@@ -42,15 +42,27 @@
 
 <main>
 	<button class="none transaction" on:click={() => {
-		menu.children = [{
-			name: 'Quantity',
-			type: 'value',
-			value: Math.floor(Math.abs(transaction.quantity) * 1000000) / 1000000
-		}, {
-			name: 'Each',
-			type: 'value',
-			value: transaction.price.toFixed(2)
-		}]
+		console.log(transaction)
+		switch (transaction.type) {
+			case 'buy':
+			case 'sell':
+				menu.children = [{
+					name: 'Quantity',
+					type: 'value',
+					value: Math.floor(Math.abs(transaction.quantity) * 1000000) / 1000000
+				}, {
+					name: 'Each',
+					type: 'value',
+					value: transaction.price.toFixed(2)
+				}]
+				break
+			case 'cash':
+				menu.children = [{
+					name: 'Fee',
+					type: 'value',
+					value: Math.abs(transaction.fees).toFixed(2)
+				}]
+		}
 		close()
 		open[index] = !open[index]
 	}} bind:this={node} transition:slide>

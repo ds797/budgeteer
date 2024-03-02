@@ -205,6 +205,10 @@ input.disabled, button.disabled {
 	cursor: not-allowed;
 }
 
+button.none.disabled {
+	border: none;
+}
+
 button:focus:not(:focus-visible) {
 	outline: none;
 }
