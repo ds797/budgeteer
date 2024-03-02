@@ -1,5 +1,5 @@
 import Links from '$lib/classes/Links'
-import { random } from '$lib/utils/math'
+import { random, clamp } from '$lib/utils/math'
 import { count } from '$lib/utils/date'
 
 const dinners = (offset = 0) => {
@@ -30,7 +30,7 @@ const dinners = (offset = 0) => {
 		const option = options[random(options.length - 1)]
 		ts.push({
 			id: `demo-dinner-${i}`,
-			date: new Date(today.getFullYear(), today.getMonth() + offset, random(count(today), 1)),
+			date: new Date(today.getFullYear(), today.getMonth() + offset, random(offset === 0 ? today.getDate() : count(today), 1)),
 			name: option.name,
 			account: 'demo-checking',
 			amount: -random(option.price.max, option.price.min),
@@ -66,7 +66,7 @@ const groceries = (offset = 0) => {
 		const option = options[random(options.length - 1)]
 		ts.push({
 			id: `demo-groceries-${i}`,
-			date: new Date(today.getFullYear(), today.getMonth() + offset, random(count(today), 1)),
+			date: new Date(today.getFullYear(), today.getMonth() + offset, random(offset === 0 ? today.getDate() : count(today), 1)),
 			name: option.name,
 			account: 'demo-checking',
 			amount: -random(option.price.max, option.price.min),
@@ -82,7 +82,9 @@ const paychecks = (value = random(2200, 1300), offset = 0) => {
 
 	const ts = []
 
-	for (let i = 0; i < 2; i++) {
+	const count = offset === 0 ? clamp(Math.floor((today.getDate() - 1) / 14) + 1, { max: 2 }) : 2
+
+	for (let i = 0; i < count; i++) {
 		ts.push({
 			id: `demo-paycheck-${i}`,
 			date: new Date(today.getFullYear(), today.getMonth() + offset, i * 14 + 1),
