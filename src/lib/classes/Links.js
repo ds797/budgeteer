@@ -182,7 +182,7 @@ export default class Links {
 
 		self.links = obj?.links ?? [self.default.account()]
 		self.budgets = obj?.budgets ?? [self.default.budget()]
-		self.investments = obj?.investments ?? []
+		self.investments = obj?.investments
 		self.selected = obj?.selected ?? self.budgets[0]
 
 		self.select = name => {

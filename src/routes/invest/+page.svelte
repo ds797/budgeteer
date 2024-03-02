@@ -1,5 +1,6 @@
 <script>
 	import { links } from '$lib/stores/user'
+	import Loading from '$lib/components/Loading.svelte'
 	import Investment from './Investment.svelte'
 	import Data from './Data.svelte'
 
@@ -15,15 +16,23 @@
 
 <main>
 	<div class="investments">
-		{ #each $links.investments as link }
-			{ #each link.holdings as holding }
-				{ @const security = link.securities.find(s => s.security_id === holding.security_id) }
-				{ @const transactions = link.transactions }
-				<Investment {holding} {security} {transactions} selected={holding.account_id === selected.holding?.account_id && holding.security_id === selected.holding?.security_id} on:click={e => selected = e.detail} />
+		{ #if $links.investments }
+			{ #each $links.investments as link }
+				{ #each link.holdings as holding }
+					{ @const security = link.securities.find(s => s.security_id === holding.security_id) }
+					{ @const transactions = link.transactions }
+					<Investment {holding} {security} {transactions} selected={holding.account_id === selected.holding?.account_id && holding.security_id === selected.holding?.security_id} on:click={e => selected = e.detail} />
+				{ /each }
+			{ :else }
+				<div class="loading">
+					<p>You don't have any investments!</p>
+				</div>
 			{ /each }
 		{ :else }
-			<p>You don't have any investments!</p>
-		{ /each }
+			<div class="loading">
+				<Loading />
+			</div>
+		{ /if }
 	</div>
 	<div class="bar" />
 	<div class="data">
@@ -43,11 +52,33 @@
 		gap: 1vw;
 	}
 
+	@media (max-aspect-ratio: 1/1) {
+		main { flex-flow: column }
+	}
+
 	p {
 		text-align: center;
 	}
 
-	.investments { flex: 1 }
+	.investments {
+		flex: 1;
+		padding-top: 0.5rem;
+		display: flex;
+		flex-flow: column;
+		justify-content: stretch;
+		align-items: flex-start;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.investments .loading {
+		flex: 1;
+		align-self: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: var(--text-weak);
+	}
 
 	.bar {
 		width: 0.125rem;
@@ -56,6 +87,7 @@
 
 	.data {
 		flex: 1;
+		padding-top: 0.5rem;
 		display: flex;
 		flex-flow: column;
 		justify-content: center;
