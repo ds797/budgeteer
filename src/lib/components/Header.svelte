@@ -52,12 +52,13 @@
 	}
 
 	$: url = $page.url.pathname
+	$: app = url === '/home' || url === '/budget' || url === '/invest' || url === '/review'
 </script>
 
 <main>
 	<div class="banner">
 		<!-- Check if browser defined to prevent including banner in SSR page -->
-		{ #if browser && (url === '/home' || url === '/budget' || url === '/invest') && demo }
+		{ #if browser && app && demo }
 			<div class="error" transition:slide>
 				<p>You're testing Budgeteer!<button class="none" on:click={() => goto('/subscribe')}>Subscribe</button>to get full access.</p>
 			</div>
@@ -65,7 +66,7 @@
 	</div>
 	<div class="header">
 		<div class="left">
-			{ #if !data.mobile }
+			{ #if !data.mobile && app }
 				<Month date={$date} max={new Date()} set={v => {
 					$date.setMonth($date.getMonth() + v)
 					$date = $date
@@ -95,7 +96,7 @@
 			{ /if }
 		</div>
 		<div class="right">
-			{ #if (url === '/home' || url === '/budget' || url === '/invest') && !data.paying }
+			{ #if app && !data.paying }
 				<button class="none" on:click={() => goto('/')}>
 					<Close stroke={'var(--accent-0)'} />
 				</button>
