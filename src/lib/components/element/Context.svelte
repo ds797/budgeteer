@@ -59,14 +59,13 @@
 
 <svelte:window bind:innerWidth={width} bind:innerHeight={height} on:keydown={key} />
 
-<div class="invisible" bind:this={node} />
-<div class="wrap">
+<div class="wrap" bind:this={node}>
 	{ #key open }
 		<main bind:this={context} style="
 			opacity: {open ? 100 : 0}%;
 			pointer-events: {open ? 'all' : 'none'};
-			top: 0px;
-			left: 0px;
+			top: {node?.innerHeight}px;
+			left: {node?.innerWidth}px;
 			transform: {transform};"
 		use:outside on:outside={e => {
 			if (!open) return
@@ -151,7 +150,7 @@
 	}
 
 	main {
-		position: absolute;
+		position: fixed;
 		width: auto;
 		padding: 0.125rem 0;
 		background: var(--accent-0-light);
@@ -177,8 +176,6 @@
 		transform: none;
 		box-shadow: none;
 	}
-
-	.invisible { display: none }
 
 	.bar {
 		flex: 1;
