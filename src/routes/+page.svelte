@@ -4,7 +4,7 @@
 
 <div class="info" style="">
 	<h1 class="hero">Budgeteer</h1>
-	<p class="big">Intuitive budgeting that allows you to harness the power of artificial intelligence.</p>
+	<p class="big">Budgeting without the bloat.</p>
 </div>
 <div class="stack">
 	<BillStack />
