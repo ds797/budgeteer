@@ -1,6 +1,7 @@
-import Links from '$lib/classes/Links'
+import { v4 as uuidv4 } from 'uuid'
 import { random, clamp } from '$lib/utils/math'
 import { count } from '$lib/utils/date'
+import Links from '$lib/classes/Links'
 
 const dinners = (offset = 0) => {
 	const today = new Date()
@@ -29,12 +30,12 @@ const dinners = (offset = 0) => {
 	for (let i = 0; i < random(5, 3); i++) {
 		const option = options[random(options.length - 1)]
 		ts.push({
-			id: `demo-dinner-${i}`,
+			id: `demo-dinner-${uuidv4()}`,
 			date: new Date(today.getFullYear(), today.getMonth() + offset, random(offset === 0 ? today.getDate() : count(today), 1)),
 			name: option.name,
 			account: 'demo-checking',
 			amount: -random(option.price.max, option.price.min),
-			properties: { group: 'Wants', category: 'Dinners Out' }
+			properties: { group: 'Wants', category: 'Dinners Out', manual: true }
 		})
 	}
 
@@ -65,12 +66,12 @@ const groceries = (offset = 0) => {
 	for (let i = 0; i < random(4, 2); i++) {
 		const option = options[random(options.length - 1)]
 		ts.push({
-			id: `demo-groceries-${i}`,
+			id: `demo-groceries-${uuidv4()}`,
 			date: new Date(today.getFullYear(), today.getMonth() + offset, random(offset === 0 ? today.getDate() : count(today), 1)),
 			name: option.name,
 			account: 'demo-checking',
 			amount: -random(option.price.max, option.price.min),
-			properties: { group: 'Needs', category: 'Groceries' }
+			properties: { group: 'Needs', category: 'Groceries', manual: true }
 		})
 	}
 
@@ -86,12 +87,12 @@ const paychecks = (value = random(2200, 1300), offset = 0) => {
 
 	for (let i = 0; i < count; i++) {
 		ts.push({
-			id: `demo-paycheck-${i}`,
+			id: `demo-paycheck-${uuidv4()}`,
 			date: new Date(today.getFullYear(), today.getMonth() + offset, i * 14 + 1),
 			name: 'Paycheck',
 			account: 'demo-checking',
 			amount: value,
-			properties: { group: 'Bills', category: 'Mortgage' }
+			properties: { group: 'Bills', category: 'Mortgage', manual: true }
 		})
 	}
 

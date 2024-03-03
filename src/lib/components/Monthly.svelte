@@ -3,14 +3,14 @@
 	import { cubicOut } from 'svelte/easing'
 	import { links } from '$lib/stores/user'
 	import { toDate, count } from '$lib/utils/date'
-	import { clamp, max } from '$lib/utils/math'
+	import { clamp, min, max } from '$lib/utils/math'
 	import { month as compareMonth } from '$lib/utils/compare'
 	import Transaction from '$lib/components/budget/Transaction.svelte'
 
 	// TODO: ignore hidden elements
 
-	export let height = 2;
-	export let type = { spend: false };
+	export let height = 2
+	export let type = { spend: false }
 	export let month = new Date()
 
 	let date = new Date()
@@ -48,25 +48,25 @@
 		return compareMonth(d1, one) || compareMonth(d1, two) || compareMonth(d1, three)
 	}
 
-	// const predicate = i => {
-
-	let currentValues = Array(31).fill(0)
-	let averageValues = Array(31).fill(0)
-
-	$: currentValues = Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => (type.spend ? t.amount < 0 : type.save ? 0 < t.amount : true) && i === toDate(t.date).getDate() - 1 && compareMonth(t.date, date) && toDate(t.date).getTime() < date.getTime()))
-	$: averageValues = Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => (type.spend ? t.amount < 0 : type.save ? 0 < t.amount : true) && i === toDate(t.date).getDate() - 1 && compareMonths(t.date, date) && toDate(t.date).getTime() < date.getTime()) / 3)
-
-	$: current = currentValues.map((_, i) => type.spend
-		? currentValues.slice(0, i + 1).reduce((p, c) => p - c, 0)
-		: currentValues.slice(0, i + 1).reduce((p, c) => p + c, 0))
-	$: average = averageValues.map((_, i) => type.spend
-		? averageValues.slice(0, i + 1).reduce((p, c) => p - c, 0)
-		: averageValues.slice(0, i + 1).reduce((p, c) => p + c, 0))
-	$: top = max([...average, ...current])
+	$: current = {
+		positive: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && 0 < t.amount && i >= toDate(t.date).getDate() - 1 && compareMonth(t.date, date) && toDate(t.date).getTime() < date.getTime())),
+		negative: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && t.amount < 0 && i >= toDate(t.date).getDate() - 1 && compareMonth(t.date, date) && toDate(t.date).getTime() < date.getTime())),
+		total: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && i >= toDate(t.date).getDate() - 1 && compareMonth(t.date, date) && toDate(t.date).getTime() < date.getTime()))
+	}
+	$: average = {
+		positive: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && 0 < t.amount && i >= toDate(t.date).getDate() - 1 && compareMonths(t.date, date) && toDate(t.date).getTime() < date.getTime()) / 3),
+		negative: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && t.amount < 0 && i >= toDate(t.date).getDate() - 1 && compareMonths(t.date, date) && toDate(t.date).getTime() < date.getTime()) / 3),
+		total: Array(count(date)).fill(undefined).map((_, i) => $links.get.sum(t => !t.properties.hide && i >= toDate(t.date).getDate() - 1 && compareMonths(t.date, date) && toDate(t.date).getTime() < date.getTime()) / 3)
+	}
+	$: current.type = type.both ? current.total : type.spend ? current.negative : current.positive
+	$: average.type = type.both ? average.total : type.spend ? average.negative : average.positive
+	$: top = type.both
+		? max([max([...current.positive, ...average.positive]), Math.abs(min([...current.negative, ...average.negative]))])
+		: type.spend ? Math.abs(min([...current.negative, ...average.negative])) : max([...current.positive, ...average.positive])
 
 	const y = v => {
-		const multiplier = -900 / (top + 0.1) // Avoid divide by 0
-		return v * multiplier
+		const multiplier = -(type.both ? 450 : 900) / (top + 0.1) // Avoid divide by 0
+		return v * multiplier + (type.both ? 500 : 950)
 	}
 
 	const path = (values) => {
@@ -77,12 +77,12 @@
 		for (let i = 0; i < 31; i++) {
 			const prev = clamp(i - 1, { min: 0, max: values.length - 1 })
 			const clamped = clamp(i, { max: values.length - 1 })
-			const p = prev / offset
+			const p = prev / offset + 5
 			const x = clamped / offset + 5
-			const v = 950 + y(values[clamped])
-			const offsetp = (i === 0 || values.length <= i) ? 5 : 30
-			const offsetx = (i === 0 || values.length <= i) ? 5 : -20
-			string += `C${p + offsetp},${950 + y(values[prev])},${x + offsetx},${v},${x},${v}`
+			const v = y(values[clamped])
+			const offsetp = (i === 0 || values.length <= i) ? 0 : 25
+			const offsetx = (i === 0 || values.length <= i) ? 0 : -25
+			string += `C${p + offsetp},${y(values[prev])},${x + offsetx},${v},${x},${v}`
 		}
 
 		return string
@@ -97,15 +97,15 @@
 
 	$: sorted = sort($links).slice(0, 5)
 
-	$: $difference = current[date.getDate() - 1] - average[date.getDate() - 1]
-	$: $value = current[date.getDate() - 1]
+	$: $difference = Math.abs(current.type[date.getDate() - 1]) - Math.abs(average.type[date.getDate() - 1])
+	$: $value = current.type[date.getDate() - 1]
 </script>
 
 <main>
 	<div class="label">
 		<div class="left">
 			<p>{new Date().getMonth() === date.getMonth() ? 'Current' : `${date.toLocaleString('default', { month: 'long' })}\'s`} {type.spend ? 'spend' : type.both ? 'budget' : 'saving'}</p>
-			<h2>{$value.toFixed(2)}</h2>
+			<h2>{type.both ? $value.toFixed(2) : Math.abs($value).toFixed(2)}</h2>
 		</div>
 		<div class="right">
 			<p><span class="value" style="color: {(type.spend ? 0 < $difference : $difference < 0) ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs($difference).toFixed(2)}</span> {0 < $difference ? 'above' : 'below'} average</p>
@@ -113,10 +113,18 @@
 	</div>
 	<div class="wrapper">
 		<svg class="graph" viewBox="0 0 1010 1000" preserveAspectRatio="none">
-			<path class="average" style="fill: {type.spend ? 'var(--text-bad)' : 'var(--text-good)'};" d="M5, 950 {path(average)}L1005, 950" />
-			<path class="position" d="M{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, {950 + y(current[date.getDate() - 1])} L{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, 950" />
-			<path class="current" d="M5, {950 + y(current[0])} {path(current.filter((_, i) => i <= date.getDate() - 1))}" />
-			<path class="bg" d="M5, 950 L1005, 950"/>
+			{ #if type.both }
+				<path class="average" style="fill: var(--text-good);" d="M5, 500 {path(average.total.map(v => clamp(v, { min: 0 })))}L1005, 500" />
+				<path class="average" style="fill: var(--text-bad);" d="M5, 500 {path(average.total.map(v => clamp(v, { max: 0 })))}L1005, 500" />
+				<path class="position" d="M{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, {y(current.type[date.getDate() - 1])} L{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, 500" />
+				<path class="bg" d="M5, 500 L1005, 500" />
+				<path class="current" d="M5, {y(current.type[0])} {path(current.type.filter((_, i) => i <= date.getDate() - 1))}" />
+			{ :else }
+				<path class="average" style="fill: {type.spend ? 'var(--text-bad)' : 'var(--text-good)'};" d="M5, 950 {path(average.type.map(v => Math.abs(v)))}L1005, 950" />
+				<path class="position" d="M{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, {y(Math.abs(current.type[date.getDate() - 1]))} L{(date.getDate() - 1) / (count(date) - 1) * 1000 + 5}, 950" />
+				<path class="bg" d="M5, 950 L1005, 950" />
+				<path class="current" d="M5, {y(Math.abs(current.type[0]))} {path(current.type.filter((_, i) => i <= date.getDate() - 1).map(v => Math.abs(v)))}" />
+			{ /if }
 		</svg>
 	</div>
 	<div class="gap" />
