@@ -7,7 +7,7 @@
 	import { slide } from '$lib/utils/transition'
 	import Month from '$lib/components/element/Month.svelte'
 	import Flow from '$lib/components/budget/Flow.svelte'
-	import Graph from '$lib/components/budget/Graph.svelte'
+	import Monthly from '$lib/components/Monthly.svelte'
 	import Logo from '$lib/components/svg/Logo.svelte'
 	import Account from '$lib/components/svg/Account.svelte'
 	import Close from '$lib/components/svg/Close.svelte'
@@ -109,7 +109,7 @@
 	<div class="extra">
 		{ #if graph && url === '/budget' }
 			<div class="graph" transition:slide={{ duration: 600 }}>
-				<Graph />
+				<Monthly type={{ both: true }} height={1} />
 			</div>
 		{ /if }
 	</div>
@@ -181,6 +181,10 @@
 
 	.right {
 		justify-content: flex-end;
+	}
+
+	.extra {
+		padding: 0 5vw;
 	}
 
 	.graph {

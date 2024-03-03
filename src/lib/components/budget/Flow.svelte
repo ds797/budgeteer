@@ -44,7 +44,7 @@
 			value: graph,
 			set: () => {
 				graph = !graph
-				open = false
+				setTimeout(() => open = false, 250)
 			}
 		}]
 	}
