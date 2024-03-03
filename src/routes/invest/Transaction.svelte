@@ -78,7 +78,7 @@
 		</div>
 		<p class="date">{format(transaction.date)}</p>
 		<div class="bar" />
-		<p>{Math.abs(transaction.amount).toFixed(2)}</p>
+		<p style="color: {i.good ? 'var(--text-good)' : 'var(--text-bad)'};">{Math.abs(transaction.amount).toFixed(2)}</p>
 	</button>
 	<Context bind:menu bind:open={open[index]} on:close={e => !node.contains(e.detail) && close()} />
 </main>
