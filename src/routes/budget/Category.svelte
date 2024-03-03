@@ -35,23 +35,33 @@
 	}
 
 	$: {
-		const sum = $links.get.sum(t =>
+		const positive = $links.get.sum(t =>
 			t.properties.group === group.name
 			&& t.properties.category === category.name
+			&& 0 < t.amount
 			&& !t.properties.hide && month(t.date, $date)
 		) + $links.get.overflow(group.name, category.name, t =>
 			!t.properties.hide && month(t.date, $date)
 		)
+		const negative = $links.get.sum(t =>
+			t.properties.group === group.name
+			&& t.properties.category === category.name
+			&& t.amount < 0
+			&& !t.properties.hide && month(t.date, $date)
+		) + $links.get.overflow(group.name, category.name, t =>
+			!t.properties.hide && month(t.date, $date)
+		)
+		const sum = positive + negative
 		if (num(category.value)) {
 			const v = parseFloat(category.value)
 			if (category.spend) {
 				if (category.overflow?.category) $value = clamp(v + sum, { min: 0 })
 				else $value = v + sum
-				$progress = clamp(v + sum, { min: 0, max: v })
+				$progress = clamp(v + positive + clamp(positive - negative, { max: 0 }), { min: 0, max: v })
 			} else {
 				if (category.overflow?.category) $value = clamp(sum, { max: v })
 				else $value = sum
-				$progress = clamp(sum, { min: 0, max: v })
+				$progress = clamp(positive + clamp(positive + negative, { max: 0 }), { min: 0, max: v })
 			}
 		} else {
 			$value = sum
