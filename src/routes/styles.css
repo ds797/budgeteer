@@ -29,6 +29,7 @@
 	--shadow: 0 0.125rem 1rem #00000035;
 	--shadow-strong: 0 0.125rem 0.5rem #00000050;
 	--shadow-stronger: 0 0.125rem 1rem #00000095;
+	--shadow-text: 0 0.125rem 0.5rem #00000035;
 	--blur: blur(0.5rem);
 	--transition: all 0.2s ease-out;
 	--transition-fast: all 0.1s ease-out;
@@ -186,7 +187,7 @@ input.none, button.none {
 
 button.none:hover, button.none:focus {
 	box-shadow: none;
-	text-shadow: var(--shadow);
+	text-shadow: var(--shadow-text);
 }
 
 input.fill, button.fill {
