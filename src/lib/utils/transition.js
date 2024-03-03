@@ -1,6 +1,43 @@
 import * as eases from 'svelte/easing';
 import { crossfade } from 'svelte/transition'
 
+export const scale = (
+	node,
+	{ delay = 0, duration = 300, easing = eases.cubicOut, fade = true }
+) => {
+	const style = getComputedStyle(node);
+	const margin = { top: parseFloat(style.marginTop), right: parseFloat(style.marginRight), bottom: parseFloat(style.marginBottom), left: parseFloat(style.marginLeft) };
+	const padding = { top: parseFloat(style.paddingTop), right: parseFloat(style.paddingRight), bottom: parseFloat(style.paddingBottom), left: parseFloat(style.paddingLeft) };
+	const border = { top: parseFloat(style.borderTop), right: parseFloat(style.borderRight), bottom: parseFloat(style.borderBottom), left: parseFloat(style.borderLeft) };
+	const opacity = +style.opacity;
+	const transform = style.transform === 'none' ? '' : style.transform;
+
+	const width = parseFloat(style.width);
+	const height = parseFloat(style.height);
+	return {
+		delay,
+		duration,
+		easing,
+		css: t => `
+			overflow: hidden;
+			width: ${t * width}px;
+			height: ${t * height}px;
+			margin-top: ${t * margin.top}px;
+			margin-bottom: ${t * margin.bottom}px;
+			margin-left: ${t * margin.left}px;
+			margin-right: ${t * margin.right}px;
+			padding-top: ${t * padding.top}px;
+			padding-bottom: ${t * padding.bottom}px;
+			padding-left: ${t * padding.left}px;
+			padding-right: ${t * padding.right}px;
+			border-width: ${t * border.left}px;
+			transform: ${transform} scale(${t});
+			opacity: ${fade ? t * opacity : opacity};
+			white-space: nowrap;
+		`
+	};
+}
+
 export const spin = (node, { deg = 45, duration = 400, easing = eases.cubicOut }) => {
 	return {
 		duration,
@@ -98,7 +135,6 @@ export const slide = (
 			padding-left: ${axis !== 'height' ? t * padding.left : padding.left}px;
 			padding-right: ${axis !== 'height' ? t * padding.right : padding.right}px;
 			border-width: ${axis !== 'width' ? t * border.top : border.top}px ${axis !== 'height' ? t * border.right : border.right}px ${axis !== 'width' ? t * border.bottom : border.bottom}px ${axis !== 'height' ? t * border.left : border.left}px;
-			// border-width: ${t * border.top}px ${t * border.top}px ${t * border.top}px ${t * border.top}px;
 			opacity: ${fade ? t * opacity : opacity};
 			white-space: nowrap;
 		`
