@@ -1,4 +1,5 @@
 <script>
+	import { date } from '$lib/stores/user'
 	import Monthly from '$lib/components/Monthly.svelte'
 	import Accounts from '$lib/components/Accounts.svelte'
 
@@ -13,12 +14,12 @@
 <main>
 	<div class="left">
 		<div class="card">
-			<Monthly spend={true} />
+			<Monthly type={{ spend: true }} month={$date} />
 		</div>
 	</div>
 	<div class="right">
 		<div class="card">
-			<Monthly spend={false} height={1} />
+			<Monthly type={{ save: true }} month={$date} height={1} />
 		</div>
 		<div class="card">
 			<Accounts {data} />

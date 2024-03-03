@@ -109,7 +109,7 @@
 	<div class="extra">
 		{ #if graph && url === '/budget' }
 			<div class="graph" transition:slide={{ duration: 600 }}>
-				<Monthly type={{ both: true }} height={1} />
+				<Monthly type={{ both: true }} month={$date} height={1} />
 			</div>
 		{ /if }
 	</div>
