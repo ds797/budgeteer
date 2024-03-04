@@ -52,7 +52,8 @@
 			&& 0 < t.amount
 			&& !t.properties.hide && month(t.date, $date)
 		) + $links.get.overflow(group.name, category.name, t =>
-			!t.properties.hide && month(t.date, $date)
+			0 < t.amount
+			&& !t.properties.hide && month(t.date, $date)
 		)
 		const negative = $links.get.sum(t =>
 			t.properties.group === group.name
@@ -60,11 +61,13 @@
 			&& t.amount < 0
 			&& !t.properties.hide && month(t.date, $date)
 		) + $links.get.overflow(group.name, category.name, t =>
-			!t.properties.hide && month(t.date, $date)
+			t.amount < 0
+			&& !t.properties.hide && month(t.date, $date)
 		)
 		$inflow = positive
 		$outflow = negative
 		const sum = positive + negative
+		console.log(positive, negative)
 		if (num(category.value)) {
 			const v = parseFloat(category.value)
 			if (category.spend) {
