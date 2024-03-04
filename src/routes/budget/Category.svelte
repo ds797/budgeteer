@@ -67,7 +67,6 @@
 		$inflow = positive
 		$outflow = negative
 		const sum = positive + negative
-		console.log(positive, negative)
 		if (num(category.value)) {
 			const v = parseFloat(category.value)
 			if (category.spend) {
@@ -93,12 +92,12 @@
 		children: [{
 			name: 'Inflow',
 			type: 'value',
-			value: $inflow,
+			value: $inflow.toFixed(2),
 			color: 'var(--text-good)'
 		}, {
 			name: 'Outflow',
 			type: 'value',
-			value: Math.abs($outflow),
+			value: Math.abs($outflow).toFixed(2),
 			color: 'var(--text-bad)'
 		}]
 	}
