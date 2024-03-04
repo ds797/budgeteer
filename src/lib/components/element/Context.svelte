@@ -3,11 +3,14 @@
 	import { backOut } from 'svelte/easing'
 	import { outside } from '$lib/utils/use'
 	import { slide } from '$lib/utils/transition'
+	import { scroll } from '$lib/utils/use'
 	import Checkbox from '$lib/components/element/Checkbox.svelte'
 	import Date from '$lib/components/element/Date.svelte'
 
 	export let menu = {}
 	export let open = false
+	export let wide = 0
+	export let tall = 0
 
 	let show = -1
 
@@ -18,17 +21,18 @@
 	$: parent = (node && node.parentNode) ?? {}
 
 	const calc = () => {
-		let offset = 0
-		if (width < (parent ?? {}).offsetLeft + (parent ?? {}).offsetWidth / 2
-			+ (context ?? {}).offsetWidth / 2)
-			offset = -1
-		else if ((parent ?? {}).offsetLeft + (parent ?? {}).offsetWidth / 2
-			- (context ?? {}).offsetWidth / 2 < 0)
-			offset = 1
-		return `translateX(${offset * 50 - 50}%)`
+		let x = 0
+		let y = 0
+		if (width < (node?.getBoundingClientRect().x ?? 0) + (context ?? {}).offsetWidth / 2)
+			x = -1
+		else if ((node?.getBoundingClientRect().x ?? 0) + (context ?? {}).offsetWidth / 2 < 0)
+			x = 1
+		if (height < (node?.getBoundingClientRect().y ?? 0) + (context ?? {}).offsetHeight)
+			y = -1
+		return `translateX(calc(${x * 50 - 50}% + ${x * wide}px)) translateY(calc(${y * 100}% + ${y * tall}px))`
 	}
 
-	$: transform = calc(width, parent)
+	$: transform = calc(width, height, parent)
 
 	const scale = (node, { delay = 0, duration = 350, easing = backOut, start = 0.3, opacity = 0 } = {}) => {
 		const style = getComputedStyle(node)
@@ -55,17 +59,24 @@
 		e.stopPropagation()
 		dispatch('close')
 	}
+
+	const change = e => {
+		position = e.detail
+		if (open) dispatch('close')
+	}
+
+	let position = { x: 0, y: 0 }
 </script>
 
-<svelte:window bind:innerWidth={width} bind:innerHeight={height} on:keydown={key} />
+<svelte:window bind:innerWidth={width} bind:innerHeight={height} on:keydown={key} on:scroll={scroll} />
 
-<div class="wrap" bind:this={node}>
+<div class="wrap" bind:this={node} use:scroll on:change={change}>
 	{ #key open }
 		<main bind:this={context} style="
 			opacity: {open ? 100 : 0}%;
 			pointer-events: {open ? 'all' : 'none'};
-			top: {node?.innerHeight}px;
-			left: {node?.innerWidth}px;
+			top: {node?.getBoundingClientRect().y ?? 0 - position.y}px;
+			left: {node?.innerWidth + position.x}px;
 			transform: {transform};"
 		use:outside on:outside={e => {
 			if (!open) return
@@ -133,14 +144,6 @@
 </div>
 
 <style>
-	* {
-		transition: top 0s left 0s;
-	}
-
-	.invisible {
-		max-width: 1rem;
-	}
-
 	.wrap {
 		justify-self: center;
 		align-self: center;
@@ -159,6 +162,7 @@
 		box-shadow: var(--shadow);
 		backdrop-filter: blur(0.75rem);
 		z-index: 1002;
+		transition: top 0s, left 0s;
 	}
 
 	button {
