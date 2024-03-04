@@ -108,7 +108,7 @@
 			<h2>{type.both ? $value.toFixed(2) : Math.abs($value).toFixed(2)}</h2>
 		</div>
 		<div class="right">
-			<p><span class="value" style="color: {(type.spend ? 0 < $difference : $difference < 0) ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs($difference).toFixed(2)}</span> {0 < $difference ? 'above' : 'below'} average</p>
+			<p><span class="value" style="color: {(type.spend ? 0 < $difference : $difference < 0) ? 'var(--text-bad)' : 'var(--text-good)'};">{Math.abs($difference).toFixed(2)}</span> {$difference < 0 ? 'below' : 'above'} average</p>
 		</div>
 	</div>
 	<div class="wrapper">
