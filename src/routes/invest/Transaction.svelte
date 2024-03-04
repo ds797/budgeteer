@@ -80,7 +80,7 @@
 		<div class="bar" />
 		<p style="color: {i.good ? 'var(--text-good)' : 'var(--text-bad)'};">{Math.abs(transaction.amount).toFixed(2)}</p>
 	</button>
-	<Context bind:menu bind:open={open[index]} on:close={e => !node.contains(e.detail) && close()} />
+	<Context bind:menu bind:open={open[index]} on:close={e => (e && !node.contains(e.detail)) && close()} />
 </main>
 
 <style>
