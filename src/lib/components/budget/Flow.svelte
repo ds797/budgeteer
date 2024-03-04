@@ -67,7 +67,7 @@
 				<h3 class="right">{Math.abs($outflow).toFixed(2)}</h3>
 			{ /if }
 		</button>
-		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = !open)} />
+		<Context bind:menu bind:open on:close={e => !flow.contains(e.detail) && (open = false)} />
 	</div>
 </main>
 
