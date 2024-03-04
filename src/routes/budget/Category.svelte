@@ -10,10 +10,21 @@
 	import Progress from '$lib/components/element/Progress.svelte'
 	import Chevron from '$lib/components/svg/Chevron.svelte'
 	import Transaction from '$lib/components/budget/Transaction.svelte'
+	import Context from '$lib/components/element/Context.svelte'
 
 	export let group, category
 
 	const value = tweened(0, {
+		duration: 600,
+		easing: cubicOut
+	})
+
+	const inflow = tweened(0, {
+		duration: 600,
+		easing: cubicOut
+	})
+
+	const outflow = tweened(0, {
 		duration: 600,
 		easing: cubicOut
 	})
@@ -51,6 +62,8 @@
 		) + $links.get.overflow(group.name, category.name, t =>
 			!t.properties.hide && month(t.date, $date)
 		)
+		$inflow = positive
+		$outflow = negative
 		const sum = positive + negative
 		if (num(category.value)) {
 			const v = parseFloat(category.value)
@@ -69,6 +82,25 @@
 	}
 
 	$: $max = parseFloat(category.value)
+
+	let node
+
+	$: menu = {
+		name: category.name,
+		children: [{
+			name: 'Inflow',
+			type: 'value',
+			value: $inflow,
+			color: 'var(--text-good)'
+		}, {
+			name: 'Outflow',
+			type: 'value',
+			value: Math.abs($outflow),
+			color: 'var(--text-bad)'
+		}]
+	}
+
+	let open = false
 </script>
 
 <main>
@@ -88,7 +120,10 @@
 		{ /if }
 		<div class="container">
 			<h3>$</h3>
-			<h3 class="money {$value < 0 ? 'bad' : 'good'}">{money($value)}</h3>
+			<div class="money">
+				<button class="none {$value < 0 ? 'bad' : 'good'}" on:click={() => open = !open} bind:this={node}>{money($value)}</button>
+				<Context bind:menu {open} on:close={e => (e && !node.contains(e.detail)) && (open = false)} tall={node?.offsetHeight ?? 0} />
+			</div>
 			<div class="icon">
 				{ #if category.overflow?.category }
 					{ #if category.spend }
@@ -142,9 +177,15 @@
 
 	.money {
 		min-width: 4.5rem;
+		margin-right: 0.5rem;
+		display: flex;
+		flex-flow: column;
+		align-items: stretch;
+	}
+
+	.money button {
 		text-align: right;
 		text-transform: capitalize;
-		margin-right: 0.5rem;
 	}
 
 	.icon {
