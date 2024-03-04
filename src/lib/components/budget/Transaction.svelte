@@ -14,7 +14,7 @@
 </script>
 
 <main>
-	<button transition:slide class='none {transaction.properties.hide ? 'hidden' : (transaction.amount < 0 ? 'bad' : 'good')}' on:click={() => {
+	<button transition:slide|global class='none {transaction.properties.hide ? 'hidden' : (transaction.amount < 0 ? 'bad' : 'good')}' on:click={() => {
 		$route.state.transaction = transaction
 		$route.state.transaction.new = structuredClone(transaction)
 		$route.state.choose.category = $route.state.transaction.new.properties
