@@ -155,7 +155,7 @@
 	}
 
 	.left, .middle, .right {
-		flex: 1;
+		flex: 2;
 		padding: 0.5rem;
 		display: flex;
 		justify-content: center;
@@ -167,7 +167,7 @@
 	}
 
 	.middle {
-		flex: 2;
+		flex: 3;
 		align-self: stretch;
 		max-width: 20rem;
 		display: flex;
