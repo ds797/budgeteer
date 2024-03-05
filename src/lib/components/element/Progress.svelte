@@ -14,7 +14,7 @@
 		flex-flow: row;
 		justify-content: flex-start;
 		align-items: stretch;
-		border: 0.125rem solid var(--accent-0);
+		background: var(--text-bg);
 		border-radius: 0.5rem;
 	}
 

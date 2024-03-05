@@ -65,7 +65,7 @@
 	<main on:introend={() => reverse = false} transition:slide|global={{ axis: 'both' }}>
 		<div class='items'>
 			<div class='title'>
-				<button class="close" class:disabled={!(menu?.close ?? true) || loading} on:click={() => dispatch('close', 0)}>
+				<button class="none close" class:disabled={!(menu?.close ?? true) || loading} on:click={() => dispatch('close', 0)}>
 					<Chevron direction={'left'} size={'1.5rem'} />
 				</button>
 				{ #if menu?.name }
