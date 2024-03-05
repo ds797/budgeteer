@@ -4,7 +4,7 @@
 	import { links } from '$lib/stores/user'
 	import { month as currentMonth } from '$lib/utils/compare'
 	import { toDate, count } from '$lib/utils/date'
-	import { max } from '$lib/utils/math'
+	import { clamp } from '$lib/utils/math'
 	import Arrow from '$lib/components/svg/Arrow.svelte'
 	import Context from '$lib/components/element/Context.svelte'
 	import Graph from '$lib/components/chart/Graph.svelte'
@@ -48,19 +48,22 @@
 
 	let spending = {}
 
-	$: spending.current = $links.get.sum(t => t.amount < 0 && currentMonth(t.date, date))
-	$: spending.previous = $links.get.sum(t => t.amount < 0 && currentMonth(t.date, new Date(new Date(date).setMonth(date.getMonth() - 1))))
+	$: spending.current = $links.get.sum(t => t.amount < 0 && currentMonth(toDate(t.date), date) && (thisMonth ? toDate(t.date).getTime() <= date.getTime() : true))
+	$: spending.previous = $links.get.sum(t => t.amount < 0 && currentMonth(toDate(t.date), new Date(new Date(date).setMonth(date.getMonth() - 1))) && (thisMonth ? toDate(t.date).getTime() <= new Date(new Date(date).setMonth(date.getMonth() - 1)).getTime() : true))
 	$: $current = Math.abs(spending.current)
 	$: $previous = Math.abs(spending.previous)
 
-	$: difference = spending.previous ? Math.abs(spending.current) - Math.abs(spending.previous) : 0
-	$: $percent = Math.abs((spending.previous ? Math.abs(spending.current) - Math.abs(spending.previous) : 0) / (spending.previous || Infinity) * 100)
+	$: difference = Math.abs(spending.current) - Math.abs(spending.previous)
+	$: $percent = clamp(Math.abs(Math.abs(spending.current) - Math.abs(spending.previous)) / (spending.previous || 0.1) * 100, { min: -101, max: 101 })
 
 	let node
 	let open = false
 
+	$: thisMonth = date.getMonth() === new Date().getMonth()
+
 	$: menu = {
 		name: 'Spending',
+		alt: thisMonth ? `as of ${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}` : date.toLocaleString('default', { month: 'long' }),
 		children: [{
 			name: 'This month',
 			type: 'value',
@@ -146,7 +149,7 @@
 					<p>spent of {budget.toFixed(2)}</p>
 				</div>
 				<div class="percent" style="background: {0 < difference ? 'var(--bad-light)' : difference < 0 ? 'var(--good-light)' : 'var(--text-bg)'};">
-					<p style="color: {0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--text-good)' : 'var(--text-weak)'};">{Math.abs($percent).toFixed(2)}%</p>
+					<p style="color: {0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--text-good)' : 'var(--text-weak)'};">{Math.abs(clamp($percent, { max: 100 })).toFixed(2)}{100 < $percent ? '+' : ''}%</p>
 					<div style="transform: rotate({0 < difference ? '-45deg' : difference < 0 ? '45deg' : '0deg'}){difference === 0 ? ' scale(0.9)' : ''};">
 						<Arrow size={'1.75rem'} stroke={0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--good)' : 'var(--text-weak)'} />
 					</div>
@@ -183,7 +186,7 @@
 	}
 
 	.overview {
-		width: 15rem;
+		width: 18rem;
 		display: flex;
 		flex-flow: column;
 		align-items: stretch;
