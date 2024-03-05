@@ -149,7 +149,7 @@
 					<p>spent of {budget.toFixed(2)}</p>
 				</div>
 				<div class="percent" style="background: {0 < difference ? 'var(--bad-light)' : difference < 0 ? 'var(--good-light)' : 'var(--text-bg)'};">
-					<p style="color: {0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--text-good)' : 'var(--text-weak)'};">{Math.abs(clamp($percent, { max: 100 })).toFixed(2)}{100 < $percent ? '+' : ''}%</p>
+					<p style="color: {0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--text-good)' : 'var(--text-weak)'};">{clamp(Math.abs($percent), { max: 100 }).toFixed(2)}{100 < Math.abs($percent) ? '+' : ''}%</p>
 					<div style="transform: rotate({0 < difference ? '-45deg' : difference < 0 ? '45deg' : '0deg'}){difference === 0 ? ' scale(0.9)' : ''};">
 						<Arrow size={'1.75rem'} stroke={0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--good)' : 'var(--text-weak)'} />
 					</div>
