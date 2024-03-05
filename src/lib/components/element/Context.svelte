@@ -46,7 +46,7 @@
 			css: (_t, u) => `
 				transform: ${transform} scale(${1 - sd * u});
 				opacity: ${target_opacity - od * u};
-				filter: blur(${u * 0.25}rem);
+				// filter: blur(${u * 0.25}rem);
 			`
 		}
 	}
