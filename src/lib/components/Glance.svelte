@@ -141,7 +141,10 @@
 	<div class="spending">
 		<div class="overview">
 			<button class="none nohover" on:click={() => open = !open} bind:this={node}>
-				<h2>{$current.toFixed(2)}</h2>
+				<div class="info">
+					<h2>{$current.toFixed(2)}</h2>
+					<p>spent of {budget.toFixed(2)}</p>
+				</div>
 				<div class="percent" style="background: {0 < difference ? 'var(--bad-light)' : difference < 0 ? 'var(--good-light)' : 'var(--text-bg)'};">
 					<p style="color: {0 < difference ? 'var(--bad)' : difference < 0 ? 'var(--text-good)' : 'var(--text-weak)'};">{Math.abs($percent).toFixed(2)}%</p>
 					<div style="transform: rotate({0 < difference ? '-45deg' : difference < 0 ? '45deg' : '0deg'}){difference === 0 ? ' scale(0.9)' : ''};">
@@ -180,10 +183,21 @@
 	}
 
 	.overview {
-		width: 12.5rem;
+		width: 15rem;
 		display: flex;
 		flex-flow: column;
-		align-items: center;
+		align-items: stretch;
+	}
+
+	.overview .info {
+		display: flex;
+		flex-flow: column;
+		align-items: flex-start;
+	}
+
+	.overview .info p {
+		font-size: 0.875rem;
+		font-weight: normal;
 	}
 
 	.spending button {
