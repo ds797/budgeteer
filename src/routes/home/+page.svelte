@@ -38,15 +38,15 @@
 		align-items: stretch;
 	}
 
-	@media (max-aspect-ratio: 1/1) {
-		main {
-			flex-flow: column;
-		}
-	}
-
 	.container {
 		flex: 1;
 		display: flex;
+	}
+
+	@media (max-aspect-ratio: 1/1) {
+		.container {
+			flex-flow: column;
+		}
 	}
 
 	.left, .right {
