@@ -25,7 +25,7 @@ export const load = async ({ fetch, data, depends, url }) => {
 		if (!payload) response = await supabase.functions.invoke(name)
 		else response = await supabase.functions.invoke(name, { body: payload })
 		if (response.error) {
-			console.error(response.error)
+			console.error(name, payload, response.error)
 			notifications.add({ type: 'error', message: response.error })
 			return {}
 		}
