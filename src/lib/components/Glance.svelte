@@ -74,6 +74,7 @@
 	}
 
 	// TODO: Add "budget" so that Glance compares to spending goal
+	// TODO: Glance doesn't show for first month of data?
 	let budget = 1000
 	let info = {
 		open: false,
