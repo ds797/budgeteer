@@ -19,9 +19,15 @@
 	--text-bad: rgb(233, 80, 80);
 	--text-okay: rgb(230, 187, 59);
 	--text-good: rgb(80, 200, 80);
-	--text-bad-light: rgba(233, 80, 80, 0.6);
-	--text-okay-light: rgba(230, 187, 59, 0.6);
-	--text-good-light: rgba(80, 200, 80, 0.6);
+	--text-bad-light: rgba(233, 80, 80, 0.3);
+	--text-okay-light: rgba(230, 187, 59, 0.3);
+	--text-good-light: rgba(80, 200, 80, 0.3);
+	--bad: rgb(230, 30, 30);
+	--okay: rgb(230, 187, 59);
+	--good: rgb(30, 210, 30);
+	--bad-light: rgb(230, 30, 30, 25%);
+	--okay-light: rgb(230, 187, 59, 25%);
+	--good-light: rgb(30, 210, 30, 25%);
 	--noti-success: rgb(50, 225, 50);
 	--noti-warning: rgb(255, 205, 0);
 	--noti-error: rgb(225, 50, 50);
@@ -142,18 +148,20 @@ input, button, textarea {
 	background: none;
 	color: var(--text);
 	font-weight: bold;
-	border: 0.125rem solid var(--accent-0);
+	border: 0.125rem solid var(--text-bg);
 	border-radius: 0.25rem;
 	box-shadow: 0px 0px 0.25rem #0000;
 }
 
 button:hover {
 	transform: translateY(-0.125rem);
+}
+
+button:not(.nohover):hover {
 	box-shadow: var(--shadow);
 }
 
-button:hover svg {
-	/* filter: drop-shadow(1rem 1rem 1rem rgba(0, 0, 0, 1)); */
+button:not(.nohover):hover svg {
 	filter: drop-shadow(var(--shadow-strong));
 }
 

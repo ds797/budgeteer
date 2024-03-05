@@ -2,6 +2,7 @@
 	import { date } from '$lib/stores/user'
 	import Monthly from '$lib/components/Monthly.svelte'
 	import Accounts from '$lib/components/Accounts.svelte'
+	import Glance from '$lib/components/Glance.svelte'
 
 	export let data
 </script>
@@ -12,17 +13,20 @@
 </svelte:head>
 
 <main>
-	<div class="left">
-		<div class="card">
-			<Monthly type={{ spend: true }} month={$date} />
+	<Glance month={$date} />
+	<div class="container">
+		<div class="left">
+			<div class="card">
+				<Monthly type={{ spend: true }} month={$date} />
+			</div>
 		</div>
-	</div>
-	<div class="right">
-		<div class="card">
-			<Monthly type={{ save: true }} month={$date} height={1} />
-		</div>
-		<div class="card">
-			<Accounts {data} />
+		<div class="right">
+			<div class="card">
+				<Monthly type={{ save: true }} month={$date} height={1} />
+			</div>
+			<div class="card">
+				<Accounts {data} />
+			</div>
 		</div>
 	</div>
 </main>
@@ -30,7 +34,6 @@
 <style>
 	main {
 		margin: 0.5rem;
-		flex-flow: row;
 		justify-content: stretch;
 		align-items: stretch;
 	}
@@ -39,6 +42,11 @@
 		main {
 			flex-flow: column;
 		}
+	}
+
+	.container {
+		flex: 1;
+		display: flex;
 	}
 
 	.left, .right {

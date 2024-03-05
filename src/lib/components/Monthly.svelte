@@ -199,6 +199,7 @@
 	.graph path {
 		fill: none;
 		stroke-width: 2px;
+		stroke-linejoin: round;
 		stroke-linecap: round;
 		stroke-dashoffset: -50%;
 		vector-effect: non-scaling-stroke;

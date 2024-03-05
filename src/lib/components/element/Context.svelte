@@ -1,6 +1,6 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
-	import { backOut } from 'svelte/easing'
+	import { createEventDispatcher, onMount } from 'svelte'
+	import { cubicOut, backOut } from 'svelte/easing'
 	import { outside } from '$lib/utils/use'
 	import { slide } from '$lib/utils/transition'
 	import { scroll } from '$lib/utils/use'
@@ -51,6 +51,31 @@
 		}
 	}
 
+	const tween = (node, { delay = 0, duration = 2000, easing = cubicOut, start = 0.3, opacity = 0 } = {}) => {
+		node.style.maxWidth = '0px'
+		console.log(node.getBoundingClientRect().width, node.parentNode.getBoundingClientRect().width)
+		const initial = node.parentNode.getBoundingClientRect().width
+		node.style.maxWidth = ''
+		const final = parseFloat(getComputedStyle(node.parentNode).width)
+		const style = getComputedStyle(node)
+		const height = parseFloat(style.height)
+		const target_opacity = +style.opacity
+		const sd = 1 - start
+		const od = target_opacity * (1 - opacity)
+		return {
+			delay,
+			duration,
+			easing,
+			css: (t, u) => `
+				width: ${t * (final - initial) + initial}px;
+				height: ${t * height}px;
+				// transform: ${transform} scale(${1 - sd * u});
+			`,
+			// Cleanup function
+			tick: t => (node.style.maxWidth = '')
+		}
+	}
+
 	let height, width
 
 	const key = e => {
@@ -83,6 +108,9 @@
 			show = -1
 			dispatch('close', e.detail.target)
 		}} transition:scale>
+			<div class="name">
+				<p class="bold" style="{menu.width ? `min-width: ${menu.width};` : ''}">{menu.name}</p>
+			</div>
 			{ #each (menu?.children ?? []) as child, index }
 				{ #if show === -1 || show === index }
 					{ #if show === -1 && index !== 0 }
@@ -97,6 +125,13 @@
 							</div>
 							<div class="right value" style="{child.color && `color: ${child.color};`}">
 								<p>{child.value}</p>
+							</div>
+						{ :else if child.type === 'value-reverse' }
+							<div class="left value" style="{child.color && `color: ${child.color};`}">
+								<p>{child.value}</p>
+							</div>
+							<div class="right">
+								<p>{child.name}</p>
 							</div>
 						{ :else if child.type === 'toggle' }
 							<div class="left">
@@ -122,12 +157,12 @@
 								{ #if show === index }
 									<div class="bar" />
 									<div class="center">
-										<div transition:slide={{ axis: 'both', duration: 5000 }}>
+										<div style="opacity: 0;" transition:tween>
 											<Date max={child.max} value={child.value} set={v => {
 												child.set(v)
 												show = -1
 											}} style={{
-												day: 'padding: 0.125rem 0.25rem; font-weight: normal; border: 0.1rem solid var(--accent-0);'
+												day: 'padding: 0.125rem 0.25rem; font-weight: normal; border: none;'
 											}} />
 										</div>
 									</div>
@@ -144,6 +179,10 @@
 </div>
 
 <style>
+	* {
+		transition: color 0.1s ease-out;
+	}
+
 	.wrap {
 		justify-self: center;
 		align-self: center;
@@ -181,6 +220,10 @@
 		box-shadow: none;
 	}
 
+	.name {
+		padding: 0.125rem 0.375rem;
+	}
+
 	.bar {
 		flex: 1;
 		min-height: 0.0625rem;
@@ -197,18 +240,19 @@
 		flex: 1;
 		display: flex;
 		align-items: center;
+		white-space: nowrap;
 	}
 
 	.child .left {
-		padding: 0.0625rem 0.5rem;
+		padding: 0.0625rem 0 0 0.5rem;
 		justify-content: flex-start;
 	}
 	.child .right {
-		padding: 0.0625rem 0.5rem;
+		padding: 0.0625rem 0.5rem 0 0;
 		justify-content: flex-end;
 	}
 
-	.right.value { font-weight: bold }
+	.value { font-weight: bold }
 
 	.child .more {
 		flex: 1;
