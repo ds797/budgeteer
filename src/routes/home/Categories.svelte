@@ -25,10 +25,10 @@
 		return $links.get.sum(t =>
 			t.properties.group === group.name
 			&& t.properties.category === category.name
-			&& (category.spend ? 0 < t.amount : t.amount < 0)
+			&& (category.spend ? t.amount < 0 : 0 < t.amount)
 			&& !t.properties.hide && compareMonth(t.date, date)
 		) + $links.get.overflow(group.name, category.name, t =>
-			(category.spend ? 0 < t.amount : t.amount < 0)
+			(category.spend ? t.amount < 0 : 0 < t.amount)
 			&& !t.properties.hide && compareMonth(t.date, date)
 		)
 	}
@@ -41,8 +41,8 @@
 
 	const gradient = category => {
 		return category.spend
-		? ['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']
-		: ['var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
+		? ['var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
+		: ['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']
 
 	}
 </script>
@@ -50,14 +50,14 @@
 <main>
 	{ #each $links.selected.groups as group }
 		{ #each group.categories as category }
-			{ @const amount = sum(group, category)}
+			{ @const amount = Math.abs(sum(group, category))}
 			<button class="none category" on:click={() => click(group, category)}>
 				<div class="fraction">
 					<p>{Math.round(amount)}</p>
 					<div class="bar" />
 					<p>{Math.round(parseFloat(category.value ?? 0))}</p>
 				</div>
-				<Progress vertical={true} max={parseFloat(category.value ?? 0)} value={Math.abs(amount)} gradient={gradient(category)} />
+				<Progress vertical={true} max={parseFloat(category.value ?? 0)} value={amount} gradient={gradient(category)} />
 				{ #if category.emoji }
 					<p class="emoji">{category.emoji}</p>
 				{ :else }
