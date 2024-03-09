@@ -154,7 +154,7 @@ export default class Links {
 						name: 'Wants',
 						categories: [{
 							name: 'Dinners Out',
-							emoji: '️🍲️',
+							emoji: '️🍾',
 							pfc: [{
 								name: 'FOOD_AND_DRINK_RESTAURANT',
 								confidence: 1
