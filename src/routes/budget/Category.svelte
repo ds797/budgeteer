@@ -98,7 +98,10 @@
 <main>
 	<div class="category">
 		<div class="row">
-			<button class="none name" on:click={click}>{category.name}</button>
+			<button class="none name" on:click={click}>
+				<p class="emoji">{category.emoji ?? '🤔'}</p>
+				{category.name}
+			</button>
 			<button class="none" class:turn={!category.hide} on:click={() => category.hide = !category.hide}>
 				<Chevron size={'1.5rem'} direction={'right'} />
 			</button>
@@ -155,6 +158,9 @@
 
 	.name {
 		margin-left: 0.5rem;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
 	}
 
 	.container {
