@@ -3,6 +3,7 @@
 	import Monthly from '$lib/components/Monthly.svelte'
 	import Accounts from '$lib/components/Accounts.svelte'
 	import Glance from '$lib/components/Glance.svelte'
+	import Categories from './Categories.svelte'
 
 	export let data
 </script>
@@ -14,6 +15,7 @@
 
 <main>
 	<Glance month={$date} />
+	<Categories month={$date} />
 	<div class="container">
 		<div class="left">
 			<div class="card">
