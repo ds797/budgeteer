@@ -29,15 +29,7 @@
 		easing: cubicOut
 	})
 
-	const progress = tweened(0, {
-		duration: 600,
-		easing: cubicOut
-	})
-
-	const max = tweened(parseFloat(category.value), {
-		duration: 600,
-		easing: cubicOut
-	})
+	let progress = 0
 
 	const click = () => {
 		$route.state.category = category
@@ -72,18 +64,16 @@
 			if (category.spend) {
 				if (category.overflow?.category) $value = clamp(v + sum, { min: 0 })
 				else $value = v + sum
-				$progress = clamp(v + positive + clamp(positive - negative, { max: 0 }), { min: 0, max: v })
+				progress = clamp(v + positive + clamp(positive - negative, { max: 0 }), { min: 0, max: v })
 			} else {
 				if (category.overflow?.category) $value = clamp(sum, { max: v })
 				else $value = sum
-				$progress = clamp(positive + clamp(positive + negative, { max: 0 }), { min: 0, max: v })
+				progress = clamp(positive + clamp(positive + negative, { max: 0 }), { min: 0, max: v })
 			}
 		} else {
 			$value = sum
 		}
 	}
-
-	$: $max = parseFloat(category.value)
 
 	let node
 
@@ -113,13 +103,9 @@
 				<Chevron size={'1.5rem'} direction={'right'} />
 			</button>
 		</div>
-		{ #if category.value && parseFloat(category.value) !== 0 }
-			<div class="progress">
-				<Progress max={$max} value={$progress} />
-			</div>
-		{ :else }
-			<div class="bar" />
-		{ /if }
+		<div class="progress">
+			<Progress max={parseFloat(category.value ?? 0)} value={progress} gradient={['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']} />
+		</div>
 		<div class="container">
 			<h3>$</h3>
 			<div class="money">
@@ -218,12 +204,5 @@
 
 	.wrapper {
 		margin-right: 1rem;
-	}
-
-	.exception {
-		height: 1.5rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
 	}
 </style>
