@@ -25,10 +25,10 @@
 		return $links.get.sum(t =>
 			t.properties.group === group.name
 			&& t.properties.category === category.name
-			&& (category.spend ? t.amount < 0 : 0 < t.amount)
+			&& (category.spend ? 0 < t.amount : t.amount < 0)
 			&& !t.properties.hide && compareMonth(t.date, date)
 		) + $links.get.overflow(group.name, category.name, t =>
-			(category.spend ? t.amount < 0 : 0 < t.amount)
+			(category.spend ? 0 < t.amount : t.amount < 0)
 			&& !t.properties.hide && compareMonth(t.date, date)
 		)
 	}
@@ -37,6 +37,13 @@
 		$route.state.category = category
 		$route.state.category.group = group.name
 		$route.current = $route.category
+	}
+
+	const gradient = category => {
+		return category.spend
+		? ['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']
+		: ['var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
+
 	}
 </script>
 
@@ -50,7 +57,7 @@
 					<div class="bar" />
 					<p>{Math.round(parseFloat(category.value ?? 0))}</p>
 				</div>
-				<Progress vertical={true} max={parseFloat(category.value ?? 0)} value={amount} gradient={['var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']} />
+				<Progress vertical={true} max={parseFloat(category.value ?? 0)} value={Math.abs(amount)} gradient={gradient(category)} />
 				{ #if category.emoji }
 					<p class="emoji">{category.emoji}</p>
 				{ :else }
