@@ -817,9 +817,8 @@ export const update = {
 							})
 						}
 					})
-					console.log('queued it')
+					$route.current = undefined
 					goto('/')
-					console.log('went?')
 				}
 			}]
 		}
