@@ -146,7 +146,8 @@ export default class Links {
 								name: 'FOOD_AND_DRINK_GROCERIES',
 								confidence: 1
 							}],
-							value: 0,
+							spend: true,
+							value: 600,
 							overflow: { group: 'Wants', category: 'Dinners Out' }
 						}]
 					}, {
@@ -158,7 +159,7 @@ export default class Links {
 								name: 'FOOD_AND_DRINK_RESTAURANT',
 								confidence: 1
 							}],
-							value: 0,
+							value: 450,
 							spend: true,
 							overflow: {}
 						}]
