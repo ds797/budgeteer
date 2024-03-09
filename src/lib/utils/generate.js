@@ -79,7 +79,7 @@ const groceries = (offset = 0) => {
 	return ts
 }
 
-const paychecks = (value = random(2200, 1300), offset = 0) => {
+const paychecks = (value = random(2800, 1800), offset = 0) => {
 	const today = new Date()
 
 	const ts = []
@@ -280,7 +280,7 @@ export const generate = (links, data) => {
 		links.links.find(l => l.id === 'demo-link').transactions.push(t)
 	}
 
-	const amount = random(2200, 1300)
+	const amount = random(2800, 1800)
 
 	ts = [...paychecks(amount), ...paychecks(amount, -1), ...paychecks(amount, -2), ...paychecks(amount, -3)]
 	for (const t of ts) {
