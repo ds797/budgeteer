@@ -128,7 +128,7 @@ export const load = async ({ fetch, data, depends, url }) => {
 			if (error) console.error(error)
 
 			// There's no "custom" link -- add it
-			if (!ls.find(l => !l.institution)) ls.push(get(links).custom())
+			if (!ls.find(l => !l.institution)) ls.push(get(links).default.link())
 
 			return ls ?? []
 		},

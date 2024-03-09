@@ -91,7 +91,7 @@ const conflicts = ($links, group, category) => {
 }
 const sort = ($links) => {
 	const index = $links.links.findIndex(l => !l.institution)
-	if (index === -1) $links.links.push($links.custom())
+	if (index === -1) $links.links.push($links.default.link())
 	else $links.links.push($links.links.splice(index, 1)[0])
 
 	return $links.links

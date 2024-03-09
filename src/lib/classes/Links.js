@@ -170,7 +170,7 @@ export default class Links {
 					}]
 				}
 			},
-			account: () => {
+			link: () => {
 				return {
 					id: uuidv4(),
 					accounts: [{
@@ -184,7 +184,7 @@ export default class Links {
 			}
 		}
 
-		self.links = obj?.links ?? [self.default.account()]
+		self.links = obj?.links ?? [self.default.link()]
 		self.budgets = obj?.budgets ?? [self.default.budget()]
 		self.investments = obj?.investments
 		self.selected = obj?.selected ?? self.budgets[0]
@@ -450,7 +450,7 @@ export default class Links {
 			links: links => {
 				self.links = []
 				const index = links.findIndex(l => !l.institution)
-				if (index === -1) links.push(self.default.account())
+				if (index === -1) links.push(self.default.link())
 				else links.push(links.splice(index, 1)[0])
 				self.add.link(...links)
 
