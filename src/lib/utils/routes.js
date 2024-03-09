@@ -303,7 +303,15 @@ export const update = {
 							set: v => {
 								$route.state.choose.category.categoryName = v
 								route.set($route)
-							}
+							},
+							children: [{
+								type: 'emoji',
+								value: $route.state.choose.category.categoryEmoji ?? '🤔',
+								set: v => {
+									$route.state.choose.category.categoryEmoji = v
+									route.set($route)
+								}
+							}]
 						}, {
 							name: 'Description',
 							fill: $route.state.choose.category?.description,
@@ -338,7 +346,7 @@ export const update = {
 								$route.state.choose.category.group = $route.state.choose.category.groupName
 								$route.state.choose.category.category = $route.state.choose.category.categoryName
 								$route.state.choose.category.manual = true
-								$links = $links.add.category($route.state.choose.category.group, $route.state.choose.category.category, { description: $route.state.choose.category.description || '', value: parseFloat($route.state.choose.category.categoryValue) || 0 })
+								$links = $links.add.category($route.state.choose.category.group, $route.state.choose.category.category, { description: $route.state.choose.category.description || '', value: parseFloat($route.state.choose.category.categoryValue) || 0, emoji: $route.state.choose.category.categoryEmoji || '🤔' })
 								links.set($links)
 
 								if (!state.paying) {
@@ -706,7 +714,6 @@ export const update = {
 		$route.category.quit = () => {
 			// Remove circular references
 			delete $route.state.category.new.overflow.disabled
-			console.log($route.state.category.new)
 
 			// Should we update PFCs?
 			const update = $route.state.category.new.group && $route.state.category.name !== $route.state.category.new.name
@@ -737,7 +744,15 @@ export const update = {
 			type: 'input',
 			placeholder: 'Category Name',
 			value: $route.state.category.new?.name,
-			set: v => $route.state.category.new.name = v
+			set: v => $route.state.category.new.name = v,
+			children: [{
+				type: 'emoji',
+				value: $route.state.category.new.emoji ?? '🤔',
+				set: v => {
+					$route.state.category.new.emoji = v
+					route.set($route)
+				}
+			}]
 		}, {
 			name: 'Description',
 			fill: $route.state.category.new?.description,
@@ -783,27 +798,28 @@ export const update = {
 				type: 'action',
 				dangerous: true,
 				click: async () => {
-					const res = await state.supabase.auth.signOut()
-					console.log(res)
-					return 1
-					try {
-						const { error } = await state.supabase.auth.signOut()
-						if (error) {
+					queue.enq(async () => {
+						try {
+							const { error } = await state.supabase.auth.signOut()
+							if (error) {
+								notifications.add({
+									type: 'error',
+									message: error
+								})
+							} else {
+								invalidateAll()
+								goto('/')
+							}
+						} catch (error) {
 							notifications.add({
 								type: 'error',
 								message: error
 							})
-						} else {
-							invalidateAll()
-							goto('/')
 						}
-					} catch (error) {
-						notifications.add({
-							type: 'error',
-							message: error
-						})
-					}
-					return 1
+					})
+					console.log('queued it')
+					goto('/')
+					console.log('went?')
 				}
 			}]
 		}

@@ -520,6 +520,7 @@ export default class Links {
 
 				const c = g.categories.find(c => c.name === category)
 				if (c.name === data.name
+					&& c.emoji === data.emoji
 					&& c.description === data.description
 					&& c.value === data.value
 					&& c.spend === data.spend
@@ -539,6 +540,7 @@ export default class Links {
 					if (t.properties.group === g.name && t.properties.category === c.name) t.properties.category = data.name
 				c.description = data.description
 				c.name = data.name ?? c.name
+				c.emoji = data.emoji ?? c.emoji
 				c.value = data.value ?? c.value
 				c.spend = data.spend ?? c.spend
 				if (data.overflow) c.overflow = data.overflow

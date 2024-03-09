@@ -1,4 +1,5 @@
 <script>
+	import Emoji from '$lib/components/element/Emoji.svelte';
 	import Check from '$lib/components/svg/Check.svelte';
 
 	export let type = 'text';
@@ -37,6 +38,8 @@
 	{ :else if type === 'password' }
 		<h4>{name}</h4>
 		<input type='password' {placeholder} bind:value={internal} {style} />
+	{ :else if type === 'emoji' }
+		<Emoji on:emoji={e => set(e.detail)} />
 	{ /if }
 </main>
 
@@ -44,6 +47,7 @@
 	main {
 		display: flex;
 		flex-flow: column;
+		align-items: stretch;
 		gap: 0.25rem;
 	}
 

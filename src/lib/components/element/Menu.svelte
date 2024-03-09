@@ -115,16 +115,24 @@
 						{ :else if child.type === 'spacer' }
 							<div />
 						{ :else if child.type === 'input' }
-							<Input value={child.value} name={child.name} placeholder={child.placeholder} set={child.set ?? blank} style={child.css ?? ''} />
+							<div class="input">
+								<Input value={child.value} name={child.name} placeholder={child.placeholder} set={child.set ?? blank} style={child.css ?? ''} />
+								{ #if child.children }
+									<!-- TODO: Not the best approach -->
+									<div class="lock">
+										<button class="none emoji" on:click={() => show = index}>{child.children[0].value}</button>
+									</div>
+								{ /if }
+							</div>
 						{ :else if child.type === 'money' }
 							<Input type='money' value={child.value} name={child.name} placeholder={child.placeholder} set={child.set ?? blank} style={child.css ?? ''} />
 						{ :else if child.type === 'textarea' }
 							<Input type='textarea' value={child.value} name={child.name} placeholder={child.placeholder} set={child.set ?? blank} style={'height: 3rem; ' + child.css ?? ''} />
-						<!-- { :else if child.type === 'time' }
-							<div class="time">
-								<Date value={child.value} set={child.set ?? blank} />
-								<Time value={child.value} set={child.set ?? blank} />
-							</div> -->
+						{ :else if child.type === 'emoji' }
+							<Input type='emoji' value={child.value} set={v => {
+								child.set(v)
+								dispatch('close', 0)
+							}} style={child.css ?? ''} />
 						{ :else if child.type === 'toggle' }
 							<div class="toggle">
 								<button class="label" class:none={!child.children} style={child.children ? '' : 'pointer-events: none;'} on:click={() => click.menu(child, index)}>
@@ -158,7 +166,12 @@
 							<div class="date">
 								<Date max={child.max} value={child.value} set={child.set} />
 							</div>
-						<!-- { :else if child.type === 'color' && child.value !== undefined }
+						<!-- { :else if child.type === 'time' }
+							<div class="time">
+								<Date value={child.value} set={child.set ?? blank} />
+								<Time value={child.value} set={child.set ?? blank} />
+							</div>
+						{ :else if child.type === 'color' && child.value !== undefined }
 							<Color value={child.value} set={child.set ?? blank} />
 						{ :else if child.type === 'colors' }
 							<Colors set={v => {
@@ -322,6 +335,24 @@
 		justify-content: center;
 		align-items: center;
 		border-radius: 50%;
+	}
+
+	.input {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+	}
+
+	.input .lock {
+		width: 0;
+		height: 0;
+		position: relative;
+	}
+
+	.input .lock button {
+		position: absolute;
+		right: 0.25rem;
+		top: -0.25rem;
 	}
 
 	/* .time {
