@@ -129,6 +129,7 @@ export default class Links {
 						name: 'Bills',
 						categories: [{
 							name: 'Mortgage',
+							emoji: '🏠️',
 							pfc: [{
 								name: 'LOAN_PAYMENTS_MORTGAGE_PAYMENT',
 								confidence: 1
@@ -140,6 +141,7 @@ export default class Links {
 						name: 'Needs',
 						categories: [{
 							name: 'Groceries',
+							emoji: '🛍️',
 							pfc: [{
 								name: 'FOOD_AND_DRINK_GROCERIES',
 								confidence: 1
@@ -151,6 +153,7 @@ export default class Links {
 						name: 'Wants',
 						categories: [{
 							name: 'Dinners Out',
+							emoji: '️🍲️',
 							pfc: [{
 								name: 'FOOD_AND_DRINK_RESTAURANT',
 								confidence: 1
