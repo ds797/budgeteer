@@ -52,12 +52,9 @@
 		{ #each group.categories as category }
 			{ @const amount = Math.abs(sum(group, category))}
 			<button class="none category" on:click={() => click(group, category)}>
-				<div class="fraction">
-					<p>{Math.round(amount)}</p>
-					<div class="bar" />
-					<p>{Math.round(parseFloat(category.value ?? 0))}</p>
-				</div>
+				<p class="fraction">{Math.round(parseFloat(category.value ?? 0))}</p>
 				<Progress vertical={true} max={parseFloat(category.value ?? 0)} value={amount} gradient={gradient(category)} />
+				<p class="fraction">{Math.round(amount)}</p>
 				{ #if category.emoji }
 					<p class="emoji">{category.emoji}</p>
 				{ :else }
@@ -83,22 +80,8 @@
 	}
 
 	.fraction {
-		width: 2rem;
-		display: flex;
-		flex-flow: column;
-		align-items: stretch;
-	}
-
-	.fraction p {
 		font-size: 0.75rem;
-		text-align: center;
-	}
-
-	.fraction .bar {
-		height: 0.0625rem;
-		margin: 0 0.375rem;
-		background: var(--accent-0);
-		border-radius: 1rem;
+		font-weight: 500;
 	}
 
 	.emoji {
