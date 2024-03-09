@@ -160,9 +160,9 @@
 	</div>
 	<div class="graph">
 		<Graph>
-			<Gradient name={'test'} />
+			<Gradient name={'gradient'} />
 			<Line values={[0]} center={0.5} style={'stroke: var(--text-bg); stroke-dasharray: 5 7;'} />
-			<Line values={detail} pad={31} blanks={date.getMonth() === new Date().getMonth() ? true : false} center={0.5} multiplier={0.5} style={'stroke: url(#test);'} />
+			<Line values={detail} pad={31} blanks={date.getMonth() === new Date().getMonth() ? true : false} center={0.5} multiplier={0.5} style={'stroke: url(#gradient);'} />
 			<Grid chunks={{ x: count(date) }} style={'stroke: var(--text-bg); stroke-dasharray: 5 7;'} on:enter={click} on:leave={() => leave()} on:click={e => click(e, true)} />
 		</Graph>
 		<Context bind:menu={info.detail} bind:open={info.open} on:close={e => (e && info.target && info.target !== e.detail) && leave(true)} />
