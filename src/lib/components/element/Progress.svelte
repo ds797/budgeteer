@@ -23,7 +23,7 @@
 
 <main class:vertical={vertical} style="{vertical ? 'width' : 'height'}: {0 < max ? '0.5rem' : '0.125rem'};">
 	{ #if 0 < max }
-		<div style='{vertical ? 'bottom' : 'left'}: 0; {vertical ? 'width' : 'height'}: 100%; {vertical ? 'height' : 'width'}: {$current / $maximum * 100}%; background: {gradient[Math.floor(clamp($current / $maximum, { max: 1 }) * (gradient.length - 1))]};' />
+		<div style='{vertical ? 'bottom' : 'left'}: 0; {vertical ? 'width' : 'height'}: 100%; {vertical ? 'height' : 'width'}: {$current / $maximum * 100}%; background: {gradient[Math.floor(clamp($current / $maximum, { max: 1 - Number.EPSILON }) * gradient.length)]};' />
 	{ /if }
 </main>
 
