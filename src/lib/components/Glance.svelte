@@ -48,8 +48,8 @@
 
 	let spending = {}
 
-	$: spending.current = $links.get.sum(t => t.amount < 0 && currentMonth(toDate(t.date), date) && (thisMonth ? toDate(t.date).getTime() <= date.getTime() : true))
-	$: spending.previous = $links.get.sum(t => t.amount < 0 && currentMonth(toDate(t.date), new Date(new Date(date).setMonth(date.getMonth() - 1))) && (thisMonth ? toDate(t.date).getTime() <= new Date(new Date(date).setMonth(date.getMonth() - 1)).getTime() : true))
+	$: spending.current = $links.get.sum(t => t.amount < 0 && !t.properties.hide && currentMonth(toDate(t.date), date) && (thisMonth ? toDate(t.date).getTime() <= date.getTime() : true))
+	$: spending.previous = $links.get.sum(t => t.amount < 0 && !t.properties.hide && currentMonth(toDate(t.date), new Date(new Date(date).setMonth(date.getMonth() - 1))) && (thisMonth ? toDate(t.date).getTime() <= new Date(new Date(date).setMonth(date.getMonth() - 1)).getTime() : true))
 	$: $current = Math.abs(spending.current)
 	$: $previous = Math.abs(spending.previous)
 
