@@ -21,7 +21,7 @@
 	$: $current = clamp(value, { min: 0, max })
 </script>
 
-<main class:vertical={vertical} style="{vertical ? 'width' : 'height'}: {0 < max ? '0.5rem' : '0.125rem'};">
+<main class:vertical={vertical} style="{vertical ? 'width' : 'height'}: {0 < max ? '0.5rem' : '0.125rem'}; {0 < max ? `min-${vertical ? 'height' : 'width'}: 3rem;` : ''}">
 	{ #if 0 < max }
 		<div style='{vertical ? 'bottom' : 'left'}: 0; {vertical ? 'width' : 'height'}: 100%; {vertical ? 'height' : 'width'}: {$current / $maximum * 100}%; background: {gradient[Math.floor(clamp($current / $maximum, { max: 1 - Number.EPSILON }) * gradient.length)]};' />
 	{ /if }
@@ -31,7 +31,6 @@
 	main {
 		flex: 1;
 		position: relative;
-		min-width: 3rem;
 		width: 100%;
 		height: 0.5rem;
 		flex-flow: row;
@@ -47,8 +46,6 @@
 	}
 
 	.vertical {
-		min-width: unset;
-		min-height: 3rem;
 		height: 100%;
 		width: 0.5rem;
 	}
