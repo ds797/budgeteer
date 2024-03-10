@@ -41,7 +41,7 @@
 
 	const gradient = category => {
 		return category.spend
-		? ['var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
+		? ['var(--text-good)', 'var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
 		: ['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']
 
 	}
