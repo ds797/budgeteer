@@ -110,7 +110,6 @@
 			<Progress max={parseFloat(category.value ?? 0)} value={progress} gradient={['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']} />
 		</div>
 		<div class="container">
-			<h3>$</h3>
 			<div class="money">
 				<button class="none {$value < 0 ? 'bad' : 'good'}" on:click={() => open = !open} bind:this={node}>{money($value)}</button>
 				<Context bind:menu {open} on:close={e => (e && !node.contains(e.detail)) && (open = false)} tall={node?.offsetHeight ?? 0} />
@@ -147,7 +146,7 @@
 		display: flex;
 		justify-content: space-evenly;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
 	}
 
 	.row {
@@ -170,7 +169,6 @@
 	}
 
 	.money {
-		min-width: 4.5rem;
 		margin-right: 0.5rem;
 		display: flex;
 		flex-flow: column;
