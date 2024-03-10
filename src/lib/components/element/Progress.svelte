@@ -38,6 +38,7 @@
 		align-items: stretch;
 		background: var(--text-bg);
 		border-radius: 1rem;
+		overflow: hidden;
 	}
 
 	div {
