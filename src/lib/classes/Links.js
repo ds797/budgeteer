@@ -169,22 +169,10 @@ export default class Links {
 						protected: true
 					}]
 				}
-			},
-			link: () => {
-				return {
-					id: uuidv4(),
-					accounts: [{
-						account_id: uuidv4(),
-						balances: { available: 0 },
-						name: 'Custom Account'
-					}],
-					name: 'Custom',
-					transactions: []
-				}
 			}
 		}
 
-		self.links = obj?.links ?? [self.default.link()]
+		self.links = obj?.links ?? []
 		self.budgets = obj?.budgets ?? [self.default.budget()]
 		self.investments = obj?.investments
 		self.selected = obj?.selected ?? self.budgets[0]
@@ -449,9 +437,7 @@ export default class Links {
 		self.set = {
 			links: links => {
 				self.links = []
-				const index = links.findIndex(l => !l.institution)
-				if (index === -1) links.push(self.default.link())
-				else links.push(links.splice(index, 1)[0])
+
 				self.add.link(...links)
 
 				return self

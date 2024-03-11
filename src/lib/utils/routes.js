@@ -89,11 +89,8 @@ const conflicts = ($links, group, category) => {
 
 	return categories
 }
-const sort = ($links) => {
-	const index = $links.links.findIndex(l => !l.institution)
-	if (index === -1) $links.links.push($links.default.link())
-	else $links.links.push($links.links.splice(index, 1)[0])
-
+const sort = $links => {
+	// TODO: How should we sort links?
 	return $links.links
 }
 
@@ -110,9 +107,9 @@ export const update = {
 		if ($route.current === $route.transaction) {
 			$route.state.choose.category = $route.state.transaction.new.properties
 			$route.state.choose.category.hint = 'Category'
-			$route.state.account = $route.state.transaction.new
-			$route.state.account.hint = 'Account'
-			$route.state.account.enabled = [...$links.selected.accounts.filter(id => $links.links.find(l => !l.institution).accounts.find(a => a.account_id === id))]
+			$route.state.choose.account = $route.state.transaction.new
+			$route.state.choose.account.hint = 'Account'
+			$route.state.choose.account.enabled = [...$links.selected.accounts]
 		}
 
 		$route.transaction.name = $route.state.transaction.id	? 'Edit Transaction' : 'Add Transaction'
@@ -156,7 +153,7 @@ export const update = {
 			}
 			delete $route.state.transaction.new
 		}
-		$route.transaction.children = [$route.choose.category, $route.account, {
+		$route.transaction.children = [$route.choose.category, $route.choose.account, {
 			name: 'Name',
 			type: 'input',
 			placeholder: 'Transaction Name',
@@ -427,8 +424,8 @@ export const update = {
 			let any = false
 
 			$route.choose.account.hint = $route.state.choose.account.hint
-			$route.choose.account.name = $links.get.parent($route.state.choose.account.account)?.name ?? 'Select Account'
-			$route.choose.account.fill = $route.state.choose.account.account
+			$route.choose.account.name = $links.get.parent($route.state.choose.account.account)?.name ?? 'Other'
+			$route.choose.account.fill = true
 			$route.choose.account.children = [...$links.links.map(l => {
 				if (($route.state.choose.account.disabled ?? []).find(id => id === l.id)) return {}
 				if ($route.state.choose.account.enabled && !$route.state.choose.account.enabled.find(id => l.accounts.find(a => a.account_id === id))) return {}
@@ -460,7 +457,16 @@ export const update = {
 						}
 					}]
 				}
-			})]
+			}), {
+				name: 'Other',
+				type: 'action',
+				fill: $route.state.choose.account.account === undefined,
+				click: () => {
+					$route.state.choose.account.account = undefined
+					route.set($route)
+					return 1
+				}
+			}]
 			if (!any)
 				$route.choose.account.children = [{
 					name: 'Select Links',
