@@ -92,6 +92,12 @@
 		}]
 	}
 
+	const gradient = category => {
+		return category.spend
+		? ['var(--text-good)', 'var(--text-good)', 'var(--text-okay)', 'var(--text-bad)']
+		: ['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']
+	}
+
 	let open = false
 </script>
 
@@ -107,7 +113,7 @@
 			</button>
 		</div>
 		<div class="progress">
-			<Progress max={parseFloat(category.value ?? 0)} value={progress} gradient={['var(--text-bad)', 'var(--text-okay)', 'var(--text-good)']} />
+			<Progress max={parseFloat(category.value ?? 0)} value={progress} gradient={gradient(category)} />
 		</div>
 		<div class="container">
 			<div class="money">
