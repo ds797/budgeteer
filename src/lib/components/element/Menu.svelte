@@ -291,6 +291,7 @@
 	.account > .label {
 		margin: 0 0.25rem;
 		display: flex;
+		gap: 0.5rem;
 	}
 
 	.label > .name {
