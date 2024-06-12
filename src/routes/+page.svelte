@@ -2,6 +2,11 @@
 	import BillStack from '$lib/components/BillStack.svelte'
 </script>
 
+<svelte:head>
+	<title>Budgeteer</title>
+	<meta name="description" content="Next-gen financing for all." />
+</svelte:head>
+
 <div class="info" style="">
 	<h1 class="hero">Budgeteer</h1>
 	<p class="big">Budgeting without the bloat.</p>
