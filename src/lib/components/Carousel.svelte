@@ -3,22 +3,22 @@
 	import { slide } from "$lib/utils/transition";
 
 	let options = ['categorize', 'budget', 'invest', 'save']
+	let colors = [5, 100, 200, 300]
 
 	let showing = 0;
-
-	const color = i => i / (options.length - 1)
 
 	onMount(() => {
 		setInterval(() => {
 			showing++;
+			showing %= options.length;
 		}, 2000);
 	})
 </script>
 
 <div>
 	{ #each options as option, i }
-		{ #if showing % options.length === i }
-			<span style='color: hsl({color(i) * 255} 60% 50%);' transition:slide>{option}.</span>
+		{ #if showing === i }
+			<span style='color: hsl({colors[i]} 60% 55%);' transition:slide>{option}.</span>
 		{ /if }
 	{ /each }
 	<span class='width'>{options[0]}.</span>
